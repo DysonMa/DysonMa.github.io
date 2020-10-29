@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="markdown語法相當好用，不僅輕鬆省去排版的煩惱，也支援相當多的文件撰寫，是一個不能錯過的好東西，所以一定要把它好好的學起來，為了避免未來忘記markdown語法，所以寫了這篇文章來記錄一下~">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Markdown語法整理">
+<meta property="og:url" content="https://dysonma.github.io/2020/10/29/Markdown%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="markdown語法相當好用，不僅輕鬆省去排版的煩惱，也支援相當多的文件撰寫，是一個不能錯過的好東西，所以一定要把它好好的學起來，為了避免未來忘記markdown語法，所以寫了這篇文章來記錄一下~">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://markdown.tw/images/208x128.png">
+<meta property="og:image" content="https://markdown.tw/images/208x128.png">
+<meta property="article:published_time" content="2020-10-29T15:48:50.000Z">
+<meta property="article:modified_time" content="2020-10-29T15:53:12.497Z">
+<meta property="article:author" content="Madi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://markdown.tw/images/208x128.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/10/29/Markdown%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>Markdown語法整理 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/29/Markdown%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Madi">
+      <meta itemprop="description" content="學習新知識，紀錄學習筆記">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Markdown語法整理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-10-29 23:48:50 / 修改時間：23:53:12" itemprop="dateCreated datePublished" datetime="2020-10-29T23:48:50+08:00">2020-10-29</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>markdown語法相當好用，不僅輕鬆省去排版的煩惱，也支援相當多的文件撰寫，是一個不能錯過的好東西，所以一定要把它好好的學起來，為了避免未來忘記markdown語法，所以寫了這篇文章來記錄一下~</p>
+<a id="more"></a>
+
+<h2 id="標題"><a href="#標題" class="headerlink" title="標題"></a>標題</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># H1</span><br><span class="line">## H2</span><br><span class="line">### H3</span><br><span class="line">#### H4</span><br><span class="line">##### H5</span><br><span class="line">###### H6</span><br><span class="line">H1,H2有另一種寫法</span><br><span class="line">(任何數量的&#x3D;,-都可以)</span><br><span class="line"></span><br><span class="line">H1</span><br><span class="line">&#x3D;&#x3D;&#x3D;</span><br><span class="line">H2</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h1 id="H1"><a href="#H1" class="headerlink" title="H1"></a>H1</h1><h2 id="H2"><a href="#H2" class="headerlink" title="H2"></a>H2</h2><h3 id="H3"><a href="#H3" class="headerlink" title="H3"></a>H3</h3><h4 id="H4"><a href="#H4" class="headerlink" title="H4"></a>H4</h4><h5 id="H5"><a href="#H5" class="headerlink" title="H5"></a>H5</h5><h6 id="H6"><a href="#H6" class="headerlink" title="H6"></a>H6</h6><h1 id="H1-1"><a href="#H1-1" class="headerlink" title="H1"></a>H1</h1><h2 id="H2-1"><a href="#H2-1" class="headerlink" title="H2"></a>H2</h2></blockquote>
+<h2 id="強調語法"><a href="#強調語法" class="headerlink" title="強調語法"></a>強調語法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*斜體*</span><br><span class="line">**粗體**</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><em>斜體</em><br><strong>粗體</strong></p>
+</blockquote>
+<h2 id="清單"><a href="#清單" class="headerlink" title="清單"></a>清單</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">* 無序列表</span><br><span class="line">- 無序列表</span><br><span class="line">+ 無序列表</span><br><span class="line">(以上三者同樣效果)</span><br><span class="line"></span><br><span class="line">1.有序列表</span><br><span class="line">2.有序列表</span><br><span class="line">5.有序列表</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>無序列表</li>
+</ul>
+<ul>
+<li>無序列表</li>
+</ul>
+<ul>
+<li>無序列表</li>
+</ul>
+<ol>
+<li>有序列表</li>
+<li>有序列表</li>
+<li>有序列表</li>
+</ol>
+</blockquote>
+<p>即使有序列表沒有照順序，ex:1,2,5，也不會出錯，因為markdown預設轉成html會是有序的，所以顯示結果仍是1,2,3。</p>
+<h2 id="超連結"><a href="#超連結" class="headerlink" title="超連結"></a>超連結</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[超連結文字](網址)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[網址] (https:&#x2F;&#x2F;www.google.com)</span><br><span class="line"></span><br><span class="line">[有標題的網址](https:&#x2F;&#x2F;www.google.com,&quot;Google&#39;s Homepage&quot;)</span><br><span class="line">&#x2F;&#x2F; 滑鼠放在連結上會顯示 Google&#39;s Homepage</span><br><span class="line"></span><br><span class="line">[youtube]: https:&#x2F;&#x2F;www.youtube.com</span><br><span class="line">&#x2F;&#x2F;不加括號</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.google.com/">Google</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.google.com/" title="Google&#39;s Homepage">滑鼠滑過有標題的Google</a></p>
+<p>youtube: <a target="_blank" rel="noopener" href="https://www.youtube.com/">https://www.youtube.com</a></p>
+</blockquote>
+<h2 id="圖片"><a href="#圖片" class="headerlink" title="圖片"></a>圖片</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![圖片無法顯示時的文字]&gt;(圖片網址)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">行內格式:</span><br><span class="line">![NoImg](https:&#x2F;&#x2F;markdown.tw&#x2F;images&#x2F;208x128.png &quot;markdown&quot;)</span><br><span class="line"></span><br><span class="line">參考連結格式:</span><br><span class="line">![NoImg][logo]</span><br><span class="line"></span><br><span class="line">[logo]: https:&#x2F;&#x2F;markdown.tw&#x2F;images&#x2F;208x128.png &quot;markdown&quot;</span><br></pre></td></tr></table></figure>
+<p><img src="https://markdown.tw/images/208x128.png" alt="NoImg" title="markdown"></p>
+<p><img src="https://markdown.tw/images/208x128.png" alt="NoImg" title="markdown"></p>
+<h2 id="code"><a href="#code" class="headerlink" title="code"></a>code</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">行內: &#96;code&#96;</span><br><span class="line"></span><br><span class="line">段落: 用成對的三個&#96;&#96;&#96;包起來</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>code</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;code段落</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h2 id="表格"><a href="#表格" class="headerlink" title="表格"></a>表格</h2><blockquote>
+<p>冒號（Colons）是用來對齊的<br><strong>擺左齊左、擺右齊右，都擺就置中</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">UberEats | FoodPanda   | 有無外送</span><br><span class="line">---------|:-----------:|--------:</span><br><span class="line">&#96;免運費&#96;  |*食物熊貓*    |少見</span><br><span class="line">街口支付  |**line Pay** |阿災</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>UberEats</th>
+<th align="center">FoodPanda</th>
+<th align="right">有無外送</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>免運費</code></td>
+<td align="center"><em>食物熊貓</em></td>
+<td align="right">少見</td>
+</tr>
+<tr>
+<td>街口支付</td>
+<td align="center"><strong>line Pay</strong></td>
+<td align="right">阿災</td>
+</tr>
+</tbody></table>
+<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;引言</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>這是一段引言</p>
+</blockquote>
+<h2 id="行內HTML"><a href="#行內HTML" class="headerlink" title="行內HTML"></a>行內HTML</h2><p>因為Markdown 本來就預設要轉換成 HTML 網頁格式，所以當然可以直接寫入正確的 HTML 代碼</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;table&gt;</span><br><span class="line">&lt;tr&gt;&lt;th&gt;標題&lt;&#x2F;th&gt;&lt;&#x2F;tr&gt;</span><br><span class="line">&lt;tr&gt;&lt;td&gt;欄位一&lt;&#x2F;td&gt;</span><br><span class="line">&lt;&#x2F;tr&gt;</span><br><span class="line">&lt;tr&gt;&lt;td&gt;欄位二&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;</span><br><span class="line">&lt;&#x2F;table&gt;</span><br></pre></td></tr></table></figure>
+
+<table>
+<tr><th>標題</th></tr>
+<tr><td>欄位一</td>
+</tr>
+<tr><td>欄位二</td></tr>
+</table>
+
+<h2 id="水平分隔線"><a href="#水平分隔線" class="headerlink" title="水平分隔線"></a>水平分隔線</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">三個或三個以上的符號，必須在獨立的一行，前後不能有其他文字。</span><br><span class="line">---</span><br><span class="line">短橫線</span><br><span class="line">***</span><br><span class="line">半形星號</span><br><span class="line">___</span><br><span class="line">下底線</span><br></pre></td></tr></table></figure>
+<blockquote>
+<hr>
+<p>上面是短橫線</p>
+<hr>
+<p>上面是半形星號</p>
+<hr>
+<p>上面是下底線</p>
+</blockquote>
+<h2 id="空行分隔段落"><a href="#空行分隔段落" class="headerlink" title="空行分隔段落"></a>空行分隔段落</h2><blockquote>
+<p>基本上<strong>空行</strong>代表前後的文字都會是段落（在 HTML 中以 <code>&lt;p&gt;</code> 與 <code>&lt;/p&gt;</code> 包裹起來）。</p>
+</blockquote>
+<h2 id="代辦事項"><a href="#代辦事項" class="headerlink" title="代辦事項"></a>代辦事項</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- [ ] 代辦事項</span><br><span class="line">- [x] 已完成事項</span><br></pre></td></tr></table></figure>
+<ul>
+<li><input disabled="" type="checkbox"> 代辦事項</li>
+<li><input checked="" disabled="" type="checkbox"> 已完成事項</li>
+</ul>
+<h2 id="列表縮進"><a href="#列表縮進" class="headerlink" title="列表縮進"></a>列表縮進</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">: 縮排</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">心得</span><br><span class="line">: 好想打球RRR</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<dl><dt>心得</dt><dd>好想打球RRR</dd></dl></blockquote>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@des75421/markdown-%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-54210976fad1">markdown語法整理</a></li>
+<li><a target="_blank" rel="noopener" href="https://wastemobile.gitbooks.io/gitbook-chinese/content/format/markdown.html">gitbook Markdown</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/29/Anaconda%E8%99%9B%E6%93%AC%E7%92%B0%E5%A2%83%E5%BB%BA%E7%AB%8B/" rel="prev" title="Anaconda虛擬環境建立">
+      <i class="fa fa-chevron-left"></i> Anaconda虛擬環境建立
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/29/Python%E8%BC%B8%E5%87%BAor%E8%AE%80%E5%8F%96%E7%9A%84%E4%BA%82%E7%A2%BC%E5%95%8F%E9%A1%8C/" rel="next" title="Python輸出or讀取的亂碼問題">
+      Python輸出or讀取的亂碼問題 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%99%E9%A1%8C"><span class="nav-number">1.</span> <span class="nav-text">標題</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#H1"><span class="nav-number"></span> <span class="nav-text">H1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#H2"><span class="nav-number">1.</span> <span class="nav-text">H2</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#H3"><span class="nav-number">1.1.</span> <span class="nav-text">H3</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#H4"><span class="nav-number">1.1.1.</span> <span class="nav-text">H4</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#H5"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">H5</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#H6"><span class="nav-number">1.1.1.1.1.</span> <span class="nav-text">H6</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#H1-1"><span class="nav-number"></span> <span class="nav-text">H1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#H2-1"><span class="nav-number">1.</span> <span class="nav-text">H2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%B7%E8%AA%BF%E8%AA%9E%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">強調語法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%85%E5%96%AE"><span class="nav-number">3.</span> <span class="nav-text">清單</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B6%85%E9%80%A3%E7%B5%90"><span class="nav-number">4.</span> <span class="nav-text">超連結</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%96%E7%89%87"><span class="nav-number">5.</span> <span class="nav-text">圖片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#code"><span class="nav-number">6.</span> <span class="nav-text">code</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A8%E6%A0%BC"><span class="nav-number">7.</span> <span class="nav-text">表格</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">8.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%8C%E5%85%A7HTML"><span class="nav-number">9.</span> <span class="nav-text">行內HTML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B0%B4%E5%B9%B3%E5%88%86%E9%9A%94%E7%B7%9A"><span class="nav-number">10.</span> <span class="nav-text">水平分隔線</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A9%BA%E8%A1%8C%E5%88%86%E9%9A%94%E6%AE%B5%E8%90%BD"><span class="nav-number">11.</span> <span class="nav-text">空行分隔段落</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E8%BE%A6%E4%BA%8B%E9%A0%85"><span class="nav-number">12.</span> <span class="nav-text">代辦事項</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%97%E8%A1%A8%E7%B8%AE%E9%80%B2"><span class="nav-number">13.</span> <span class="nav-text">列表縮進</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">14.</span> <span class="nav-text">參考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Madi</p>
+  <div class="site-description" itemprop="description">學習新知識，紀錄學習筆記</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Madi</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

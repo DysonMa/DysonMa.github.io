@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="什麼是Numpy? Python中有很多套件可以使用，numpy是最常用的其中之一，擅長處理數據計算，舉凡是矩陣、陣列、多重維度的計算都可以透過numpy這個套件來完成，它的底層是以C和Fortran來實作，所以運算速度更快，也具備平行處理的能力，可以將操作動作一次套用在大型陣列上，與其他重量級套件(如:pandas,SciPy,Scikit-Learn)共同組成資料科學的堅強後盾。  為了避免未">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Numpy常用語法整理">
+<meta property="og:url" content="https://dysonma.github.io/2020/10/29/Numpy%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="什麼是Numpy? Python中有很多套件可以使用，numpy是最常用的其中之一，擅長處理數據計算，舉凡是矩陣、陣列、多重維度的計算都可以透過numpy這個套件來完成，它的底層是以C和Fortran來實作，所以運算速度更快，也具備平行處理的能力，可以將操作動作一次套用在大型陣列上，與其他重量級套件(如:pandas,SciPy,Scikit-Learn)共同組成資料科學的堅強後盾。  為了避免未">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/TDyFswG.png">
+<meta property="article:published_time" content="2020-10-29T15:59:42.000Z">
+<meta property="article:modified_time" content="2020-10-29T16:09:05.520Z">
+<meta property="article:author" content="Madi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/TDyFswG.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/10/29/Numpy%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>Numpy常用語法整理 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/29/Numpy%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Madi">
+      <meta itemprop="description" content="學習新知識，紀錄學習筆記">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Numpy常用語法整理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-10-29 23:59:42" itemprop="dateCreated datePublished" datetime="2020-10-29T23:59:42+08:00">2020-10-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-10-30 00:09:05" itemprop="dateModified" datetime="2020-10-30T00:09:05+08:00">2020-10-30</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="什麼是Numpy"><a href="#什麼是Numpy" class="headerlink" title="什麼是Numpy?"></a>什麼是Numpy?</h2><blockquote>
+<p>Python中有很多套件可以使用，numpy是最常用的其中之一，<strong>擅長處理數據計算，舉凡是矩陣、陣列、多重維度的計算</strong>都可以透過numpy這個套件來完成，它的底層是以C和Fortran來實作，所以運算速度更快，也具備平行處理的能力，可以將操作動作一次套用在大型陣列上，與其他重量級套件(如:pandas,SciPy,Scikit-Learn)共同組成資料科學的堅強後盾。</p>
+</blockquote>
+<p>為了避免未來忘記numpy的語法，將一些常用到的語法記錄下來以供未來查閱~</p>
+<a id="more"></a>
+<hr>
+<h2 id="Numpy基本語法"><a href="#Numpy基本語法" class="headerlink" title="Numpy基本語法"></a>Numpy基本語法</h2><p><code>import numpy as np</code></p>
+<h3 id="基本建立矩陣"><a href="#基本建立矩陣" class="headerlink" title="基本建立矩陣:"></a>基本建立矩陣:</h3><blockquote>
+<p>np.array( [元素1,元素2..] )</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">demo &#x3D; np.array([1,2,3])</span><br><span class="line"></span><br><span class="line">array([1, 2, 3])</span><br></pre></td></tr></table></figure>
+<h3 id="最大值-最小值"><a href="#最大值-最小值" class="headerlink" title="最大值/最小值:"></a>最大值/最小值:</h3><blockquote>
+<p>陣列.max()/陣列.min()</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">demo.max() &#x2F;&#x2F;3</span><br><span class="line">demo.min() &#x2F;&#x2F;1</span><br></pre></td></tr></table></figure>
+<h3 id="最大值-最小值對應的index"><a href="#最大值-最小值對應的index" class="headerlink" title="最大值/最小值對應的index:"></a>最大值/最小值對應的index:</h3><blockquote>
+<p>argmax()/argmin()</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">demo.argmax() &#x2F;&#x2F;2</span><br><span class="line">demo.argmin() &#x2F;&#x2F;0</span><br></pre></td></tr></table></figure>
+<h3 id="轉置"><a href="#轉置" class="headerlink" title="轉置"></a>轉置</h3><blockquote>
+<p>陣列.T </p>
+<p>此方法僅二維以上矩陣有效果</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">demo &#x3D; np.array([[1,2,3],[4,5,6])</span><br><span class="line"></span><br><span class="line">array([[1, 2, 3],</span><br><span class="line">       [4, 5, 6]])</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">demo.T </span><br><span class="line"></span><br><span class="line">array([[1, 4],</span><br><span class="line">       [2, 5],</span><br><span class="line">       [3, 6]])</span><br></pre></td></tr></table></figure>
+<h3 id="一維陣列轉置"><a href="#一維陣列轉置" class="headerlink" title="一維陣列轉置"></a>一維陣列轉置</h3><blockquote>
+<p>一維陣列轉置得靠newaxis</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">demo &#x3D; np.array([1,2,3])</span><br><span class="line"></span><br><span class="line">array([1, 2, 3])</span><br></pre></td></tr></table></figure>
+<p><strong>陣列[ : , np.newaxis]</strong></p>
+<blockquote>
+<p>在<code>col</code>方向增加維度</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a[:,np.newaxis]</span><br><span class="line"></span><br><span class="line">array([[1],</span><br><span class="line">       [2],</span><br><span class="line">       [3]])</span><br></pre></td></tr></table></figure>
+<p><strong>陣列[np.newaxis , : ]</strong></p>
+<blockquote>
+<p>在<code>row</code>方向增加維度</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a[np.newaxis,:]</span><br><span class="line"></span><br><span class="line">array([[1, 2, 3]])</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-建立值全部都一樣的陣列"><a href="#1-建立值全部都一樣的陣列" class="headerlink" title="1. 建立值全部都一樣的陣列"></a>1. 建立值全部都一樣的陣列</h2><h3 id="zeros-shape-dtype"><a href="#zeros-shape-dtype" class="headerlink" title="zeros(shape,dtype)"></a>zeros(shape,dtype)</h3><blockquote>
+<p>產生一個全部為零的陣列</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">np.zeros(10,dtype&#x3D;int)</span><br><span class="line"></span><br><span class="line">array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</span><br></pre></td></tr></table></figure>
+<h3 id="ones-shape-dtype"><a href="#ones-shape-dtype" class="headerlink" title="ones(shape,dtype)"></a>ones(shape,dtype)</h3><blockquote>
+<p>產生一個全部為1的陣列</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">np.ones((2,4),dtype&#x3D;float)</span><br><span class="line"></span><br><span class="line">array([[1., 1., 1., 1.],</span><br><span class="line">       [1., 1., 1., 1.]])</span><br></pre></td></tr></table></figure>
+<h3 id="empty-shape-dtype"><a href="#empty-shape-dtype" class="headerlink" title="empty(shape,dtype)"></a>empty(shape,dtype)</h3><blockquote>
+<p>產生一個無初始值的陣列</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">np.empty((2,3))</span><br><span class="line">array([[6.23042070e-307, 1.33512376e-306, 1.11261230e-306],</span><br><span class="line">       [7.56577399e-307, 9.34600963e-307, 5.63234836e-322]])</span><br></pre></td></tr></table></figure>
+<h3 id="full-shape-N"><a href="#full-shape-N" class="headerlink" title="full(shape,N)"></a>full(shape,N)</h3><blockquote>
+<p>產生一個填滿N值的陣列</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">np.full((3,5),2)</span><br><span class="line"></span><br><span class="line">array([[2, 2, 2, 2, 2],</span><br><span class="line">       [2, 2, 2, 2, 2],</span><br><span class="line">       [2, 2, 2, 2, 2]])</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-建立等差數列"><a href="#2-建立等差數列" class="headerlink" title="2. 建立等差數列"></a>2. 建立等差數列</h2><h3 id="arange-start-stop-step-dtype"><a href="#arange-start-stop-step-dtype" class="headerlink" title="arange(start,stop,step,dtype)"></a>arange(start,stop,step,dtype)</h3><blockquote>
+<p>step為等差值,可為float</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">np.arange(-2,10,2, dtype&#x3D;int)</span><br><span class="line"></span><br><span class="line">array([-2,  0,  2,  4,  6,  8])</span><br></pre></td></tr></table></figure>
+<h3 id="linspace-start-stop-num"><a href="#linspace-start-stop-num" class="headerlink" title="linspace(start,stop,num)"></a>linspace(start,stop,num)</h3><blockquote>
+<p>num為陣列大小，均分成幾等分</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">np.linspace(0,10,5)</span><br><span class="line"></span><br><span class="line">array([ 0. ,  2.5,  5. ,  7.5, 10. ])</span><br></pre></td></tr></table></figure>
+<h2 id="3-建立0-1的隨機數列"><a href="#3-建立0-1的隨機數列" class="headerlink" title="3. 建立0~1的隨機數列"></a>3. 建立0~1的隨機數列</h2><h3 id="random-random-size"><a href="#random-random-size" class="headerlink" title="random.random(size)"></a>random.random(size)</h3><h3 id="random-ranf-size"><a href="#random-ranf-size" class="headerlink" title="random.ranf(size)"></a>random.ranf(size)</h3><h3 id="random-sample-size"><a href="#random-sample-size" class="headerlink" title="random.sample(size)"></a>random.sample(size)</h3><blockquote>
+<p>這三個方法效果一樣</p>
+<p>建立一個size大小，0~1之間取亂數的陣列</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">random.random((3,3))</span><br><span class="line"></span><br><span class="line">array([[0.66540127, 0.99804437, 0.56816777],</span><br><span class="line">       [0.59407879, 0.84882381, 0.22005514],</span><br><span class="line">       [0.84257899, 0.91811251, 0.74945698]])</span><br></pre></td></tr></table></figure>
+<h2 id="4-建立常態分布-高斯分布-的隨機陣列"><a href="#4-建立常態分布-高斯分布-的隨機陣列" class="headerlink" title="4. 建立常態分布(高斯分布)的隨機陣列"></a>4. 建立常態分布(高斯分布)的隨機陣列</h2><h3 id="random-normal-loc-scale-size"><a href="#random-normal-loc-scale-size" class="headerlink" title="random.normal(loc, scale, size)"></a>random.normal(loc, scale, size)</h3><blockquote>
+<p>loc: 平均值<br>scale: 標準差<br>size: 陣列大小</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">np.random.normal(3,2,5)</span><br><span class="line"></span><br><span class="line">array([-0.65926963,  4.881109  ,  5.16259178,  2.49724803,  3.84526978])</span><br></pre></td></tr></table></figure>
+<h2 id="5-建立隨機整數陣列"><a href="#5-建立隨機整數陣列" class="headerlink" title="5. 建立隨機整數陣列"></a>5. 建立隨機整數陣列</h2><h3 id="random-randint-low-high-size"><a href="#random-randint-low-high-size" class="headerlink" title="random.randint(low, high, size)"></a>random.randint(low, high, size)</h3><blockquote>
+<p>low: 最小值<br>high: 最大值<br>size: 陣列大小</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">np.random.randint(0,10,(3,3))</span><br><span class="line"></span><br><span class="line">array([[7, 5, 9],</span><br><span class="line">       [2, 9, 1],</span><br><span class="line">       [6, 7, 8]])</span><br></pre></td></tr></table></figure>
+<h2 id="6-陣列屬性"><a href="#6-陣列屬性" class="headerlink" title="6.陣列屬性"></a>6.陣列屬性</h2><p>先隨機建立一個陣列demo</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">demo &#x3D; np.random.randint(0,10,(2,3))</span><br><span class="line"></span><br><span class="line">array([[3, 3, 9],</span><br><span class="line">       [7, 9, 9]])</span><br></pre></td></tr></table></figure>
+<h3 id="ndim"><a href="#ndim" class="headerlink" title="ndim"></a>ndim</h3><blockquote>
+<p>陣列的維度數量</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">demo.ndim</span><br><span class="line">3</span><br></pre></td></tr></table></figure>
+<h3 id="size"><a href="#size" class="headerlink" title="size"></a>size</h3><blockquote>
+<p>陣列的元素數量</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">demo.size</span><br><span class="line">6</span><br></pre></td></tr></table></figure>
+<h3 id="shape"><a href="#shape" class="headerlink" title="shape"></a>shape</h3><blockquote>
+<p>陣列的形狀</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">demo.shape</span><br><span class="line">(2,3)</span><br></pre></td></tr></table></figure>
+<h3 id="dtype"><a href="#dtype" class="headerlink" title="dtype"></a>dtype</h3><blockquote>
+<p>陣列的資料型態</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">demo.dtype</span><br><span class="line">dtype(&#39;int32&#39;)</span><br></pre></td></tr></table></figure>
+<h2 id="7-陣列切片-Slice"><a href="#7-陣列切片-Slice" class="headerlink" title="7. 陣列切片(Slice)"></a>7. 陣列切片(Slice)</h2><p>先隨機建立一個陣列demo</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">demo &#x3D; np.random.randint(0,10,(3,3))</span><br><span class="line"></span><br><span class="line">array([[0, 7, 6],</span><br><span class="line">       [8, 4, 4],</span><br><span class="line">       [8, 5, 7]])</span><br></pre></td></tr></table></figure>
+<h3 id="陣列-row-col"><a href="#陣列-row-col" class="headerlink" title="陣列[row,col]"></a>陣列[row,col]</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">demo[1,2]</span><br><span class="line">4</span><br></pre></td></tr></table></figure>
+<h3 id="陣列-N"><a href="#陣列-N" class="headerlink" title="陣列[:,N]"></a>陣列[:,N]</h3><blockquote>
+<p>取陣列第N行</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">demo[:,1]</span><br><span class="line"></span><br><span class="line">array([7, 4, 5])</span><br></pre></td></tr></table></figure>
+<h3 id="陣列-N-1"><a href="#陣列-N-1" class="headerlink" title="陣列[N,:]"></a>陣列[N,:]</h3><blockquote>
+<p>取陣列第N列</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">demo[2,:]</span><br><span class="line"></span><br><span class="line">array([8, 5, 7])</span><br></pre></td></tr></table></figure>
+<h3 id="陣列-row1-row2-col1-col2"><a href="#陣列-row1-row2-col1-col2" class="headerlink" title="陣列[row1 : row2, col1 : col2]"></a>陣列[row1 : row2, col1 : col2]</h3><blockquote>
+<p><code>row1:row2</code> 代表取哪幾列<br><code>col1:col2</code> 代表取哪幾行<br><code>:N</code> 預設從0開始數到N-1</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">demo[1:3,:2]</span><br><span class="line"></span><br><span class="line">array([[8, 4],</span><br><span class="line">       [8, 5]])</span><br></pre></td></tr></table></figure>
+<h2 id="8-重塑-reshape"><a href="#8-重塑-reshape" class="headerlink" title="8.重塑(reshape)"></a>8.重塑(reshape)</h2><p>先隨機建立一個陣列</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">demo &#x3D; np.random.randint(0,100,(2,4))</span><br><span class="line"></span><br><span class="line">array([[ 4, 54, 54, 42],</span><br><span class="line">       [93, 12, 96, 69]])</span><br></pre></td></tr></table></figure>
+<h3 id="reshape-row-col"><a href="#reshape-row-col" class="headerlink" title="reshape(row,col)"></a>reshape(row,col)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">demo.reshape(4,2)</span><br><span class="line"></span><br><span class="line">array([[ 4, 54],</span><br><span class="line">       [54, 42],</span><br><span class="line">       [93, 12],</span><br><span class="line">       [96, 69]])</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>當維度數字太醜無法自己換算是幾乘幾的時候，可以採用<code>-1</code>，給程式自己算</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">demo.reshape(-1,8)</span><br><span class="line"></span><br><span class="line">array([[ 4, 54, 54, 42, 93, 12, 96, 69]])</span><br></pre></td></tr></table></figure>
+<h2 id="9-串接"><a href="#9-串接" class="headerlink" title="9. 串接"></a>9. 串接</h2><p>先隨機建立兩個陣列</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">x &#x3D; np.random.randint(0,100,(2,3))</span><br><span class="line"></span><br><span class="line">array([[99,  5, 25],</span><br><span class="line">       [74, 37,  0]])</span><br><span class="line">       </span><br><span class="line">y &#x3D; np.random.randint(0,100,(2,3))</span><br><span class="line"></span><br><span class="line">array([[76, 99,  5],</span><br><span class="line">       [16, 75, 63]])</span><br></pre></td></tr></table></figure>
+<h3 id="concatenate-陣列1-陣列2-陣列3…-axis"><a href="#concatenate-陣列1-陣列2-陣列3…-axis" class="headerlink" title="concatenate( [陣列1,陣列2,陣列3…] ,axis)"></a>concatenate( [陣列1,陣列2,陣列3…] ,axis)</h3><blockquote>
+<p>串接的兩個陣列在<strong>串接的方向上必須是同維度</strong></p>
+</blockquote>
+<p><code>axis=0</code>代表以<code>列</code>方向串接</p>
+<table>
+<thead>
+<tr>
+<th align="center">x</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">y</td>
+</tr>
+</tbody></table>
+<p><code>axis=1</code>代表以<code>行</code>方向串接</p>
+<table>
+<thead>
+<tr>
+<th align="center">x</th>
+<th align="center">y</th>
+</tr>
+</thead>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">np.concatenate([x,y],axis&#x3D;1)</span><br><span class="line"></span><br><span class="line">array([[99,  5, 25, 76, 99,  5],</span><br><span class="line">       [74, 37,  0, 16, 75, 63]])</span><br></pre></td></tr></table></figure>
+<h3 id="vstack-陣列1-陣列2-陣列3…"><a href="#vstack-陣列1-陣列2-陣列3…" class="headerlink" title="vstack( [陣列1,陣列2,陣列3…] )"></a>vstack( [陣列1,陣列2,陣列3…] )</h3><blockquote>
+<p>同 <code>concatenate(axis=0)</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">np.vstack([x,y])</span><br><span class="line"></span><br><span class="line">array([[99,  5, 25],</span><br><span class="line">       [74, 37,  0],</span><br><span class="line">       [76, 99,  5],</span><br><span class="line">       [16, 75, 63]])</span><br></pre></td></tr></table></figure>
+<h3 id="hstack-陣列1-陣列2-陣列3…"><a href="#hstack-陣列1-陣列2-陣列3…" class="headerlink" title="hstack( [陣列1,陣列2,陣列3…] )"></a>hstack( [陣列1,陣列2,陣列3…] )</h3><blockquote>
+<p>同 <code>concatenate(axis=1)</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">np.hstack([x,y])</span><br><span class="line"></span><br><span class="line">array([[99,  5, 25, 76, 99,  5],</span><br><span class="line">       [74, 37,  0, 16, 75, 63]])</span><br></pre></td></tr></table></figure>
+<h2 id="10-分割"><a href="#10-分割" class="headerlink" title="10. 分割"></a>10. 分割</h2><p>先隨機建立一個陣列</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">demo &#x3D; np.random.randint(0,10,(2,6))</span><br><span class="line"></span><br><span class="line">array([[4, 9, 5, 2, 7, 2],</span><br><span class="line">       [2, 5, 0, 8, 4, 9]])</span><br></pre></td></tr></table></figure>
+<h3 id="split-陣列-等分數量-axis"><a href="#split-陣列-等分數量-axis" class="headerlink" title="split(陣列,等分數量,axis)"></a>split(陣列,等分數量,axis)</h3><blockquote>
+<p>等量分割，若不等量會噴錯</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">a1,a2,a3 &#x3D; np.split(demo,3,axis&#x3D;1)</span><br><span class="line"></span><br><span class="line">a1 &#x3D; array([[4, 9],</span><br><span class="line">            [2, 5]])</span><br><span class="line">a2 &#x3D; array([[5, 2],</span><br><span class="line">            [0, 8]])</span><br><span class="line">a3 &#x3D; array([[7, 2],</span><br><span class="line">            [4, 9]])     </span><br></pre></td></tr></table></figure>
+<h3 id="array-split-陣列-切分數量-axis"><a href="#array-split-陣列-切分數量-axis" class="headerlink" title="array_split(陣列,切分數量,axis)"></a>array_split(陣列,切分數量,axis)</h3><blockquote>
+<p>不等量分割</p>
+<p>以下例子分隔成數量 <code>2,2,1,1</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">a1,a2,a3,a4 &#x3D; np.array_split(demo,3,axis&#x3D;1)</span><br><span class="line"></span><br><span class="line">a1 &#x3D; array([[4, 9],</span><br><span class="line">            [2, 5]])</span><br><span class="line">a2 &#x3D; array([[5, 2],</span><br><span class="line">            [0, 8]])</span><br><span class="line">a3 &#x3D; array([[7],</span><br><span class="line">            [4]])</span><br><span class="line">a4 &#x3D; array([[2],</span><br><span class="line">            [9]])</span><br></pre></td></tr></table></figure>
+<h3 id="vsplit-陣列-切分數量"><a href="#vsplit-陣列-切分數量" class="headerlink" title="vsplit(陣列,切分數量)"></a>vsplit(陣列,切分數量)</h3><blockquote>
+<p>只能<strong>等量分割</strong>，<strong>垂直上下拉開</strong></p>
+<p>同 <code>split(陣列,等分數量,axis=0)</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a1,a2 &#x3D; np.vsplit(demo,2)</span><br><span class="line"></span><br><span class="line">a1 &#x3D; array([[4, 9, 5, 2, 7, 2]])</span><br><span class="line">a2 &#x3D; array([[2, 5, 0, 8, 4, 9]])</span><br></pre></td></tr></table></figure>
+<h3 id="hsplit-陣列-切分數量"><a href="#hsplit-陣列-切分數量" class="headerlink" title="hsplit(陣列,切分數量)"></a>hsplit(陣列,切分數量)</h3><blockquote>
+<p>只能<strong>等量分割</strong>，<strong>水平左右拉開</strong></p>
+<p>同 <code>split(陣列,等分數量,axis=1)</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">a1,a2,a3 &#x3D; np.hsplit(demo,3)</span><br><span class="line"></span><br><span class="line">a1 &#x3D; array([[4, 9],</span><br><span class="line">            [2, 5]])</span><br><span class="line">a2 &#x3D; array([[5, 2],</span><br><span class="line">            [0, 8]])</span><br><span class="line">a3 &#x3D; array([[7, 2],</span><br><span class="line">            [4, 9]])</span><br></pre></td></tr></table></figure>
+<h2 id="11-Numpy其他函式"><a href="#11-Numpy其他函式" class="headerlink" title="11. Numpy其他函式"></a>11. Numpy其他函式</h2><p><img src="https://i.imgur.com/TDyFswG.png"></p>
+<p>(節錄至<a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10204089">[Day08]Learning Numpy - Ufuncs、broadcasting、運算子</a>)</p>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考:"></a>參考:</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10203624">[Day07]Learning Numpy - 建立、合併、分割</a></li>
+<li><a target="_blank" rel="noopener" href="http://violin-tao.blogspot.com/2017/06/numpy-2.html">numpy 筆記 (2)</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/29/Python%E8%BC%B8%E5%87%BAor%E8%AE%80%E5%8F%96%E7%9A%84%E4%BA%82%E7%A2%BC%E5%95%8F%E9%A1%8C/" rel="prev" title="Python輸出or讀取的亂碼問題">
+      <i class="fa fa-chevron-left"></i> Python輸出or讀取的亂碼問題
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AFNumpy"><span class="nav-number">1.</span> <span class="nav-text">什麼是Numpy?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Numpy%E5%9F%BA%E6%9C%AC%E8%AA%9E%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">Numpy基本語法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E5%BB%BA%E7%AB%8B%E7%9F%A9%E9%99%A3"><span class="nav-number">2.1.</span> <span class="nav-text">基本建立矩陣:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%A4%A7%E5%80%BC-%E6%9C%80%E5%B0%8F%E5%80%BC"><span class="nav-number">2.2.</span> <span class="nav-text">最大值&#x2F;最小值:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%A4%A7%E5%80%BC-%E6%9C%80%E5%B0%8F%E5%80%BC%E5%B0%8D%E6%87%89%E7%9A%84index"><span class="nav-number">2.3.</span> <span class="nav-text">最大值&#x2F;最小值對應的index:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%89%E7%BD%AE"><span class="nav-number">2.4.</span> <span class="nav-text">轉置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E7%B6%AD%E9%99%A3%E5%88%97%E8%BD%89%E7%BD%AE"><span class="nav-number">2.5.</span> <span class="nav-text">一維陣列轉置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%BB%BA%E7%AB%8B%E5%80%BC%E5%85%A8%E9%83%A8%E9%83%BD%E4%B8%80%E6%A8%A3%E7%9A%84%E9%99%A3%E5%88%97"><span class="nav-number">3.</span> <span class="nav-text">1. 建立值全部都一樣的陣列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#zeros-shape-dtype"><span class="nav-number">3.1.</span> <span class="nav-text">zeros(shape,dtype)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ones-shape-dtype"><span class="nav-number">3.2.</span> <span class="nav-text">ones(shape,dtype)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#empty-shape-dtype"><span class="nav-number">3.3.</span> <span class="nav-text">empty(shape,dtype)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#full-shape-N"><span class="nav-number">3.4.</span> <span class="nav-text">full(shape,N)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%BB%BA%E7%AB%8B%E7%AD%89%E5%B7%AE%E6%95%B8%E5%88%97"><span class="nav-number">4.</span> <span class="nav-text">2. 建立等差數列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#arange-start-stop-step-dtype"><span class="nav-number">4.1.</span> <span class="nav-text">arange(start,stop,step,dtype)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linspace-start-stop-num"><span class="nav-number">4.2.</span> <span class="nav-text">linspace(start,stop,num)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%BB%BA%E7%AB%8B0-1%E7%9A%84%E9%9A%A8%E6%A9%9F%E6%95%B8%E5%88%97"><span class="nav-number">5.</span> <span class="nav-text">3. 建立0~1的隨機數列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#random-random-size"><span class="nav-number">5.1.</span> <span class="nav-text">random.random(size)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#random-ranf-size"><span class="nav-number">5.2.</span> <span class="nav-text">random.ranf(size)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#random-sample-size"><span class="nav-number">5.3.</span> <span class="nav-text">random.sample(size)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%BB%BA%E7%AB%8B%E5%B8%B8%E6%85%8B%E5%88%86%E5%B8%83-%E9%AB%98%E6%96%AF%E5%88%86%E5%B8%83-%E7%9A%84%E9%9A%A8%E6%A9%9F%E9%99%A3%E5%88%97"><span class="nav-number">6.</span> <span class="nav-text">4. 建立常態分布(高斯分布)的隨機陣列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#random-normal-loc-scale-size"><span class="nav-number">6.1.</span> <span class="nav-text">random.normal(loc, scale, size)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%BB%BA%E7%AB%8B%E9%9A%A8%E6%A9%9F%E6%95%B4%E6%95%B8%E9%99%A3%E5%88%97"><span class="nav-number">7.</span> <span class="nav-text">5. 建立隨機整數陣列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#random-randint-low-high-size"><span class="nav-number">7.1.</span> <span class="nav-text">random.randint(low, high, size)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E9%99%A3%E5%88%97%E5%B1%AC%E6%80%A7"><span class="nav-number">8.</span> <span class="nav-text">6.陣列屬性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ndim"><span class="nav-number">8.1.</span> <span class="nav-text">ndim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#size"><span class="nav-number">8.2.</span> <span class="nav-text">size</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shape"><span class="nav-number">8.3.</span> <span class="nav-text">shape</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dtype"><span class="nav-number">8.4.</span> <span class="nav-text">dtype</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E9%99%A3%E5%88%97%E5%88%87%E7%89%87-Slice"><span class="nav-number">9.</span> <span class="nav-text">7. 陣列切片(Slice)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%A3%E5%88%97-row-col"><span class="nav-number">9.1.</span> <span class="nav-text">陣列[row,col]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%A3%E5%88%97-N"><span class="nav-number">9.2.</span> <span class="nav-text">陣列[:,N]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%A3%E5%88%97-N-1"><span class="nav-number">9.3.</span> <span class="nav-text">陣列[N,:]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%A3%E5%88%97-row1-row2-col1-col2"><span class="nav-number">9.4.</span> <span class="nav-text">陣列[row1 : row2, col1 : col2]</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E9%87%8D%E5%A1%91-reshape"><span class="nav-number">10.</span> <span class="nav-text">8.重塑(reshape)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#reshape-row-col"><span class="nav-number">10.1.</span> <span class="nav-text">reshape(row,col)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E4%B8%B2%E6%8E%A5"><span class="nav-number">11.</span> <span class="nav-text">9. 串接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#concatenate-%E9%99%A3%E5%88%971-%E9%99%A3%E5%88%972-%E9%99%A3%E5%88%973%E2%80%A6-axis"><span class="nav-number">11.1.</span> <span class="nav-text">concatenate( [陣列1,陣列2,陣列3…] ,axis)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vstack-%E9%99%A3%E5%88%971-%E9%99%A3%E5%88%972-%E9%99%A3%E5%88%973%E2%80%A6"><span class="nav-number">11.2.</span> <span class="nav-text">vstack( [陣列1,陣列2,陣列3…] )</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hstack-%E9%99%A3%E5%88%971-%E9%99%A3%E5%88%972-%E9%99%A3%E5%88%973%E2%80%A6"><span class="nav-number">11.3.</span> <span class="nav-text">hstack( [陣列1,陣列2,陣列3…] )</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-%E5%88%86%E5%89%B2"><span class="nav-number">12.</span> <span class="nav-text">10. 分割</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#split-%E9%99%A3%E5%88%97-%E7%AD%89%E5%88%86%E6%95%B8%E9%87%8F-axis"><span class="nav-number">12.1.</span> <span class="nav-text">split(陣列,等分數量,axis)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#array-split-%E9%99%A3%E5%88%97-%E5%88%87%E5%88%86%E6%95%B8%E9%87%8F-axis"><span class="nav-number">12.2.</span> <span class="nav-text">array_split(陣列,切分數量,axis)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vsplit-%E9%99%A3%E5%88%97-%E5%88%87%E5%88%86%E6%95%B8%E9%87%8F"><span class="nav-number">12.3.</span> <span class="nav-text">vsplit(陣列,切分數量)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hsplit-%E9%99%A3%E5%88%97-%E5%88%87%E5%88%86%E6%95%B8%E9%87%8F"><span class="nav-number">12.4.</span> <span class="nav-text">hsplit(陣列,切分數量)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-Numpy%E5%85%B6%E4%BB%96%E5%87%BD%E5%BC%8F"><span class="nav-number">13.</span> <span class="nav-text">11. Numpy其他函式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">14.</span> <span class="nav-text">參考:</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Madi</p>
+  <div class="site-description" itemprop="description">學習新知識，紀錄學習筆記</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Madi</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
