@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="什麼是Pandas? Pandas是Python中常用的套件之一，簡單來說，就是把 Excel的表格觀念丟到Python裡，常見的Excel功能都可以在Pandas裡完成，例如欄位的加總、分群、樞紐分析表、小計、畫折線圖、圓餅圖等等… ，其中Pandas中的資料型態DataFrame更是可以仿照SQL進行資料的處理與運算，與另一個套件numpy都是Python做資料處理常見的工具之一。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pandas常用語法整理(一) 建立Series&#x2F;DataFrame&#x2F;取值&#x2F;資料運算">
+<meta property="og:url" content="https://dysonma.github.io/2020/10/30/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%80-%E5%BB%BA%E7%AB%8BSeries-DataFrame-%E5%8F%96%E5%80%BC-%E8%B3%87%E6%96%99%E9%81%8B%E7%AE%97/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="什麼是Pandas? Pandas是Python中常用的套件之一，簡單來說，就是把 Excel的表格觀念丟到Python裡，常見的Excel功能都可以在Pandas裡完成，例如欄位的加總、分群、樞紐分析表、小計、畫折線圖、圓餅圖等等… ，其中Pandas中的資料型態DataFrame更是可以仿照SQL進行資料的處理與運算，與另一個套件numpy都是Python做資料處理常見的工具之一。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/Z8RjLdk.png">
+<meta property="og:image" content="https://i.imgur.com/iefFXSu.png">
+<meta property="og:image" content="https://i.imgur.com/02UCbTX.png">
+<meta property="og:image" content="https://i.imgur.com/R57Lxi6.png">
+<meta property="og:image" content="https://i.imgur.com/QvJA0m5.png">
+<meta property="og:image" content="https://i.imgur.com/Esc4r8J.png">
+<meta property="og:image" content="https://i.imgur.com/wcasxlc.png">
+<meta property="og:image" content="https://i.imgur.com/DGavq4k.png">
+<meta property="og:image" content="https://i.imgur.com/gS8yhVb.png">
+<meta property="og:image" content="https://i.imgur.com/0Da1LCk.png">
+<meta property="og:image" content="https://i.imgur.com/cQeUTtn.png">
+<meta property="og:image" content="https://i.imgur.com/Rv6fkRU.png">
+<meta property="og:image" content="https://i.imgur.com/H6I8rqx.png">
+<meta property="og:image" content="https://i.imgur.com/KrhrtQY.png">
+<meta property="og:image" content="https://i.imgur.com/06A1C05.png">
+<meta property="article:published_time" content="2020-10-30T11:24:01.000Z">
+<meta property="article:modified_time" content="2020-10-30T11:28:51.126Z">
+<meta property="article:author" content="Madi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/Z8RjLdk.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/10/30/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%80-%E5%BB%BA%E7%AB%8BSeries-DataFrame-%E5%8F%96%E5%80%BC-%E8%B3%87%E6%96%99%E9%81%8B%E7%AE%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>Pandas常用語法整理(一) 建立Series/DataFrame/取值/資料運算 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/30/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%80-%E5%BB%BA%E7%AB%8BSeries-DataFrame-%E5%8F%96%E5%80%BC-%E8%B3%87%E6%96%99%E9%81%8B%E7%AE%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Madi">
+      <meta itemprop="description" content="學習新知識，紀錄學習筆記">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Pandas常用語法整理(一) 建立Series/DataFrame/取值/資料運算
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-10-30 19:24:01 / 修改時間：19:28:51" itemprop="dateCreated datePublished" datetime="2020-10-30T19:24:01+08:00">2020-10-30</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="什麼是Pandas"><a href="#什麼是Pandas" class="headerlink" title="什麼是Pandas?"></a>什麼是Pandas?</h2><blockquote>
+<p>Pandas是Python中常用的套件之一，簡單來說，就是把 <strong>Excel的表格觀念丟到Python裡，常見的Excel功能都可以在Pandas裡完成，例如欄位的加總、分群、樞紐分析表、小計、畫折線圖、圓餅圖等等…</strong> ，其中Pandas中的資料型態DataFrame更是可以仿照SQL進行資料的處理與運算，與另一個套件numpy都是Python做資料處理常見的工具之一。</p>
+</blockquote>
+<a id="more"></a>
+
+<hr>
+<p>利用pip下載Pandas套件<br><code>pip install pandas as pd</code></p>
+<p>Pandas倚靠三大物件進行運算</p>
+<ul>
+<li>Series</li>
+<li>DataFrame</li>
+<li>Index</li>
+</ul>
+<h2 id="1-Series"><a href="#1-Series" class="headerlink" title="1. Series:"></a>1. Series:</h2><ul>
+<li>可以看成是<strong>一維陣列</strong></li>
+<li>但與numpy不同的是<strong>它可以定義自己的index(任何資料型態)</strong></li>
+<li>也可以看成是<strong>特殊化的dict(有key,value的關係)</strong></li>
+</ul>
+<h3 id="建立基本Series"><a href="#建立基本Series" class="headerlink" title="建立基本Series"></a>建立基本Series</h3><blockquote>
+<p>pd.Series( [元素1,元素2..] )</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">demo &#x3D; pd.Series([1,2,3])</span><br><span class="line"></span><br><span class="line">0    1</span><br><span class="line">1    2</span><br><span class="line">2    3</span><br><span class="line">dtype: int64</span><br></pre></td></tr></table></figure>
+<h3 id="取得index-values"><a href="#取得index-values" class="headerlink" title="取得index/values"></a>取得index/values</h3><blockquote>
+<p>Series.index</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">demo.index</span><br><span class="line"></span><br><span class="line">RangeIndex(start&#x3D;0, stop&#x3D;3, step&#x3D;1)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Series.values</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">demo.values</span><br><span class="line"></span><br><span class="line">array([1, 2, 3], dtype&#x3D;int64)</span><br></pre></td></tr></table></figure>
+<h3 id="建立自定義index的Series"><a href="#建立自定義index的Series" class="headerlink" title="建立自定義index的Series"></a>建立自定義index的Series</h3><blockquote>
+<p>pd.Series( [元素1,元素2…] ,index=[名稱1,名稱2…] )</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">demo &#x3D; pd.Series([1,2,3],index&#x3D;[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;])</span><br><span class="line"></span><br><span class="line">a    1</span><br><span class="line">b    2</span><br><span class="line">c    3</span><br><span class="line">dtype: int64</span><br></pre></td></tr></table></figure>
+<h3 id="使用dict來建立Series"><a href="#使用dict來建立Series" class="headerlink" title="使用dict來建立Series"></a>使用dict來建立Series</h3><blockquote>
+<p>pd.Series(字典)</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">demo &#x3D; &#123;&#39;a&#39;:1,&#39;b&#39;:2,&#39;c&#39;:3&#125;</span><br><span class="line">pd.Series(demo)</span><br><span class="line"></span><br><span class="line">a    1</span><br><span class="line">b    2</span><br><span class="line">c    3</span><br><span class="line">dtype: int64</span><br></pre></td></tr></table></figure>
+<h2 id="2-DataFrame"><a href="#2-DataFrame" class="headerlink" title="2. DataFrame:"></a>2. DataFrame:</h2><ul>
+<li>由多個Series所組成</li>
+<li>一樣可以指定index</li>
+</ul>
+<h3 id="由Series組成DataFrame"><a href="#由Series組成DataFrame" class="headerlink" title="由Series組成DataFrame"></a>由Series組成DataFrame</h3><blockquote>
+<p>pd.DataFrame( {name1: Series1, name2: Series2..} )</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">books &#x3D; pd.Series(&#123;&#39;a&#39;:&#39;beam&#39;,&#39;b&#39;:&#39;column&#39;,&#39;c&#39;:&#39;hinge&#39;&#125;)</span><br><span class="line">tools &#x3D; pd.Series(&#123;&#39;a&#39;:&#39;E-tabs&#39;,&#39;b&#39;:&#39;Sap2000&#39;,&#39;c&#39;:&#39;Revit&#39;&#125;)</span><br><span class="line"></span><br><span class="line">civil &#x3D; pd.DataFrame(&#123;&#39;books&#39;:books,&#39;tools&#39;:tools&#125;)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/Z8RjLdk.png"></p>
+<blockquote>
+<p>DataFrame有 <code>index</code>,<code>values</code>,<code>columns</code>三個屬性</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">civil.index</span><br><span class="line">civil.values</span><br><span class="line">civil.columns</span><br><span class="line"></span><br><span class="line">Index([&#39;a&#39;, &#39;b&#39;, &#39;c&#39;], dtype&#x3D;&#39;object&#39;)</span><br><span class="line"></span><br><span class="line">array([[&#39;beam&#39;, &#39;E-tabs&#39;],</span><br><span class="line">       [&#39;column&#39;, &#39;Sap2000&#39;],</span><br><span class="line">       [&#39;hinge&#39;, &#39;Revit&#39;]], dtype&#x3D;object)</span><br><span class="line">       </span><br><span class="line">Index([&#39;books&#39;, &#39;tools&#39;], dtype&#x3D;&#39;object&#39;)</span><br></pre></td></tr></table></figure>
+<p>簡而言之，DataFrame的架構大概長這樣~</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">column1</th>
+<th align="center">column2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">index1</td>
+<td align="center">value11</td>
+<td align="center">value12</td>
+</tr>
+<tr>
+<td align="center">index2</td>
+<td align="center">value21</td>
+<td align="center">value22</td>
+</tr>
+</tbody></table>
+<h3 id="從字典建立DataFrame"><a href="#從字典建立DataFrame" class="headerlink" title="從字典建立DataFrame"></a>從字典建立DataFrame</h3><blockquote>
+<p>pd.DataFrame.from_dict{字典}</p>
+</blockquote>
+<p>預設會<strong>把字典的key當成DataFrame的column</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">demo_dict &#x3D; &#123;&#39;a&#39;:[5,2,0],&#39;A&#39;:[9,1,4]&#125;</span><br><span class="line">pd.DataFrame.from_dict(demo_dict)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/iefFXSu.png"></p>
+<blockquote>
+<p>pd.DataFrame.from_dict{字典, <strong>orient=’index’</strong>}</p>
+</blockquote>
+<p>把字典的key當成DataFrame的<strong>row</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">demo_dict &#x3D; &#123;&#39;a&#39;:[5,2,0],&#39;A&#39;:[9,1,4]&#125;</span><br><span class="line">demo &#x3D; pd.DataFrame.from_dict(demo_dict,orient&#x3D;&#39;index&#39;)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/02UCbTX.png"></p>
+<blockquote>
+<p>pd.DataFrame.from_dict{ 字典, orient=’index’, <strong>columns=[欄位1,欄位2,欄位3]</strong> }</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">demo_dict &#x3D; &#123;&#39;a&#39;:[5,2,0],&#39;A&#39;:[9,1,4]&#125;</span><br><span class="line">demo &#x3D; pd.DataFrame.from_dict(demo_dict,orient&#x3D;&#39;index&#39;,columns&#x3D;[&#39;1st&#39;,&#39;2nd&#39;,&#39;3rd&#39;])</span><br></pre></td></tr></table></figure>
+<p>把字典的key當成DataFrame的<strong>row</strong>以外，也<strong>自己命名column的名稱</strong><br><img src="https://i.imgur.com/R57Lxi6.png"></p>
+<h3 id="DataFrame基本運算"><a href="#DataFrame基本運算" class="headerlink" title="DataFrame基本運算"></a>DataFrame基本運算</h3><table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">加</th>
+<th align="center">減</th>
+<th align="center">乘</th>
+<th align="center">除</th>
+<th align="center">整除</th>
+<th align="center">餘數</th>
+<th align="center">次方</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">運算子</td>
+<td align="center">+</td>
+<td align="center">-</td>
+<td align="center">*</td>
+<td align="center">/</td>
+<td align="center">//</td>
+<td align="center">%</td>
+<td align="center">**</td>
+</tr>
+</tbody></table>
+<p>先建立兩個DataFrame</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">d1 &#x3D; &#123;&#39;a&#39;:[1,2,3],&#39;b&#39;:[2,4,6],&#39;c&#39;:[3,6,9]&#125;</span><br><span class="line">d2 &#x3D; &#123;&#39;a&#39;:[10,20,30],&#39;b&#39;:[20,40,60],&#39;c&#39;:[30,60,90]&#125;</span><br><span class="line"></span><br><span class="line">demo1 &#x3D; pd.DataFrame.from_dict(d1)</span><br><span class="line">demo2 &#x3D; pd.DataFrame.from_dict(d2)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/QvJA0m5.png"></p>
+<p><img src="https://i.imgur.com/Esc4r8J.png"><br><img src="https://i.imgur.com/wcasxlc.png"></p>
+<h3 id="DataFrame不同欄位也能互相計算"><a href="#DataFrame不同欄位也能互相計算" class="headerlink" title="DataFrame不同欄位也能互相計算"></a>DataFrame不同欄位也能互相計算</h3><p><img src="https://i.imgur.com/DGavq4k.png"></p>
+<h3 id="刪除column-row"><a href="#刪除column-row" class="headerlink" title="刪除column/row"></a>刪除column/row</h3><p>建立一個DataFrame名叫demo</p>
+<p><img src="https://i.imgur.com/gS8yhVb.png"></p>
+<h4 id="刪除column"><a href="#刪除column" class="headerlink" title="刪除column"></a>刪除column</h4><blockquote>
+<p>DataFrame.drop(<strong>columns=[col1,col2…]</strong>)</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo.drop(columns&#x3D;[&#39;a&#39;,&#39;c&#39;])</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/0Da1LCk.png"></p>
+<h4 id="刪除row"><a href="#刪除row" class="headerlink" title="刪除row"></a>刪除row</h4><blockquote>
+<p>DataFrame.drop(<strong>index=[index1,index2…]</strong>)</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo.drop(index&#x3D;[0,2])</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/cQeUTtn.png"></p>
+<h3 id="資料運算函式-sum-min-max-median-mean"><a href="#資料運算函式-sum-min-max-median-mean" class="headerlink" title="資料運算函式: sum(), min(), max(), median(), mean()"></a>資料運算函式: sum(), min(), max(), median(), mean()</h3><blockquote>
+<p>DataFrame.資料運算函式( <strong>axis</strong> )</p>
+</blockquote>
+<p>預設以 <strong>index(列)</strong> 作為計算,可以修改<code>axis</code>來決定以 <code>columns</code> 或 <code>index</code> 來計算</p>
+<table>
+<thead>
+<tr>
+<th align="center">sum()</th>
+<th align="center">min()</th>
+<th align="center">max()</th>
+<th align="center">median()</th>
+<th align="center">mean()</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">加總</td>
+<td align="center">最小值</td>
+<td align="center">最大值</td>
+<td align="center">中位數</td>
+<td align="center">平均值</td>
+</tr>
+</tbody></table>
+<h3 id="其他常用的資料運算函式"><a href="#其他常用的資料運算函式" class="headerlink" title="其他常用的資料運算函式"></a>其他常用的資料運算函式</h3><p><img src="https://i.imgur.com/Rv6fkRU.png"><br><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10200565">節錄至[Day13]Learning Pandas - 處理資料分組</a></p>
+<h2 id="3-Index"><a href="#3-Index" class="headerlink" title="3. Index"></a>3. Index</h2><h3 id="前幾筆資料"><a href="#前幾筆資料" class="headerlink" title="前幾筆資料"></a>前幾筆資料</h3><blockquote>
+<p>DataFrame.head(<strong>N</strong>)</p>
+</blockquote>
+<p>取出前N行的資料</p>
+<h3 id="後幾筆資料"><a href="#後幾筆資料" class="headerlink" title="後幾筆資料"></a>後幾筆資料</h3><blockquote>
+<p>DataFrame.tail(<strong>N</strong>)</p>
+</blockquote>
+<p>取出後N行的資料</p>
+<h3 id="遮罩"><a href="#遮罩" class="headerlink" title="遮罩"></a>遮罩</h3><blockquote>
+<p>DataFrame[ <strong>搜尋條件</strong> ]</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo[demo[&#39;1st&#39;]&gt;5]</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/H6I8rqx.png"></p>
+<h3 id="Fancy索引"><a href="#Fancy索引" class="headerlink" title="Fancy索引"></a>Fancy索引</h3><blockquote>
+<p>DataFrame[ <strong>[column1,column2…]</strong> ]</p>
+</blockquote>
+<p>傳遞一個list當作index去取得元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo[[&#39;1st&#39;,&#39;3rd&#39;]]</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/KrhrtQY.png"></p>
+<h3 id="loc取值"><a href="#loc取值" class="headerlink" title="loc取值"></a>loc取值</h3><blockquote>
+<p>DataFrame.loc[ <strong>[index1,index2…]</strong> ]</p>
+</blockquote>
+<p>以<strong>index的名稱</strong>去取值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">demo.loc[&#39;A&#39;]</span><br><span class="line"></span><br><span class="line">1st    9</span><br><span class="line">2nd    1</span><br><span class="line">3rd    4</span><br><span class="line">Name: A, dtype: int64</span><br></pre></td></tr></table></figure>
+<h3 id="iloc取值"><a href="#iloc取值" class="headerlink" title="iloc取值"></a>iloc取值</h3><blockquote>
+<p>DataFrame.iloc[ <strong>index1的編號,index2的編號…</strong> ]</p>
+</blockquote>
+<p>以<strong>index的編號</strong>去取值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo.iloc[:2,:2]</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/06A1C05.png"></p>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><p><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10204656">[Day10]Learning Pandas - Series、DataFrame、Index</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/30/%5BPython%5D%20Lambda%E5%87%BD%E5%BC%8F%E8%AA%9E%E6%B3%95/" rel="prev" title="[Python] Lambda函式語法">
+      <i class="fa fa-chevron-left"></i> [Python] Lambda函式語法
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AFPandas"><span class="nav-number">1.</span> <span class="nav-text">什麼是Pandas?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Series"><span class="nav-number">2.</span> <span class="nav-text">1. Series:</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%9F%BA%E6%9C%ACSeries"><span class="nav-number">2.1.</span> <span class="nav-text">建立基本Series</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%96%E5%BE%97index-values"><span class="nav-number">2.2.</span> <span class="nav-text">取得index&#x2F;values</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E8%87%AA%E5%AE%9A%E7%BE%A9index%E7%9A%84Series"><span class="nav-number">2.3.</span> <span class="nav-text">建立自定義index的Series</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8dict%E4%BE%86%E5%BB%BA%E7%AB%8BSeries"><span class="nav-number">2.4.</span> <span class="nav-text">使用dict來建立Series</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-DataFrame"><span class="nav-number">3.</span> <span class="nav-text">2. DataFrame:</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%B1Series%E7%B5%84%E6%88%90DataFrame"><span class="nav-number">3.1.</span> <span class="nav-text">由Series組成DataFrame</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%9E%E5%AD%97%E5%85%B8%E5%BB%BA%E7%AB%8BDataFrame"><span class="nav-number">3.2.</span> <span class="nav-text">從字典建立DataFrame</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DataFrame%E5%9F%BA%E6%9C%AC%E9%81%8B%E7%AE%97"><span class="nav-number">3.3.</span> <span class="nav-text">DataFrame基本運算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DataFrame%E4%B8%8D%E5%90%8C%E6%AC%84%E4%BD%8D%E4%B9%9F%E8%83%BD%E4%BA%92%E7%9B%B8%E8%A8%88%E7%AE%97"><span class="nav-number">3.4.</span> <span class="nav-text">DataFrame不同欄位也能互相計算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%AA%E9%99%A4column-row"><span class="nav-number">3.5.</span> <span class="nav-text">刪除column&#x2F;row</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%AA%E9%99%A4column"><span class="nav-number">3.5.1.</span> <span class="nav-text">刪除column</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%AA%E9%99%A4row"><span class="nav-number">3.5.2.</span> <span class="nav-text">刪除row</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B3%87%E6%96%99%E9%81%8B%E7%AE%97%E5%87%BD%E5%BC%8F-sum-min-max-median-mean"><span class="nav-number">3.6.</span> <span class="nav-text">資料運算函式: sum(), min(), max(), median(), mean()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E5%B8%B8%E7%94%A8%E7%9A%84%E8%B3%87%E6%96%99%E9%81%8B%E7%AE%97%E5%87%BD%E5%BC%8F"><span class="nav-number">3.7.</span> <span class="nav-text">其他常用的資料運算函式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Index"><span class="nav-number">4.</span> <span class="nav-text">3. Index</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E5%B9%BE%E7%AD%86%E8%B3%87%E6%96%99"><span class="nav-number">4.1.</span> <span class="nav-text">前幾筆資料</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%8C%E5%B9%BE%E7%AD%86%E8%B3%87%E6%96%99"><span class="nav-number">4.2.</span> <span class="nav-text">後幾筆資料</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%81%AE%E7%BD%A9"><span class="nav-number">4.3.</span> <span class="nav-text">遮罩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Fancy%E7%B4%A2%E5%BC%95"><span class="nav-number">4.4.</span> <span class="nav-text">Fancy索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#loc%E5%8F%96%E5%80%BC"><span class="nav-number">4.5.</span> <span class="nav-text">loc取值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#iloc%E5%8F%96%E5%80%BC"><span class="nav-number">4.6.</span> <span class="nav-text">iloc取值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">參考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Madi</p>
+  <div class="site-description" itemprop="description">學習新知識，紀錄學習筆記</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Madi</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
