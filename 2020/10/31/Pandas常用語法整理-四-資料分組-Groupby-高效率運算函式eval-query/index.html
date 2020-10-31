@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Table of Contents:  資料分組: groupby&#x2F;aggregate()&#x2F;apply() group屬性與方法: str.count()&#x2F;groups&#x2F;size()&#x2F;get_group() 高效率運算函式: pd.eval()&#x2F;df.query()">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pandas常用語法整理(四) 資料分組 Groupby&#x2F;高效率運算函式eval,query">
+<meta property="og:url" content="https://dysonma.github.io/2020/10/31/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E5%9B%9B-%E8%B3%87%E6%96%99%E5%88%86%E7%B5%84-Groupby-%E9%AB%98%E6%95%88%E7%8E%87%E9%81%8B%E7%AE%97%E5%87%BD%E5%BC%8Feval-query/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="Table of Contents:  資料分組: groupby&#x2F;aggregate()&#x2F;apply() group屬性與方法: str.count()&#x2F;groups&#x2F;size()&#x2F;get_group() 高效率運算函式: pd.eval()&#x2F;df.query()">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/qkWd9QW.png">
+<meta property="og:image" content="https://i.imgur.com/3ZmRWT7.png">
+<meta property="og:image" content="https://i.imgur.com/DXK1BxY.png">
+<meta property="og:image" content="https://i.imgur.com/mPmtTC1.png">
+<meta property="og:image" content="https://i.imgur.com/6fCk1HE.png">
+<meta property="article:published_time" content="2020-10-31T14:29:52.000Z">
+<meta property="article:modified_time" content="2020-10-31T14:33:01.902Z">
+<meta property="article:author" content="Madi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/qkWd9QW.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/10/31/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E5%9B%9B-%E8%B3%87%E6%96%99%E5%88%86%E7%B5%84-Groupby-%E9%AB%98%E6%95%88%E7%8E%87%E9%81%8B%E7%AE%97%E5%87%BD%E5%BC%8Feval-query/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>Pandas常用語法整理(四) 資料分組 Groupby/高效率運算函式eval,query | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/31/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E5%9B%9B-%E8%B3%87%E6%96%99%E5%88%86%E7%B5%84-Groupby-%E9%AB%98%E6%95%88%E7%8E%87%E9%81%8B%E7%AE%97%E5%87%BD%E5%BC%8Feval-query/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Madi">
+      <meta itemprop="description" content="學習新知識，紀錄學習筆記">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Pandas常用語法整理(四) 資料分組 Groupby/高效率運算函式eval,query
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-10-31 22:29:52 / 修改時間：22:33:01" itemprop="dateCreated datePublished" datetime="2020-10-31T22:29:52+08:00">2020-10-31</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Table-of-Contents"><a href="#Table-of-Contents" class="headerlink" title="Table of Contents:"></a>Table of Contents:</h1><blockquote>
+<ol>
+<li>資料分組: <strong>groupby/aggregate()/apply()</strong></li>
+<li>group屬性與方法: <strong>str.count()/groups/size()/get_group()</strong></li>
+<li>高效率運算函式: <strong>pd.eval()/df.query()</strong></li>
+</ol>
+</blockquote>
+<a id="more"></a>
+
+<hr>
+<h2 id="資料分組"><a href="#資料分組" class="headerlink" title="資料分組"></a>資料分組</h2><p>先建立一個NBA球員的DataFrame</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo &#x3D; pd.DataFrame(&#123;&#39;球隊&#39;:[&#39;湖人&#39;,&#39;勇士&#39;,&#39;湖人&#39;,&#39;勇士(富邦)&#39;],&#39;球員&#39;:[&#39;Kobe&#39;,&#39;Curry&#39;,&#39;Lebron&#39;,&#39;林書緯&#39;],&#39;薪資&#39;:[1000,900,800,200]&#125;)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/qkWd9QW.png"></p>
+<h3 id="groupby"><a href="#groupby" class="headerlink" title="groupby()"></a>groupby()</h3><p>計算球隊總薪資</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo.groupby([&#39;球隊&#39;]).sum()</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/3ZmRWT7.png"></p>
+<p>也可以用多個名稱來分組</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo.groupby([&#39;球隊&#39;,&#39;球員&#39;]).sum()</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/DXK1BxY.png"></p>
+<h3 id="aggregate"><a href="#aggregate" class="headerlink" title="aggregate()"></a>aggregate()</h3><p>一次計算sum(),min(),max()…</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo.groupby([&#39;球隊&#39;])[&#39;薪資&#39;].aggregate([&#39;sum&#39;,&#39;max&#39;,&#39;min&#39;])</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/mPmtTC1.png"></p>
+<h3 id="apply"><a href="#apply" class="headerlink" title="apply()"></a>apply()</h3><p>呼叫lambda函式或是一般函式來運算</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">demo.groupby([&#39;球隊&#39;]).apply(lambda x: x[&#39;薪資&#39;]&gt;500)</span><br><span class="line"></span><br><span class="line">球隊       </span><br><span class="line">勇士      1     True</span><br><span class="line">勇士(富邦)  3    False</span><br><span class="line">湖人      0     True</span><br><span class="line">        2     True</span><br><span class="line">Name: 薪資, dtype: bool</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo[demo[&#39;薪資&#39;].apply(lambda x: x&gt;500)]</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/6fCk1HE.png"></p>
+<h3 id="str-count"><a href="#str-count" class="headerlink" title="str.count()"></a>str.count()</h3><blockquote>
+<p>DataFrame[某欄位].str.count(關鍵字)</p>
+</blockquote>
+<p>計算某欄位出現給定的關鍵字的數量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">demo[&#39;球隊&#39;].str.count(&#39;人&#39;)</span><br><span class="line"></span><br><span class="line">0    1</span><br><span class="line">1    0</span><br><span class="line">2    1</span><br><span class="line">3    0</span><br><span class="line">Name: 球隊, dtype: int64</span><br></pre></td></tr></table></figure>
+
+<h3 id="group-size"><a href="#group-size" class="headerlink" title="group.size()"></a>group.size()</h3><p>看分組後的資料大小(多寡)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">group &#x3D; demo.groupby(&#39;球隊&#39;)</span><br><span class="line">group.size()</span><br><span class="line"></span><br><span class="line">球隊</span><br><span class="line">勇士        1</span><br><span class="line">勇士(富邦)    1</span><br><span class="line">湖人        2</span><br><span class="line">dtype: int64</span><br></pre></td></tr></table></figure>
+
+<h3 id="group-groups"><a href="#group-groups" class="headerlink" title="group.groups"></a>group.groups</h3><p>看分組後的組別</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">group &#x3D; demo.groupby(&#39;球隊&#39;)</span><br><span class="line">group.groups</span><br><span class="line"></span><br><span class="line">&#123;&#39;勇士&#39;: [1], &#39;勇士(富邦)&#39;: [3], &#39;湖人&#39;: [0, 2]&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="group-get-group"><a href="#group-get-group" class="headerlink" title="group.get_group()"></a>group.get_group()</h3><p>取得分組後的某組別資料</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">group &#x3D; demo.groupby(&#39;球隊&#39;)</span><br><span class="line">group.get_group(&#39;湖人&#39;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Pandas高效率運算函式"><a href="#Pandas高效率運算函式" class="headerlink" title="Pandas高效率運算函式"></a>Pandas高效率運算函式</h2><h3 id="pd-eval"><a href="#pd-eval" class="headerlink" title="pd.eval()"></a>pd.eval()</h3><blockquote>
+<p>功能強大，將字符串str當成有效的表達式來求值並返回計算結果<br>常用來設定config檔的參數</p>
+</blockquote>
+<p>建立三個df並計算加總，比較有無eval的效率差異</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">df1,df2,df3 &#x3D; (pd.DataFrame(np.random.randint(0,10,(4,2))) for i in range(3))</span><br><span class="line"></span><br><span class="line">%timeit df1+df2+df3</span><br><span class="line">%timeit pd.eval(&#39;df1+df2+df3&#39;)</span><br><span class="line"></span><br><span class="line"># eval快很多</span><br><span class="line">1.47 ms ± 171 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)</span><br><span class="line">4.55 ms ± 314 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</span><br></pre></td></tr></table></figure>
+
+<h3 id="df-query"><a href="#df-query" class="headerlink" title="df.query()"></a>df.query()</h3><blockquote>
+<p>功能強大，用來查詢符合條件的資料</p>
+</blockquote>
+<p>建立df並查詢條件，比較有無query的效率差異</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">df &#x3D; pd.DataFrame(np.random.randint(0,10,(4,2)), columns&#x3D;[&#39;A&#39;,&#39;B&#39;])</span><br><span class="line"></span><br><span class="line">%timeit df[&#39;A&#39;]&gt;df[&#39;B&#39;]</span><br><span class="line">%timeit df.query(&#39;A&gt;B&#39;)</span><br><span class="line"></span><br><span class="line"># query快很多</span><br><span class="line">635 µs ± 70.7 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)</span><br><span class="line">5.86 ms ± 232 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</span><br></pre></td></tr></table></figure>
+
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><p><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10200565">[Day13]Learning Pandas - 處理資料分組</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/31/andas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%89-%E5%90%88%E4%BD%B5%E8%B3%87%E6%96%99Merge-Concat-Append/" rel="prev" title="Pandas常用語法整理(三) 合併資料Merge/Concat/Append">
+      <i class="fa fa-chevron-left"></i> Pandas常用語法整理(三) 合併資料Merge/Concat/Append
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Table-of-Contents"><span class="nav-number">1.</span> <span class="nav-text">Table of Contents:</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B3%87%E6%96%99%E5%88%86%E7%B5%84"><span class="nav-number">1.1.</span> <span class="nav-text">資料分組</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#groupby"><span class="nav-number">1.1.1.</span> <span class="nav-text">groupby()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#aggregate"><span class="nav-number">1.1.2.</span> <span class="nav-text">aggregate()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#apply"><span class="nav-number">1.1.3.</span> <span class="nav-text">apply()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#str-count"><span class="nav-number">1.1.4.</span> <span class="nav-text">str.count()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#group-size"><span class="nav-number">1.1.5.</span> <span class="nav-text">group.size()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#group-groups"><span class="nav-number">1.1.6.</span> <span class="nav-text">group.groups</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#group-get-group"><span class="nav-number">1.1.7.</span> <span class="nav-text">group.get_group()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pandas%E9%AB%98%E6%95%88%E7%8E%87%E9%81%8B%E7%AE%97%E5%87%BD%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">Pandas高效率運算函式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pd-eval"><span class="nav-number">1.2.1.</span> <span class="nav-text">pd.eval()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#df-query"><span class="nav-number">1.2.2.</span> <span class="nav-text">df.query()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">1.3.</span> <span class="nav-text">參考</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Madi</p>
+  <div class="site-description" itemprop="description">學習新知識，紀錄學習筆記</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Madi</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

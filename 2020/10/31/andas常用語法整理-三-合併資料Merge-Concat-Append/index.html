@@ -20,20 +20,27 @@
     var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="問題 Q1: 為什麼 Python 輸出中文到csv檔後，用Excel開啟卻會亂碼? Q2: 為什麼 Python 讀取文件首行多了”\ufeff”字符串，程式報錯?">
+  <meta name="description" content="Table of Contents:  concat() append() merge()">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Python輸出or讀取的亂碼問題">
-<meta property="og:url" content="https://dysonma.github.io/2020/10/29/Python%E8%BC%B8%E5%87%BAor%E8%AE%80%E5%8F%96%E7%9A%84%E4%BA%82%E7%A2%BC%E5%95%8F%E9%A1%8C/index.html">
+<meta property="og:title" content="Pandas常用語法整理(三) 合併資料Merge&#x2F;Concat&#x2F;Append">
+<meta property="og:url" content="https://dysonma.github.io/2020/10/31/andas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%89-%E5%90%88%E4%BD%B5%E8%B3%87%E6%96%99Merge-Concat-Append/index.html">
 <meta property="og:site_name" content="MaDi&#39;s Blog">
-<meta property="og:description" content="問題 Q1: 為什麼 Python 輸出中文到csv檔後，用Excel開啟卻會亂碼? Q2: 為什麼 Python 讀取文件首行多了”\ufeff”字符串，程式報錯?">
+<meta property="og:description" content="Table of Contents:  concat() append() merge()">
 <meta property="og:locale" content="zh_TW">
-<meta property="article:published_time" content="2020-10-29T15:53:57.000Z">
-<meta property="article:modified_time" content="2020-10-29T15:58:17.187Z">
+<meta property="og:image" content="https://i.imgur.com/qxyfvRN.png">
+<meta property="og:image" content="https://i.imgur.com/jFBVBWs.png">
+<meta property="og:image" content="https://i.imgur.com/sgmhIJ9.png">
+<meta property="og:image" content="https://i.imgur.com/jFBVBWs.png">
+<meta property="og:image" content="https://i.imgur.com/iSRbIdi.png">
+<meta property="og:image" content="https://i.imgur.com/iZoear4.png">
+<meta property="article:published_time" content="2020-10-31T14:26:53.000Z">
+<meta property="article:modified_time" content="2020-10-31T14:29:14.198Z">
 <meta property="article:author" content="Madi">
 <meta property="article:tag" content="python,AI,學習紀錄">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/qxyfvRN.png">
 
-<link rel="canonical" href="https://dysonma.github.io/2020/10/29/Python%E8%BC%B8%E5%87%BAor%E8%AE%80%E5%8F%96%E7%9A%84%E4%BA%82%E7%A2%BC%E5%95%8F%E9%A1%8C/">
+<link rel="canonical" href="https://dysonma.github.io/2020/10/31/andas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%89-%E5%90%88%E4%BD%B5%E8%B3%87%E6%96%99Merge-Concat-Append/">
 
 
 <script id="page-configurations">
@@ -46,7 +53,7 @@
   };
 </script>
 
-  <title>Python輸出or讀取的亂碼問題 | MaDi's Blog</title>
+  <title>Pandas常用語法整理(三) 合併資料Merge/Concat/Append | MaDi's Blog</title>
   
 
 
@@ -152,7 +159,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
-    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/29/Python%E8%BC%B8%E5%87%BAor%E8%AE%80%E5%8F%96%E7%9A%84%E4%BA%82%E7%A2%BC%E5%95%8F%E9%A1%8C/">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/31/andas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%89-%E5%90%88%E4%BD%B5%E8%B3%87%E6%96%99Merge-Concat-Append/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -165,7 +172,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Python輸出or讀取的亂碼問題
+          Pandas常用語法整理(三) 合併資料Merge/Concat/Append
         </h1>
 
         <div class="post-meta">
@@ -176,7 +183,7 @@
               <span class="post-meta-item-text">發表於</span>
               
 
-              <time title="創建時間：2020-10-29 23:53:57 / 修改時間：23:58:17" itemprop="dateCreated datePublished" datetime="2020-10-29T23:53:57+08:00">2020-10-29</time>
+              <time title="創建時間：2020-10-31 22:26:53 / 修改時間：22:29:14" itemprop="dateCreated datePublished" datetime="2020-10-31T22:26:53+08:00">2020-10-31</time>
             </span>
 
           
@@ -190,36 +197,46 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="問題"><a href="#問題" class="headerlink" title="問題"></a>問題</h2><blockquote>
-<p>Q1: 為什麼 Python 輸出中文到csv檔後，用Excel開啟卻會亂碼?</p>
-<p>Q2: 為什麼 Python 讀取文件首行多了”\ufeff”字符串，程式報錯?</p>
+        <h1 id="Table-of-Contents"><a href="#Table-of-Contents" class="headerlink" title="Table of Contents:"></a>Table of Contents:</h1><blockquote>
+<ol>
+<li>concat()</li>
+<li>append()</li>
+<li>merge()</li>
+</ol>
 </blockquote>
 <a id="more"></a>
-<hr>
-<h2 id="問題一"><a href="#問題一" class="headerlink" title="問題一"></a>問題一</h2><blockquote>
-<p>Q1: 為什麼 Python 輸出中文到csv檔後，用Excel開啟卻會亂碼?</p>
-</blockquote>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><blockquote>
-<p>Excel 以 ANSI 格式開啟，不會做編碼識別</p>
-</blockquote>
-<h2 id="解決方法"><a href="#解決方法" class="headerlink" title="解決方法"></a>解決方法</h2><blockquote>
-<p>encoding採用 <strong>utf-8-sig</strong> 作為輸出即可。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.to_csv(&#39;123.csv&#39;,encoding&#x3D;&#39;utf-8-sig&#39;)</span><br></pre></td></tr></table></figure>
 
-<h2 id="問題二"><a href="#問題二" class="headerlink" title="問題二"></a>問題二</h2><blockquote>
-<p>Q: Python 讀取文件首行多了”\ufeff”字符串，程式報錯?</p>
+<hr>
+<h2 id="合併資料"><a href="#合併資料" class="headerlink" title="合併資料"></a>合併資料</h2><h3 id="concat"><a href="#concat" class="headerlink" title="concat()"></a>concat()</h3><blockquote>
+<p>pd.concat( <strong>[df1, df2], join</strong>)</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">with open(&quot;%s.txt&quot; % line, &#39;r&#39;, encoding&#x3D;&#39;utf-8&#39;) as f1:</span><br><span class="line"></span><br><span class="line">FileNotFoundError: [Errno 2] No such file or directory: &#39;\ufeffA.txt&#39;</span><br></pre></td></tr></table></figure>
-<p>要打開的路徑比預期A.txt多了一串字符”\ufeff”, 顯然無法正確打開文件.</p>
-<h2 id="原因-1"><a href="#原因-1" class="headerlink" title="原因"></a>原因</h2><blockquote>
-<p><strong>首行出現的”\ufeff“叫BOM(“ByteOrder Mark”)，用來聲明該文件的編碼信息.</strong></p>
-<p>”utf-8“ 是以字節為編碼單元,它的字節順序在所有系統中都是一樣的,沒有字節序問題,因此它不需要BOM,所以當用”utf-8”編碼方式讀取帶有BOM的文件時,它會把BOM當做是文件內容來處理, 也就會發生上面的錯誤.</p>
+<p>將兩個DataFrame合併起來, join可以選擇: (1) <code>outer</code> : 聯集 (2) <code>inner</code> : 交集</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">demo1 &#x3D; pd.DataFrame(&#123;&#39;球員&#39;:[&#39;Kobe&#39;,&#39;Curry&#39;],&#39;號碼&#39;:[24,30],&#39;球隊&#39;:[&#39;湖人&#39;,&#39;勇士&#39;]&#125;)</span><br><span class="line">demo2 &#x3D; pd.DataFrame(&#123;&#39;球員&#39;:[&#39;Lebron&#39;,&#39;林書豪&#39;],&#39;號碼&#39;:[23,17]&#125;)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/qxyfvRN.png"></p>
+<p><strong>outer(聯集):</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.concat([demo1,demo2],join&#x3D;&#39;outer&#39;)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/jFBVBWs.png"></p>
+<p><strong>inner(交集):</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.concat([demo1,demo2],join&#x3D;&#39;inner&#39;)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/sgmhIJ9.png"></p>
+<h3 id="append"><a href="#append" class="headerlink" title="append()"></a>append()</h3><blockquote>
+<p>df1.append(df2)</p>
 </blockquote>
-<h2 id="解決方法-1"><a href="#解決方法-1" class="headerlink" title="解決方法"></a>解決方法</h2><blockquote>
-<p>encoding採用 <strong>utf-8-sig</strong> 作為讀取即可。</p>
+<p>用法同 <code>pd.concat([df1,df2],join=&#39;outer&#39;)</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo1.append(demo2)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/jFBVBWs.png"></p>
+<h3 id="merge"><a href="#merge" class="headerlink" title="merge()"></a>merge()</h3><blockquote>
+<p>pd.merge(df1, df2, <strong>how</strong>, <strong>on</strong>)</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">with open(&quot;B.txt&quot;, &#39;r&#39;, encoding&#x3D;&#39;utf-8-sig&#39;) as f:</span><br></pre></td></tr></table></figure>
+<p>將兩個DataFrame以交集,聯集,差集..等方式join起來,<code>how</code> 可以定義要用何種方式連結資料，ex: <code>outer</code>,<code>inner</code>,<code>left</code>,<code>right</code></p>
+<p>此處再多建立一個DataFrame</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo3 &#x3D; pd.DataFrame(&#123;&#39;球隊&#39;:[&#39;湖人&#39;,&#39;勇士&#39;],&#39;經紀人&#39;:[&#39;MD&#39;,&#39;MaDi&#39;]&#125;)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/iSRbIdi.png"></p>
+<p>將demo1與demo3連結起來，預設會以兩個DataFrame的<strong>共同欄位(球隊)作為join</strong>的依據，而<strong>參數 <code>on</code> 則可以自定義join的欄位依據</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.merge(demo1,demo3, on&#x3D;&#39;球隊&#39;)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/iZoear4.png"></p>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考:"></a>參考:</h2><p><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10200433">[Day12]Learning Pandas - 資料合併</a></p>
+
     </div>
 
     
@@ -234,12 +251,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/10/29/Markdown%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/" rel="prev" title="Markdown語法整理">
-      <i class="fa fa-chevron-left"></i> Markdown語法整理
+    <a href="/2020/10/31/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%BA%8C-astype-%E8%99%95%E7%90%86%E7%A9%BA%E5%80%BC%E8%B3%87%E6%96%99-stack-unstack/" rel="prev" title="Pandas常用語法整理(二) astype/處理空值資料/stack/unstack">
+      <i class="fa fa-chevron-left"></i> Pandas常用語法整理(二) astype/處理空值資料/stack/unstack
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/10/29/Numpy%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/" rel="next" title="Numpy常用語法整理">
-      Numpy常用語法整理 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/10/31/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E5%9B%9B-%E8%B3%87%E6%96%99%E5%88%86%E7%B5%84-Groupby-%E9%AB%98%E6%95%88%E7%8E%87%E9%81%8B%E7%AE%97%E5%87%BD%E5%BC%8Feval-query/" rel="next" title="Pandas常用語法整理(四) 資料分組 Groupby/高效率運算函式eval,query">
+      Pandas常用語法整理(四) 資料分組 Groupby/高效率運算函式eval,query <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -299,7 +316,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%95%8F%E9%A1%8C"><span class="nav-number">1.</span> <span class="nav-text">問題</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%95%8F%E9%A1%8C%E4%B8%80"><span class="nav-number">2.</span> <span class="nav-text">問題一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0"><span class="nav-number">3.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E6%B1%BA%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">解決方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%95%8F%E9%A1%8C%E4%BA%8C"><span class="nav-number">5.</span> <span class="nav-text">問題二</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0-1"><span class="nav-number">6.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E6%B1%BA%E6%96%B9%E6%B3%95-1"><span class="nav-number">7.</span> <span class="nav-text">解決方法</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Table-of-Contents"><span class="nav-number">1.</span> <span class="nav-text">Table of Contents:</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%88%E4%BD%B5%E8%B3%87%E6%96%99"><span class="nav-number">1.1.</span> <span class="nav-text">合併資料</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#concat"><span class="nav-number">1.1.1.</span> <span class="nav-text">concat()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#append"><span class="nav-number">1.1.2.</span> <span class="nav-text">append()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#merge"><span class="nav-number">1.1.3.</span> <span class="nav-text">merge()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">1.2.</span> <span class="nav-text">參考:</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
