@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Table of Contents:  讀檔: read_csv&#x2F;json&#x2F;excel&#x2F;html&#x2F;clipboard&#x2F;sql DataFrame繪圖: 折線圖&#x2F;柱狀圖&#x2F;直方圖… DataFrame特殊技巧: style&#x2F;sample.set_option…">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pandas常用語法整理(五) 讀檔&#x2F;繪圖&#x2F;DataFrame特殊技巧">
+<meta property="og:url" content="https://dysonma.github.io/2020/11/09/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%BA%94-%E8%AE%80%E6%AA%94-%E7%B9%AA%E5%9C%96-DataFrame%E7%89%B9%E6%AE%8A%E6%8A%80%E5%B7%A7/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="Table of Contents:  讀檔: read_csv&#x2F;json&#x2F;excel&#x2F;html&#x2F;clipboard&#x2F;sql DataFrame繪圖: 折線圖&#x2F;柱狀圖&#x2F;直方圖… DataFrame特殊技巧: style&#x2F;sample.set_option…">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/Ot2iu8L.png">
+<meta property="og:image" content="https://i.imgur.com/o2dathP.png">
+<meta property="og:image" content="https://i.imgur.com/IZSIHsX.png">
+<meta property="og:image" content="https://i.imgur.com/gzlFkeO.png">
+<meta property="og:image" content="https://i.imgur.com/wGLWwwp.png">
+<meta property="og:image" content="https://i.imgur.com/NnL5ml9.png">
+<meta property="og:image" content="https://i.imgur.com/MrFRl78.png">
+<meta property="og:image" content="https://i.imgur.com/zRxNK4D.png">
+<meta property="article:published_time" content="2020-11-09T15:45:55.000Z">
+<meta property="article:modified_time" content="2020-11-09T16:13:56.637Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/Ot2iu8L.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/11/09/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%BA%94-%E8%AE%80%E6%AA%94-%E7%B9%AA%E5%9C%96-DataFrame%E7%89%B9%E6%AE%8A%E6%8A%80%E5%B7%A7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>Pandas常用語法整理(五) 讀檔/繪圖/DataFrame特殊技巧 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/11/09/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%BA%94-%E8%AE%80%E6%AA%94-%E7%B9%AA%E5%9C%96-DataFrame%E7%89%B9%E6%AE%8A%E6%8A%80%E5%B7%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Pandas常用語法整理(五) 讀檔/繪圖/DataFrame特殊技巧
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-11-09 23:45:55" itemprop="dateCreated datePublished" datetime="2020-11-09T23:45:55+08:00">2020-11-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-11-10 00:13:56" itemprop="dateModified" datetime="2020-11-10T00:13:56+08:00">2020-11-10</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Table-of-Contents"><a href="#Table-of-Contents" class="headerlink" title="Table of Contents:"></a>Table of Contents:</h1><blockquote>
+<ol>
+<li>讀檔: <strong>read_csv/json/excel/html/clipboard/sql</strong></li>
+<li>DataFrame繪圖: <strong>折線圖/柱狀圖/直方圖…</strong></li>
+<li>DataFrame特殊技巧: <strong>style/sample.set_option…</strong></li>
+</ol>
+</blockquote>
+<a id="more"></a>
+
+<hr>
+<h2 id="讀檔"><a href="#讀檔" class="headerlink" title="讀檔"></a>讀檔</h2><h3 id="pd-read-csv"><a href="#pd-read-csv" class="headerlink" title="pd.read_csv()"></a>pd.read_csv()</h3><blockquote>
+<p><code>chunksize</code>: 決定一次要讀進幾列，避免檔案太大<br><code>encoding</code>: 編碼<br><code>nrows</code>: 讀幾列進來</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df &#x3D; pd.read_csv(&#39;本地檔案&#39; or &#39;網路url&#39;, chunksize&#x3D;N ,encoding&#x3D;&#39;utf-8&#39;,nrows&#x3D;4)</span><br></pre></td></tr></table></figure>
+<h3 id="pd-read-json"><a href="#pd-read-json" class="headerlink" title="pd.read_json()"></a>pd.read_json()</h3><h3 id="pd-read-excel"><a href="#pd-read-excel" class="headerlink" title="pd.read_excel()"></a>pd.read_excel()</h3><h3 id="pd-read-html"><a href="#pd-read-html" class="headerlink" title="pd.read_html()"></a>pd.read_html()</h3><h3 id="pd-read-clipboard"><a href="#pd-read-clipboard" class="headerlink" title="pd.read_clipboard()"></a>pd.read_clipboard()</h3><blockquote>
+<p>複製Excel、Google Sheet或是網頁上的表格，將剪貼簿內容轉換成DataFrame</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">step1. 複製Excel、Google Sheet或是網頁上的表格</span><br><span class="line">step2. pd.read_clipboard()</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/Ot2iu8L.png"></p>
+<h3 id="pd-read-sql"><a href="#pd-read-sql" class="headerlink" title="pd.read_sql()"></a>pd.read_sql()</h3><blockquote>
+<p><code>sql</code>: SQL語法<br><code>con</code>: 連接SQL數據庫的engine, 常見有<code>sqlalchemy</code>或<code>pymysql</code>或<code>pyodbc</code><br><code>index_col</code>: 選擇某一列作為index<br><code>coerce_float</code>: 將數字型態的string以float讀入</p>
+</blockquote>
+<p><strong>&lt;p.s&gt; df.tosql()</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df_new.to_sql(tblName, con&#x3D;engine, if_exists&#x3D;&#39;replace&#39;,dtype&#x3D;&#123;col_name: sqlalchemy.types.NVARCHAR for col_name in df_new&#125;,index&#x3D;False)</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="繪圖"><a href="#繪圖" class="headerlink" title="繪圖"></a>繪圖</h2><p>Pandas有以下類型的圖可以繪製</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">折線圖 df.plot()</span><br><span class="line">柱狀圖 df.plot(kind&#x3D;&#39;bar&#39;)</span><br><span class="line">橫向柱狀圖 df.plot(kind&#x3D;&#39;barh&#39;)</span><br><span class="line">直方圖 df.plot(kind&#x3D;&#39;hist&#39;)</span><br><span class="line">KDE圖 df.plot(kind&#x3D;&#39;kde&#39;)</span><br><span class="line">面積圖 df.plot(kind&#x3D;&#39;area&#39;)</span><br><span class="line">圓餅圖 df.plot(kind&#x3D;&#39;pie&#39;)</span><br><span class="line">散佈圖 df.plot(kind&#x3D;&#39;scatter&#39;)</span><br><span class="line">六角形箱體圖 df.plot(kind&#x3D;&#39;hexbin&#39;)</span><br><span class="line">箱形圖 df.plot(kind&#x3D;&#39;box&#39;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="DataFrame特殊技巧"><a href="#DataFrame特殊技巧" class="headerlink" title="DataFrame特殊技巧"></a>DataFrame特殊技巧</h2><h3 id="pd-util-testing"><a href="#pd-util-testing" class="headerlink" title="pd.util.testing"></a>pd.util.testing</h3><blockquote>
+<p>隨機建立DataFrame</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.util.testing.makeDataFrame().head(5)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/o2dathP.png"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.util.testing.makeCustomDataframe(5,3)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/IZSIHsX.png"></p>
+<h3 id="DataFrame-info-memory-usage-”deep”"><a href="#DataFrame-info-memory-usage-”deep”" class="headerlink" title="DataFrame. info(memory_usage=”deep”)"></a>DataFrame. info(memory_usage=”deep”)</h3><blockquote>
+<p>查看DataFrame的記憶體使用量</p>
+</blockquote>
+<p><strong>&lt;p.s&gt; 將已知分類的欄位資料型態轉為<code>category</code>較省記憶體空間</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dtypes &#x3D; &#123;&quot;已知分類欄位名稱&quot;: &quot;category&quot;&#125; &#x2F;&#x2F; 轉成catogory較省記憶體</span><br><span class="line">df &#x3D; pd.read_csv(&#39;檔案url&#39;, dtype&#x3D;dtypes)</span><br><span class="line">df.info(memory_usage&#x3D;&quot;deep&quot;)            &#x2F;&#x2F; 查看記憶體</span><br></pre></td></tr></table></figure>
+<h3 id="pd-set-option"><a href="#pd-set-option" class="headerlink" title="pd.set_option()"></a>pd.set_option()</h3><blockquote>
+<p>把某些顯示設定套用到<strong>所有</strong>DataFrames</p>
+</blockquote>
+<h4 id="1-DataFrame顯示所有欄位"><a href="#1-DataFrame顯示所有欄位" class="headerlink" title="1.  DataFrame顯示所有欄位"></a>1.  DataFrame顯示所有欄位</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.set_option(&quot;display.max_columns&quot;, None)</span><br></pre></td></tr></table></figure>
+<h4 id="2-改變DataFrame欄位的寬度"><a href="#2-改變DataFrame欄位的寬度" class="headerlink" title="2. 改變DataFrame欄位的寬度"></a>2. 改變DataFrame欄位的寬度</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.set_option(&quot;display.max_colwidth&quot;, N)  &#x2F;&#x2F; N &#x3D; -1 代表全顯示</span><br></pre></td></tr></table></figure>
+<h4 id="3-改變浮點數-float-顯示位數"><a href="#3-改變浮點數-float-顯示位數" class="headerlink" title="3. 改變浮點數(float)顯示位數"></a>3. 改變浮點數(float)顯示位數</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.set_option(&quot;display.precision&quot;, N)</span><br></pre></td></tr></table></figure>
+<h4 id="4-重設"><a href="#4-重設" class="headerlink" title="4. 重設"></a>4. 重設</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.reset_option(&quot;all&quot;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="DataFrame-style"><a href="#DataFrame-style" class="headerlink" title="DataFrame.style"></a>DataFrame.style</h3><blockquote>
+<p>不想改全部的DataFrame, <strong>僅客製化某些欄位</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(demo.style</span><br><span class="line">     .format(&#39;&#123;:.1f&#125;&#39;, subset&#x3D;&#39;Fare&#39;)           &#x2F;&#x2F;&#39;Fare&#39;欄位顯示浮點一位 </span><br><span class="line">     .set_caption(&#39;客製化五彩繽紛的鐵達尼號數據&#39;)  &#x2F;&#x2F; df標題</span><br><span class="line">     .hide_index()                              &#x2F;&#x2F; 隱藏最左邊的index</span><br><span class="line">     .bar(&#39;Age&#39;, vmin&#x3D;0)                        &#x2F;&#x2F; &#39;Age&#39;欄位依數值大小畫條狀圖</span><br><span class="line">     .highlight_max(&#39;Survived&#39;)                 &#x2F;&#x2F; &#39;Survived&#39;欄位最大值highlight</span><br><span class="line">     .background_gradient(&#39;Greens&#39;,subset&#x3D;&#39;Fare&#39;) &#x2F;&#x2F; &#39;Fare&#39;欄位依數值大小畫綠色的colormap</span><br><span class="line">     .highlight_null()  &#x2F;&#x2F; 整個df中NaN畫紅色</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/gzlFkeO.png"></p>
+<h3 id="DataFrame-sample-frac-random-state"><a href="#DataFrame-sample-frac-random-state" class="headerlink" title="DataFrame.sample(frac, random_state)"></a>DataFrame.sample(frac, random_state)</h3><blockquote>
+<p>將DataFrame隨機切成兩個子集</p>
+<p>常用於機器學習中的train,test切分</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">df_train &#x3D; demo.sample(frac&#x3D;0.8, random_state&#x3D;5566)</span><br><span class="line">df_test &#x3D; demo.drop(df_train.index)</span><br><span class="line"></span><br><span class="line"># display() -&gt; 顯示結果</span><br><span class="line">display(df_train)</span><br><span class="line">display(df_test)</span><br><span class="line">print(&#39;各 DataFrame 大小：&#39;, len(demo), len(df_train), len(df_test))</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/wGLWwwp.png"></p>
+<h3 id="DataFrame-value-counts-欄位"><a href="#DataFrame-value-counts-欄位" class="headerlink" title="DataFrame.value_counts(欄位)"></a>DataFrame.value_counts(欄位)</h3><blockquote>
+<p>預設會把某欄位裡的值依據<strong>頻率高到低</strong>排列</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">display(demo[&#39;Age&#39;].value_counts().head(5).reset_index())</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/NnL5ml9.png"></p>
+<h3 id="df-describe"><a href="#df-describe" class="headerlink" title="df.describe()"></a>df.describe()</h3><blockquote>
+<p>一行描述數值欄位(最小值、最大值、平均和中位數…)</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo.describe()</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/MrFRl78.png"></p>
+<h3 id="tqdm進度條"><a href="#tqdm進度條" class="headerlink" title="tqdm進度條"></a>tqdm進度條</h3><blockquote>
+<p>DataFrame.<strong>progress_apply()</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">from tqdm import tqdm_notebook</span><br><span class="line">tqdm_notebook().pandas()</span><br><span class="line"></span><br><span class="line">df.某欄位.progress_apply(運算...)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/zRxNK4D.png"></p>
+<h3 id="swifter加速數據處理"><a href="#swifter加速數據處理" class="headerlink" title="swifter加速數據處理"></a>swifter加速數據處理</h3><blockquote>
+<p>DataFrame.<strong>swifter.apply()</strong></p>
+<p>最有效率的方式執行<code>apply</code>函式</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">import swifter</span><br><span class="line"></span><br><span class="line">df.某欄位.swifter.apply(運算...)</span><br></pre></td></tr></table></figure>
+
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://yanwei-liu.medium.com/python-%E8%B3%87%E6%96%99%E8%99%95%E7%90%86%E7%AD%86%E8%A8%98-%E4%BA%8C-%E8%A9%A6%E8%A9%A6%E7%9C%8Bseaborn%E5%90%A7-bf9fecdc1905">Python 資料視覺化筆記(一 ) - 使用Pandas繪圖</a></li>
+<li><a target="_blank" rel="noopener" href="https://leemeng.tw/practical-pandas-tutorial-for-aspiring-data-scientists.html">資料科學家的pandas 實戰手冊：掌握40 個實用數據技巧</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/31/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E5%9B%9B-%E8%B3%87%E6%96%99%E5%88%86%E7%B5%84-Groupby-%E9%AB%98%E6%95%88%E7%8E%87%E9%81%8B%E7%AE%97%E5%87%BD%E5%BC%8Feval-query/" rel="prev" title="Pandas常用語法整理(四) 資料分組 Groupby/高效率運算函式eval,query">
+      <i class="fa fa-chevron-left"></i> Pandas常用語法整理(四) 資料分組 Groupby/高效率運算函式eval,query
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/11/10/ython%5D%20config%E7%B5%84%E6%85%8B/logging%E6%A8%A1%E7%B5%84/SMTP%E8%87%AA%E5%8B%95%E5%AF%84%E4%BF%A1/" rel="next" title="[Python] config組態/logging模組/SMTP自動寄信">
+      [Python] config組態/logging模組/SMTP自動寄信 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Table-of-Contents"><span class="nav-number">1.</span> <span class="nav-text">Table of Contents:</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%80%E6%AA%94"><span class="nav-number">1.1.</span> <span class="nav-text">讀檔</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pd-read-csv"><span class="nav-number">1.1.1.</span> <span class="nav-text">pd.read_csv()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pd-read-json"><span class="nav-number">1.1.2.</span> <span class="nav-text">pd.read_json()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pd-read-excel"><span class="nav-number">1.1.3.</span> <span class="nav-text">pd.read_excel()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pd-read-html"><span class="nav-number">1.1.4.</span> <span class="nav-text">pd.read_html()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pd-read-clipboard"><span class="nav-number">1.1.5.</span> <span class="nav-text">pd.read_clipboard()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pd-read-sql"><span class="nav-number">1.1.6.</span> <span class="nav-text">pd.read_sql()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B9%AA%E5%9C%96"><span class="nav-number">1.2.</span> <span class="nav-text">繪圖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DataFrame%E7%89%B9%E6%AE%8A%E6%8A%80%E5%B7%A7"><span class="nav-number">1.3.</span> <span class="nav-text">DataFrame特殊技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pd-util-testing"><span class="nav-number">1.3.1.</span> <span class="nav-text">pd.util.testing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DataFrame-info-memory-usage-%E2%80%9Ddeep%E2%80%9D"><span class="nav-number">1.3.2.</span> <span class="nav-text">DataFrame. info(memory_usage&#x3D;”deep”)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pd-set-option"><span class="nav-number">1.3.3.</span> <span class="nav-text">pd.set_option()</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-DataFrame%E9%A1%AF%E7%A4%BA%E6%89%80%E6%9C%89%E6%AC%84%E4%BD%8D"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">1.  DataFrame顯示所有欄位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%94%B9%E8%AE%8ADataFrame%E6%AC%84%E4%BD%8D%E7%9A%84%E5%AF%AC%E5%BA%A6"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">2. 改變DataFrame欄位的寬度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E6%94%B9%E8%AE%8A%E6%B5%AE%E9%BB%9E%E6%95%B8-float-%E9%A1%AF%E7%A4%BA%E4%BD%8D%E6%95%B8"><span class="nav-number">1.3.3.3.</span> <span class="nav-text">3. 改變浮點數(float)顯示位數</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E9%87%8D%E8%A8%AD"><span class="nav-number">1.3.3.4.</span> <span class="nav-text">4. 重設</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DataFrame-style"><span class="nav-number">1.3.4.</span> <span class="nav-text">DataFrame.style</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DataFrame-sample-frac-random-state"><span class="nav-number">1.3.5.</span> <span class="nav-text">DataFrame.sample(frac, random_state)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DataFrame-value-counts-%E6%AC%84%E4%BD%8D"><span class="nav-number">1.3.6.</span> <span class="nav-text">DataFrame.value_counts(欄位)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#df-describe"><span class="nav-number">1.3.7.</span> <span class="nav-text">df.describe()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tqdm%E9%80%B2%E5%BA%A6%E6%A2%9D"><span class="nav-number">1.3.8.</span> <span class="nav-text">tqdm進度條</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#swifter%E5%8A%A0%E9%80%9F%E6%95%B8%E6%93%9A%E8%99%95%E7%90%86"><span class="nav-number">1.3.9.</span> <span class="nav-text">swifter加速數據處理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">1.4.</span> <span class="nav-text">參考</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">MaDi</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
