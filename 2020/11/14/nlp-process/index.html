@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言半年前接觸到NLP自然語言處理的範疇，起初對這項技術完全沒概念，只知道電腦好像可以猜出我講的話，幸好在幾個專家耐心解釋之後總算對這個領域有點眉目，自己跳下去研究後大概整理出一些分析的流程，近期工作上常常會需要用到這項技術，因此用這篇文章紀錄一下研究的心得。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="談談NLP自然語言處理">
+<meta property="og:url" content="https://dysonma.github.io/2020/11/14/nlp-process/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="前言半年前接觸到NLP自然語言處理的範疇，起初對這項技術完全沒概念，只知道電腦好像可以猜出我講的話，幸好在幾個專家耐心解釋之後總算對這個領域有點眉目，自己跳下去研究後大概整理出一些分析的流程，近期工作上常常會需要用到這項技術，因此用這篇文章紀錄一下研究的心得。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-11-14T15:46:51.000Z">
+<meta property="article:modified_time" content="2020-11-14T16:04:51.229Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/11/14/nlp-process/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>談談NLP自然語言處理 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/11/14/nlp-process/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          談談NLP自然語言處理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-11-14 23:46:51" itemprop="dateCreated datePublished" datetime="2020-11-14T23:46:51+08:00">2020-11-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-11-15 00:04:51" itemprop="dateModified" datetime="2020-11-15T00:04:51+08:00">2020-11-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NLP%E8%87%AA%E7%84%B6%E8%AA%9E%E8%A8%80%E8%99%95%E7%90%86/" itemprop="url" rel="index"><span itemprop="name">NLP自然語言處理</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">閱讀次數：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/11/14/nlp-process/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/11/14/nlp-process/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>半年前接觸到NLP自然語言處理的範疇，起初對這項技術完全沒概念，只知道電腦好像可以猜出我講的話，幸好在幾個專家耐心解釋之後總算對這個領域有點眉目，自己跳下去研究後大概整理出一些分析的流程，近期工作上常常會需要用到這項技術，因此用這篇文章紀錄一下研究的心得。</p>
+<a id="more"></a>
+
+<h2 id="何謂自然語言處理"><a href="#何謂自然語言處理" class="headerlink" title="何謂自然語言處理?"></a>何謂自然語言處理?</h2><p>用一句話來形容自然語言</p>
+<blockquote>
+<p>讓電腦擁有理解人類語言的能力，就是自然語言處理 (Natural Language Processing，NLP)</p>
+</blockquote>
+<p>這項領域仍在大量的持續研究，比起影像辨識更難做到高分，因為語言實在太過複雜，連人類都很難定義其規則，更遑論要讓一台只懂0跟1的電腦懂我們在講什麼鬼。</p>
+<p>至於要如何透過NLP去處理文字以便讓電腦去判讀呢? 這就是NLP在處理的問題，簡單來說，跟其他AI模型做一樣的事情，第一步準備大量資料，第二步做前處理，第三步透過不同的模型去訓練驗證，第四步讓電腦預測人類說的話，最後再判斷表現的好壞。</p>
+<h2 id="分析流程"><a href="#分析流程" class="headerlink" title="分析流程:"></a>分析流程:</h2><h3 id="1-文本分詞-Tokenize"><a href="#1-文本分詞-Tokenize" class="headerlink" title="1. 文本分詞(Tokenize)"></a>1. 文本分詞(Tokenize)</h3><blockquote>
+<p>會先去掉標點符號(punctuation)與無意義的停用字(StopWords)</p>
+<p>英文直觀上靠空白斷詞，常見套件為<code>nltk</code>(有<code>Lemmatization</code>詞型還原功能)</p>
+<p>中文靠<code>jieba</code>斷詞(有詞意功能)或其他tokenizer的套件</p>
+</blockquote>
+<p>例如:</p>
+<p><code>美國總統大選開票看這裡川普拜登誰會主掌白宮</code></p>
+<p>用<code>jieba</code>套件斷詞後就變成 </p>
+<p><code>美國 總統 大選 開票 看 這裡 川普 拜登 誰 會 主掌 白宮</code></p>
+<h3 id="2-建立字典並將文本轉成數字序列-Text-to-Sequence"><a href="#2-建立字典並將文本轉成數字序列-Text-to-Sequence" class="headerlink" title="2. 建立字典並將文本轉成數字序列(Text to Sequence)"></a>2. 建立字典並將文本轉成數字序列(Text to Sequence)</h3><blockquote>
+<p>依照文本的詞彙量編成一個大的字典，並把詞彙轉成數字</p>
+</blockquote>
+<p>把分詞後的各個詞彙轉成數字序列:</p>
+<p><code>&#123;&#39;美國&#39;: 0, &#39;總統&#39;: 1, &#39;大選&#39;: 2, &#39;開票&#39;: 3, &#39;看&#39;: 4, &#39;這裡&#39;: 5, &#39;川普&#39;: 6, &#39;拜登&#39;: 7, &#39;誰&#39;: 8, &#39;會&#39;: 9, &#39;主掌&#39;: 10, &#39;白宮&#39;: 11&#125;</code></p>
+<blockquote>
+</blockquote>
+<h3 id="3-序列的-Zero-Padding"><a href="#3-序列的-Zero-Padding" class="headerlink" title="3. 序列的 Zero Padding"></a>3. 序列的 Zero Padding</h3><blockquote>
+<p>長度超過<code>MAX_SEQUENCE_LENGTH</code>的截掉</p>
+<p>長度不足<code>MAX_SEQUENCE_LENGTH</code>的在前面補零</p>
+</blockquote>
+<h3 id="4-詞向量詞嵌入-Word-Embedding-：將詞彙表達成有意義的向量"><a href="#4-詞向量詞嵌入-Word-Embedding-：將詞彙表達成有意義的向量" class="headerlink" title="4. 詞向量詞嵌入(Word Embedding)：將詞彙表達成有意義的向量"></a>4. 詞向量詞嵌入(Word Embedding)：將詞彙表達成有意義的向量</h3><blockquote>
+<p>塞入RNN模型的每個詞彙不能單單只是數字序列，應該用張量(Tensor)表示，也就是一個N維向量</p>
+<p>因為當維度提高，才更能看出文字之間的距離(相似度)</p>
+<p>在NLP裡，這種<strong>將一個詞彙或句子轉換成一個實數詞向量</strong>的技術被稱為<strong>詞嵌入（Word Embedding）</strong></p>
+<p>常見的word embedding方式有 <code>word2Vec</code>, <code>Glove</code></p>
+</blockquote>
+<p>舉上例來說:</p>
+<p><code>[0,1,2...]</code> 的數字序列中的每一個數字都變成N維的向量</p>
+<p><code>[ [0.077, 0.695, 0.776...],     [0.624, 0.962, 0.96...],     [0.456, 0.927, 0.404...]  ]</code></p>
+<p>透過此方法，<strong>逐步修正隨機初始化的詞向量，使得詞向量裡頭的值越來越有意義</strong></p>
+<h3 id="5-將答案做-One-Hot-Encoding"><a href="#5-將答案做-One-Hot-Encoding" class="headerlink" title="5. 將答案做 One-Hot Encoding"></a>5. 將答案做 One-Hot Encoding</h3><blockquote>
+<p>把序列轉成矩陣才能讓GPU進行平行運算，提高運算速度</p>
+<p>可以把分類結果想成機率分佈</p>
+</blockquote>
+<p>例如: </p>
+<p>有三個分類的問題，原先用<code>&#123;0:第一類, 1:第二類, 2:第三類&#125;</code>，但如果轉成用<code>[0,1,0]</code>表示分類成第二個的結果，就是one-hot encoding。好處是當模型分類出來的機率是<code>[0.2,0.5,0.3]</code>的時候，可以很快地計算出與正解<code>[0,1,0]</code>的差異，自動修正機器學習，拉近彼此的差異。</p>
+<h3 id="6-切割Train-amp-Validate的資料集"><a href="#6-切割Train-amp-Validate的資料集" class="headerlink" title="6. 切割Train &amp; Validate的資料集"></a>6. 切割Train &amp; Validate的資料集</h3><blockquote>
+<p>train_test_split</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">from sklearn.model_selection import train_test_split</span><br><span class="line"></span><br><span class="line"># 可以自定義參數 test_size 或 train_size 的比例</span><br><span class="line">x_train, x_val, y_train, y_val &#x3D; train_test_split(X_train, Y_train, test_size&#x3D;VALIDATION_RATIO, random_state&#x3D;RANDOM_STATE)</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-採用有記憶的循環神經網路架構模型-RNN"><a href="#7-採用有記憶的循環神經網路架構模型-RNN" class="headerlink" title="7. 採用有記憶的循環神經網路架構模型(RNN)"></a>7. 採用有記憶的循環神經網路架構模型(RNN)</h3><blockquote>
+<p>Simple RNN<br>LSTM<br>BERT<br>…</p>
+</blockquote>
+<ol>
+<li>通常遇到分類問題，模型的最後一層<code>Dense</code>會採用: <strong><code>softmax</code>(適合多分類) 或是  <code>sigmoid</code>(適合二分類)</strong><blockquote>
+<p>因為 <strong>softmax 與 sigmoid 能將數字作正規化（Normalization），將它們全部壓縮到 0~1 之間，並讓它們的和等於1，符合機率的特性</strong>。</p>
+</blockquote>
+</li>
+<li>分類問題中常用的<strong>損失函數(loss function)</strong> 是<code>cross-entropy交叉熵</code>，用來計算模型判斷的結果與正解的結果兩者的差異，給機器自動學習。</li>
+<li><code>batch_size</code>: 決定每批放入幾筆訓練資料給模型看完後更新參數</li>
+<li><code>num_epochs</code>: 代表模型會重複看整個訓練資料集幾次</li>
+</ol>
+<h3 id="8-訓練驗證資料-fit"><a href="#8-訓練驗證資料-fit" class="headerlink" title="8. 訓練驗證資料(fit)"></a>8. 訓練驗證資料(fit)</h3><blockquote>
+<p>model.fit(…)</p>
+</blockquote>
+<h3 id="9-測試資料-test"><a href="#9-測試資料-test" class="headerlink" title="9. 測試資料(test)"></a>9. 測試資料(test)</h3><blockquote>
+<p>model.predict(…)</p>
+</blockquote>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考:"></a>參考:</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://leemeng.tw/shortest-path-to-the-nlp-world-a-gentle-guide-of-natural-language-processing-and-deep-learning-for-everyone.html#3-%E9%96%80%E6%8E%A8%E8%96%A6%E7%9A%84%E7%B7%9A%E4%B8%8A%E8%AA%B2%E7%A8%8B">進入 NLP 世界的最佳橋樑：寫給所有人的自然語言處理與深度學習入門指南</a></li>
+<li><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10193224">Day 13：『自然語言處理』(NLP) 概念介紹</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/14/blockchain/" rel="prev" title="五分鐘看懂何謂區塊鏈">
+      <i class="fa fa-chevron-left"></i> 五分鐘看懂何謂區塊鏈
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E8%AC%82%E8%87%AA%E7%84%B6%E8%AA%9E%E8%A8%80%E8%99%95%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">何謂自然語言處理?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E6%B5%81%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">分析流程:</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%96%87%E6%9C%AC%E5%88%86%E8%A9%9E-Tokenize"><span class="nav-number">3.1.</span> <span class="nav-text">1. 文本分詞(Tokenize)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%BB%BA%E7%AB%8B%E5%AD%97%E5%85%B8%E4%B8%A6%E5%B0%87%E6%96%87%E6%9C%AC%E8%BD%89%E6%88%90%E6%95%B8%E5%AD%97%E5%BA%8F%E5%88%97-Text-to-Sequence"><span class="nav-number">3.2.</span> <span class="nav-text">2. 建立字典並將文本轉成數字序列(Text to Sequence)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%BA%8F%E5%88%97%E7%9A%84-Zero-Padding"><span class="nav-number">3.3.</span> <span class="nav-text">3. 序列的 Zero Padding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E8%A9%9E%E5%90%91%E9%87%8F%E8%A9%9E%E5%B5%8C%E5%85%A5-Word-Embedding-%EF%BC%9A%E5%B0%87%E8%A9%9E%E5%BD%99%E8%A1%A8%E9%81%94%E6%88%90%E6%9C%89%E6%84%8F%E7%BE%A9%E7%9A%84%E5%90%91%E9%87%8F"><span class="nav-number">3.4.</span> <span class="nav-text">4. 詞向量詞嵌入(Word Embedding)：將詞彙表達成有意義的向量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%B0%87%E7%AD%94%E6%A1%88%E5%81%9A-One-Hot-Encoding"><span class="nav-number">3.5.</span> <span class="nav-text">5. 將答案做 One-Hot Encoding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%88%87%E5%89%B2Train-amp-Validate%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86"><span class="nav-number">3.6.</span> <span class="nav-text">6. 切割Train &amp; Validate的資料集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E6%8E%A1%E7%94%A8%E6%9C%89%E8%A8%98%E6%86%B6%E7%9A%84%E5%BE%AA%E7%92%B0%E7%A5%9E%E7%B6%93%E7%B6%B2%E8%B7%AF%E6%9E%B6%E6%A7%8B%E6%A8%A1%E5%9E%8B-RNN"><span class="nav-number">3.7.</span> <span class="nav-text">7. 採用有記憶的循環神經網路架構模型(RNN)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E8%A8%93%E7%B7%B4%E9%A9%97%E8%AD%89%E8%B3%87%E6%96%99-fit"><span class="nav-number">3.8.</span> <span class="nav-text">8. 訓練驗證資料(fit)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-%E6%B8%AC%E8%A9%A6%E8%B3%87%E6%96%99-test"><span class="nav-number">3.9.</span> <span class="nav-text">9. 測試資料(test)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">參考:</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MaDi"
+      src="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DysonMa" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DysonMa" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:madihsiang@gmail.com" title="E-Mail → mailto:madihsiang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/marc_de_shawn" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;marc_de_shawn" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">若要轉載文章，煩請註明作者名稱MaDi與原始連結</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="訪客總數">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="總瀏覽次數">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://dysonma.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://dysonma.github.io/2020/11/14/nlp-process/";
+    this.page.identifier = "2020/11/14/nlp-process/";
+    this.page.title = "談談NLP自然語言處理";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://dysonma.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>
