@@ -36,7 +36,7 @@
 <meta property="og:image" content="https://i.imgur.com/MrFRl78.png">
 <meta property="og:image" content="https://i.imgur.com/zRxNK4D.png">
 <meta property="article:published_time" content="2020-11-09T15:45:55.000Z">
-<meta property="article:modified_time" content="2020-11-14T14:00:30.295Z">
+<meta property="article:modified_time" content="2020-11-21T07:29:31.298Z">
 <meta property="article:author" content="MaDi">
 <meta property="article:tag" content="python,AI,學習紀錄">
 <meta name="twitter:card" content="summary">
@@ -196,7 +196,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2020-11-14 22:00:30" itemprop="dateModified" datetime="2020-11-14T22:00:30+08:00">2020-11-14</time>
+                <time title="修改時間：2020-11-21 15:29:31" itemprop="dateModified" datetime="2020-11-21T15:29:31+08:00">2020-11-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -220,20 +220,6 @@
               <span class="post-meta-item-text">閱讀次數：</span>
               <span id="busuanzi_value_page_pv"></span>
             </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/11/09/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%BA%94-%E8%AE%80%E6%AA%94-%E7%B9%AA%E5%9C%96-DataFrame%E7%89%B9%E6%AE%8A%E6%8A%80%E5%B7%A7/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/11/09/Pandas常用語法整理-五-讀檔-繪圖-DataFrame特殊技巧/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
 
         </div>
       </header>
@@ -268,8 +254,7 @@
 </blockquote>
 <p><strong>&lt;p.s&gt; df.tosql()</strong></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df_new.to_sql(tblName, con&#x3D;engine, if_exists&#x3D;&#39;replace&#39;,dtype&#x3D;&#123;col_name: sqlalchemy.types.NVARCHAR for col_name in df_new&#125;,index&#x3D;False)</span><br></pre></td></tr></table></figure>
-
-
+<p>dtype在函式裡定義比較不會有編碼問題。</p>
 <h2 id="繪圖"><a href="#繪圖" class="headerlink" title="繪圖"></a>繪圖</h2><p>Pandas有以下類型的圖可以繪製</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">折線圖 df.plot()</span><br><span class="line">柱狀圖 df.plot(kind&#x3D;&#39;bar&#39;)</span><br><span class="line">橫向柱狀圖 df.plot(kind&#x3D;&#39;barh&#39;)</span><br><span class="line">直方圖 df.plot(kind&#x3D;&#39;hist&#39;)</span><br><span class="line">KDE圖 df.plot(kind&#x3D;&#39;kde&#39;)</span><br><span class="line">面積圖 df.plot(kind&#x3D;&#39;area&#39;)</span><br><span class="line">圓餅圖 df.plot(kind&#x3D;&#39;pie&#39;)</span><br><span class="line">散佈圖 df.plot(kind&#x3D;&#39;scatter&#39;)</span><br><span class="line">六角形箱體圖 df.plot(kind&#x3D;&#39;hexbin&#39;)</span><br><span class="line">箱形圖 df.plot(kind&#x3D;&#39;box&#39;)</span><br></pre></td></tr></table></figure>
 
@@ -363,13 +348,6 @@
 
           </div>
           
-    
-  <div class="comments">
-    <div id="disqus_thread">
-      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
-    </div>
-  </div>
-  
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -432,14 +410,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
   </nav>
@@ -553,37 +531,6 @@
   
 
   
-
-<script>
-  function loadCount() {
-    var d = document, s = d.createElement('script');
-    s.src = 'https://dysonma.disqus.com/count.js';
-    s.id = 'dsq-count-scr';
-    (d.head || d.body).appendChild(s);
-  }
-  // defer loading until the whole page loading is completed
-  window.addEventListener('load', loadCount, false);
-</script>
-<script>
-  var disqus_config = function() {
-    this.page.url = "https://dysonma.github.io/2020/11/09/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%BA%94-%E8%AE%80%E6%AA%94-%E7%B9%AA%E5%9C%96-DataFrame%E7%89%B9%E6%AE%8A%E6%8A%80%E5%B7%A7/";
-    this.page.identifier = "2020/11/09/Pandas常用語法整理-五-讀檔-繪圖-DataFrame特殊技巧/";
-    this.page.title = "Pandas常用語法整理(五) 讀檔/繪圖/DataFrame特殊技巧";
-    };
-  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
-    if (window.DISQUS) {
-      DISQUS.reset({
-        reload: true,
-        config: disqus_config
-      });
-    } else {
-      var d = document, s = d.createElement('script');
-      s.src = 'https://dysonma.disqus.com/embed.js';
-      s.setAttribute('data-timestamp', '' + +new Date());
-      (d.head || d.body).appendChild(s);
-    }
-  });
-</script>
 
 </body>
 </html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="IMDB 網路資料庫 (Internet Movie Database)，是一個電影相關的線上資料庫，內部資料集共有50000筆影評，訓練資料與測試資料各25000筆，每一筆影評都被分為正評 或 負評。 本篇文章利用Pytorch中的BERT模型去分類IMDB中的影評">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用BERT(PyTorch)模型分類IMDB電影資料集評論">
+<meta property="og:url" content="https://dysonma.github.io/2020/11/21/bert_PyTorch_IMDB/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="IMDB 網路資料庫 (Internet Movie Database)，是一個電影相關的線上資料庫，內部資料集共有50000筆影評，訓練資料與測試資料各25000筆，每一筆影評都被分為正評 或 負評。 本篇文章利用Pytorch中的BERT模型去分類IMDB中的影評">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/0BJcOqy.png">
+<meta property="og:image" content="https://i.imgur.com/XVAsRL4.png">
+<meta property="og:image" content="https://i.imgur.com/IXlU2iA.png">
+<meta property="og:image" content="https://i.imgur.com/luylK1T.png">
+<meta property="article:published_time" content="2020-11-21T07:39:40.000Z">
+<meta property="article:modified_time" content="2020-11-21T07:49:24.327Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/0BJcOqy.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/11/21/bert_PyTorch_IMDB/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>用BERT(PyTorch)模型分類IMDB電影資料集評論 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/11/21/bert_PyTorch_IMDB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          用BERT(PyTorch)模型分類IMDB電影資料集評論
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-11-21 15:39:40 / 修改時間：15:49:24" itemprop="dateCreated datePublished" datetime="2020-11-21T15:39:40+08:00">2020-11-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NLP/" itemprop="url" rel="index"><span itemprop="name">NLP</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NLP/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">閱讀次數：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>IMDB 網路資料庫 (Internet Movie Database)，是一個電影相關的線上資料庫，內部資料集共有50000筆影評，訓練資料與測試資料各25000筆，每一筆影評都被分為<code>正評</code> 或 <code>負評</code>。</p>
+<p>本篇文章利用Pytorch中的<strong>BERT</strong>模型去分類IMDB中的影評</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="BERT-PyTorch"><a href="#BERT-PyTorch" class="headerlink" title="BERT(PyTorch)"></a>BERT(PyTorch)</h2><h3 id="載入套件"><a href="#載入套件" class="headerlink" title="載入套件"></a>載入套件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">!pip install transformers</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># Basic</span><br><span class="line">import time</span><br><span class="line">import os</span><br><span class="line">import pandas as pd</span><br><span class="line">from transformers import BertTokenizer</span><br><span class="line"></span><br><span class="line"># PyTorch</span><br><span class="line">import torch</span><br><span class="line">from torch.utils.data import Dataset,random_split</span><br><span class="line">from torch.utils.data import DataLoader</span><br><span class="line">from torch.nn.utils.rnn import pad_sequence</span><br><span class="line"></span><br><span class="line"># IMDB</span><br><span class="line">from keras.datasets import imdb</span><br></pre></td></tr></table></figure>
+<p>因為IMDB資料是英文的評論，所以讀取pretrain-model是用不區分英文大小寫的 <code>bert-base-uncased</code> ，再隨機取10個字來看一下BERT的Tokenizer完的字典</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 取得 BERT 內的 pre-train tokenizer</span><br><span class="line">PRETRAINED_MODEL_NAME &#x3D; &quot;bert-base-uncased&quot; #英文pretrain(不區分大小寫)</span><br><span class="line">tokenizer &#x3D; BertTokenizer.from_pretrained(PRETRAINED_MODEL_NAME)</span><br><span class="line">vocab &#x3D; tokenizer.vocab</span><br><span class="line">print(&quot;dict size&quot;, len(vocab))</span><br><span class="line"></span><br><span class="line"># 隨機看一下 BERT tokenizer 完的字典</span><br><span class="line">import random</span><br><span class="line">random_tokens &#x3D; random.sample(list(vocab), 10)</span><br><span class="line">random_ids &#x3D; [vocab[t] for t in random_tokens]</span><br><span class="line"></span><br><span class="line">print(&quot;&#123;0:20&#125;&#123;1:15&#125;&quot;.format(&quot;token&quot;, &quot;index&quot;))</span><br><span class="line">print(&quot;-&quot; * 25)</span><br><span class="line">for t, id in zip(random_tokens, random_ids): #隨便看幾個字</span><br><span class="line">  print(&quot;&#123;0:15&#125;&#123;1:10&#125;&quot;.format(t, id))</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/0BJcOqy.png"></p>
+<h3 id="準備原始文本資料"><a href="#準備原始文本資料" class="headerlink" title="準備原始文本資料"></a>準備原始文本資料</h3><p>把IMDB的資料集讀取進來</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 僅保留訓練資料集前10000個最常出現的單詞，捨棄低頻的單詞</span><br><span class="line">(train_data,train_labels),(test_data,test_labels) &#x3D; imdb.load_data(num_words&#x3D;10000)</span><br></pre></td></tr></table></figure>
+<p>跟LSTM前處理一樣，先把sequence還原成文字</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 下載IMDB的字典 word_index -&gt; word:index</span><br><span class="line">word_index &#x3D; imdb.get_word_index()</span><br><span class="line"></span><br><span class="line"># 鍵值對調 reverse_word_index -&gt; index:word</span><br><span class="line">reverse_word_index &#x3D; &#123;value:key for key,value in word_index.items()&#125;</span><br><span class="line"></span><br><span class="line"># 查看每一筆評論內容(index-3，因為index&#x3D;0,1和2分別是“填充”,“序列開始”,“未知”的保留索引)，查不到的以?表示</span><br><span class="line">def read_IMDB_text(train_data):</span><br><span class="line">  text &#x3D; &#39; &#39;.join([reverse_word_index.get(i-3,&#39;?&#39;) for i in train_data])</span><br><span class="line">  return text</span><br></pre></td></tr></table></figure>
+<p>把文字內容(text)以及評價分類(label)做成DataFrame</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 做成train&#x2F;test的dataframe</span><br><span class="line">df_train &#x3D; pd.DataFrame(&#123;&#39;TRAIN_text_to_sequence&#39;:train_data,&quot;TRAIN_label&quot;:train_labels&#125;)</span><br><span class="line">df_test &#x3D; pd.DataFrame(&#123;&#39;TEST_text_to_sequence&#39;:test_data,&quot;TEST_label&quot;:test_labels&#125;)</span><br><span class="line"></span><br><span class="line">df_train[&#39;TRAIN_text&#39;] &#x3D; df_train[&#39;TRAIN_text_to_sequence&#39;].apply(read_IMDB_text)</span><br><span class="line">df_test[&#39;TEST_text&#39;] &#x3D; df_test[&#39;TEST_text_to_sequence&#39;].apply(read_IMDB_text)</span><br><span class="line"></span><br><span class="line">df_train &#x3D; df_train[[&quot;TRAIN_text&quot;,&quot;TRAIN_label&quot;]]</span><br><span class="line">df_test &#x3D; df_test[[&quot;TEST_text&quot;,&quot;TEST_label&quot;]]</span><br><span class="line"></span><br><span class="line">display(df_train.head())</span><br><span class="line">display(df_test.head())</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/XVAsRL4.png"></p>
+<h3 id="將原始文本轉換成BERT相容的輸入格式"><a href="#將原始文本轉換成BERT相容的輸入格式" class="headerlink" title="將原始文本轉換成BERT相容的輸入格式"></a>將原始文本轉換成BERT相容的輸入格式</h3><p><strong>實作一個可以用來讀取訓練與測試集的 Dataset</strong>，這個Dataset會將資料裏頭的text轉換成BERT的相容輸入格式，並回傳3個tensors</p>
+<ol>
+<li><code>tokens_tensor</code>: 合併句子的index sequence，包含[CLS],[SEP]</li>
+<li><code>segments_tensor</code>: 用來區別兩句子的界線</li>
+<li><code>label_tensor</code>: 將分類的label轉換成index的tensor</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"># 建立Dataset</span><br><span class="line">class IMDB_Dataset(Dataset):</span><br><span class="line">  def __init__(self, mode, tokenizer):</span><br><span class="line">    assert mode in [&quot;train&quot;, &quot;test&quot;]  </span><br><span class="line">    self.mode &#x3D; mode</span><br><span class="line">    self.df &#x3D; eval(f&quot;df_&#123;mode&#125;&quot;) # df_train or df_test</span><br><span class="line">    self.len &#x3D; len(self.df)</span><br><span class="line">    self.maxlen &#x3D; 300      #限制文章長度(depend on 你的記憶體)</span><br><span class="line">    self.tokenizer &#x3D; tokenizer  # 把 BERT tokenizer 傳進來</span><br><span class="line">  </span><br><span class="line">  # 定義回傳一筆訓練&#x2F;測試數據的函式</span><br><span class="line">  def __getitem__(self, idx):</span><br><span class="line">    origin_text &#x3D; self.df.iloc[idx][0] # 原始文本</span><br><span class="line">    origin_label &#x3D; self.df.iloc[idx][1]      # 原始分類</span><br><span class="line">    if self.mode &#x3D;&#x3D; &quot;test&quot;:</span><br><span class="line">        text &#x3D; self.df.iloc[idx][0]</span><br><span class="line">        label_tensor &#x3D; None </span><br><span class="line">        # label_id &#x3D; self.df.iloc[idx][1]</span><br><span class="line">        # label_tensor &#x3D; torch.tensor(label_id)</span><br><span class="line">    else:     </span><br><span class="line">        text &#x3D; self.df.iloc[idx][0]</span><br><span class="line">        # label_id &#x3D; self.label_id</span><br><span class="line">        label_tensor &#x3D; torch.tensor(origin_label)</span><br><span class="line">        </span><br><span class="line">    </span><br><span class="line">    # 建立第一個句子的 BERT tokens 並加入分隔符號 [SEP]</span><br><span class="line">    word_pieces &#x3D; [&quot;[CLS]&quot;]</span><br><span class="line">    tokens_a &#x3D; self.tokenizer.tokenize(text)</span><br><span class="line">    word_pieces +&#x3D; tokens_a[:self.maxlen] + [&quot;[SEP]&quot;]</span><br><span class="line">    len_a &#x3D; len(word_pieces)</span><br><span class="line">            </span><br><span class="line">    # 將整個 token 序列轉換成索引序列</span><br><span class="line">    ids &#x3D; self.tokenizer.convert_tokens_to_ids(word_pieces)</span><br><span class="line">    tokens_tensor &#x3D; torch.tensor(ids)</span><br><span class="line">    </span><br><span class="line">    # 將第一句包含 [SEP] 的 token 位置設為 0，其他為 1 表示第二句</span><br><span class="line">    segments_tensor &#x3D; torch.tensor([0] * len_a,dtype&#x3D;torch.long)</span><br><span class="line">    </span><br><span class="line">    return (tokens_tensor, segments_tensor, label_tensor, origin_text, origin_label)</span><br><span class="line"></span><br><span class="line">  def __len__(self):</span><br><span class="line">    return self.len</span><br></pre></td></tr></table></figure>
+<p>透過<code>IMDB_Dataset</code>的class實例出訓練資料集與測試資料集，並轉成BERT的輸入格式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># initialize Dataset</span><br><span class="line">trainset &#x3D; IMDB_Dataset(&quot;train&quot;, tokenizer&#x3D;tokenizer)</span><br><span class="line">testset &#x3D; IMDB_Dataset(&quot;test&quot;, tokenizer&#x3D;tokenizer)</span><br></pre></td></tr></table></figure>
+<p>訓練資料集的第一筆回傳3個tensor加上原始文本與原始label，分別是<code>tokens_tensor</code>, <code>segments_tensor</code>, <code>label_tensor</code>, <code>origin_text</code>, <code>origin_label</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trainset[0]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>tensor([  101,  1029,  2023,  2143,  2001,  2074,  8235,  9179,  3295, 17363,<br>          2466,  3257,  3071,  1005,  1055,  2428, 10897,  1996,  2112,  2027, …]),<br> tensor([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …]),<br> tensor(1),<br> “? this film was just brilliant casting location scenery story direction everyone’s …”,<br>1</p>
+</blockquote>
+<p>隨機選一個id來看一下轉換前後的差異</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 隨便選一個樣本</span><br><span class="line">sample_idx &#x3D; 2</span><br><span class="line"></span><br><span class="line"># 利用剛剛建立的 Dataset 取出轉換後的 id tensors</span><br><span class="line">tokens_tensor, segments_tensor, label_tensor, origin_text, origin_label &#x3D; trainset[sample_idx]</span><br><span class="line"></span><br><span class="line"># 將 tokens_tensor 還原成文本</span><br><span class="line">tokens &#x3D; tokenizer.convert_ids_to_tokens(tokens_tensor.tolist())</span><br><span class="line"></span><br><span class="line">print(f&quot;&quot;&quot;[原始文本]</span><br><span class="line">句子：&#123;origin_text&#125;</span><br><span class="line">分類  ：&#123;origin_label&#125;</span><br><span class="line"></span><br><span class="line">--------------------</span><br><span class="line"></span><br><span class="line">[Dataset 回傳的 tensors]</span><br><span class="line">tokens_tensor  ：&#123;tokens_tensor[0:20]&#125;</span><br><span class="line"></span><br><span class="line">segments_tensor：&#123;segments_tensor[0:20]&#125;</span><br><span class="line"></span><br><span class="line">label_tensor   ：&#123;label_tensor&#125;</span><br><span class="line"></span><br><span class="line">&quot;&quot;&quot;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[原始文本]<br>句子：? this has to be one of the worst films of the 1990s when…<br>分類  ：0</p>
+<p>[Dataset 回傳的 tensors]<br>tokens_tensor  ：tensor([ 101, 1029, 2023, 2038, 2000, 2022, 2028, 1997, 1996, 5409, …])</p>
+<p>segments_tensor：tensor([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …])</p>
+<p>label_tensor   ：0</p>
+</blockquote>
+<p>製作一個DataLoader去分批讀取小量的mini-batch<br>這個函式的輸入 <code>samples</code> 是一個 list，裡頭的每個 element 都是剛剛定義的 <code>IMDB_Dataset</code> 回傳的一個資料，每個資料都包含3個tensors：</p>
+<ul>
+<li>tokens_tensor</li>
+<li>segments_tensor</li>
+<li>label_tensor</li>
+</ul>
+<p>它會對前兩個 tensors 作 zero padding，並產生masks_tensors</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">def create_mini_batch(samples):</span><br><span class="line">    tokens_tensors &#x3D; [s[0] for s in samples]</span><br><span class="line">    segments_tensors &#x3D; [s[1] for s in samples]</span><br><span class="line">    </span><br><span class="line">    # 訓練集有 labels</span><br><span class="line">    if samples[0][2] is not None:</span><br><span class="line">        label_ids &#x3D; torch.stack([s[2] for s in samples])</span><br><span class="line">    else:</span><br><span class="line">        label_ids &#x3D; None</span><br><span class="line">    </span><br><span class="line">    # zero pad到該batch下最長的長度</span><br><span class="line">    tokens_tensors &#x3D; pad_sequence(tokens_tensors, batch_first&#x3D;True)</span><br><span class="line">    segments_tensors &#x3D; pad_sequence(segments_tensors,batch_first&#x3D;True)</span><br><span class="line">    </span><br><span class="line">    # attention masks，將 tokens_tensors 裡頭不為 zero padding</span><br><span class="line">    # 的位置設為 1 讓 BERT 只關注這些位置的 tokens</span><br><span class="line">    masks_tensors &#x3D; torch.zeros(tokens_tensors.shape,dtype&#x3D;torch.long)</span><br><span class="line">    masks_tensors &#x3D; masks_tensors.masked_fill(tokens_tensors !&#x3D; 0, 1)</span><br><span class="line">    </span><br><span class="line">    return tokens_tensors, segments_tensors, masks_tensors, label_ids</span><br></pre></td></tr></table></figure>
+<p>實例化一個每次回傳 batch size 個訓練樣本的 DataLoader，並利用 <code>collate_fn</code> 將 list of samples 合併成一個 mini-batch</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">BATCH_SIZE &#x3D; 64</span><br><span class="line">trainloader &#x3D; DataLoader(trainset, batch_size&#x3D;BATCH_SIZE,collate_fn&#x3D;create_mini_batch,shuffle&#x3D;True)</span><br><span class="line">testloader &#x3D; DataLoader(testset, batch_size&#x3D;BATCH_SIZE,collate_fn&#x3D;create_mini_batch,shuffle&#x3D;False)</span><br><span class="line"></span><br><span class="line">data &#x3D; next(iter(trainloader))</span><br><span class="line">tokens_tensors, segments_tensors, masks_tensors, label_ids &#x3D; data</span><br><span class="line"></span><br><span class="line">print(f&quot;&quot;&quot;</span><br><span class="line">tokens_tensors.shape   &#x3D; &#123;tokens_tensors.shape&#125; </span><br><span class="line">&#123;tokens_tensors&#125;</span><br><span class="line">------------------------</span><br><span class="line">segments_tensors.shape &#x3D; &#123;segments_tensors.shape&#125;</span><br><span class="line">&#123;segments_tensors&#125;</span><br><span class="line">------------------------</span><br><span class="line">masks_tensors.shape    &#x3D; &#123;masks_tensors.shape&#125;</span><br><span class="line">&#123;masks_tensors&#125;</span><br><span class="line">------------------------</span><br><span class="line">label_ids.shape        &#x3D; &#123;label_ids.shape&#125;</span><br><span class="line">&#123;label_ids&#125;</span><br><span class="line">&quot;&quot;&quot;)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/IXlU2iA.png"><br><img src="https://i.imgur.com/luylK1T.png"></p>
+<h3 id="以BERT為基礎加入layers成下游任務模型"><a href="#以BERT為基礎加入layers成下游任務模型" class="headerlink" title="以BERT為基礎加入layers成下游任務模型"></a>以BERT為基礎加入layers成下游任務模型</h3><p>載入一個可以做分類的 BERT 模型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">from transformers import BertForSequenceClassification</span><br><span class="line"></span><br><span class="line">NUM_LABELS &#x3D; 2</span><br><span class="line">model &#x3D; BertForSequenceClassification.from_pretrained(PRETRAINED_MODEL_NAME, num_labels&#x3D;NUM_LABELS)</span><br></pre></td></tr></table></figure>
+<p>定義一個可以針對特定 DataLoader 取得模型預測結果以及分類準確度的函式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">def get_predictions(model, dataloader, compute_acc&#x3D;False):</span><br><span class="line">    predictions &#x3D; None</span><br><span class="line">    correct &#x3D; 0</span><br><span class="line">    total &#x3D; 0</span><br><span class="line">      </span><br><span class="line">    with torch.no_grad():</span><br><span class="line">        # 遍巡整個資料集</span><br><span class="line">        for data in dataloader:</span><br><span class="line">            # 將所有 tensors 移到 GPU 上</span><br><span class="line">            if next(model.parameters()).is_cuda:</span><br><span class="line">                data &#x3D; [t.to(&quot;cuda:0&quot;) for t in data if t is not None]</span><br><span class="line">            </span><br><span class="line">            </span><br><span class="line">            # 別忘記前 3 個 tensors 分別為 tokens, segments 以及 masks</span><br><span class="line">            # 且強烈建議在將這些 tensors 丟入 &#96;model&#96; 時指定對應的參數名稱</span><br><span class="line">            tokens_tensors, segments_tensors, masks_tensors &#x3D; data[:3]</span><br><span class="line">            outputs &#x3D; model(input_ids&#x3D;tokens_tensors, </span><br><span class="line">                            token_type_ids&#x3D;segments_tensors, </span><br><span class="line">                            attention_mask&#x3D;masks_tensors)</span><br><span class="line">            </span><br><span class="line">            logits &#x3D; outputs[0]</span><br><span class="line">            _, pred &#x3D; torch.max(logits.data, 1)</span><br><span class="line">            </span><br><span class="line">            # 用來計算訓練集的分類準確率</span><br><span class="line">            if compute_acc:</span><br><span class="line">                labels &#x3D; data[3]</span><br><span class="line">                total +&#x3D; labels.size(0)</span><br><span class="line">                correct +&#x3D; (pred &#x3D;&#x3D; labels).sum().item()</span><br><span class="line">                </span><br><span class="line">            # 將當前 batch 記錄下來</span><br><span class="line">            if predictions is None:</span><br><span class="line">                predictions &#x3D; pred</span><br><span class="line">            else:</span><br><span class="line">                predictions &#x3D; torch.cat((predictions, pred))</span><br><span class="line">    </span><br><span class="line">    if compute_acc:</span><br><span class="line">        acc &#x3D; correct &#x2F; total</span><br><span class="line">        return predictions, acc</span><br><span class="line">    return predictions</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 讓模型跑在 GPU 上並取得訓練集的分類準確率</span><br><span class="line">device &#x3D; torch.device(&quot;cuda:0&quot; if torch.cuda.is_available() else &quot;cpu&quot;)</span><br><span class="line">print(&quot;device:&quot;, device)</span><br><span class="line">model &#x3D; model.to(device)</span><br><span class="line">_, acc &#x3D; get_predictions(model, trainloader, compute_acc&#x3D;True)</span><br><span class="line">print(&quot;classification acc:&quot;, acc)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>device: cuda:0<br>classification acc: 0.49984</p>
+</blockquote>
+<h3 id="fine-tune下游任務模型"><a href="#fine-tune下游任務模型" class="headerlink" title="fine-tune下游任務模型"></a>fine-tune下游任務模型</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">%%time</span><br><span class="line"></span><br><span class="line"># 訓練模式</span><br><span class="line">model.train()</span><br><span class="line"></span><br><span class="line"># 使用 Adam Optim 更新整個分類模型的參數</span><br><span class="line">optimizer &#x3D; torch.optim.Adam(model.parameters(), lr&#x3D;1e-5)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">EPOCHS &#x3D; 6</span><br><span class="line">for epoch in range(EPOCHS):</span><br><span class="line">    </span><br><span class="line">    running_loss &#x3D; 0.0</span><br><span class="line">    for data in trainloader:</span><br><span class="line">        </span><br><span class="line">        tokens_tensors, segments_tensors, \</span><br><span class="line">        masks_tensors, labels &#x3D; [t.to(device) for t in data]</span><br><span class="line"></span><br><span class="line">        # 將參數梯度歸零</span><br><span class="line">        optimizer.zero_grad()</span><br><span class="line">        </span><br><span class="line">        # forward pass</span><br><span class="line">        outputs &#x3D; model(input_ids&#x3D;tokens_tensors, </span><br><span class="line">                        token_type_ids&#x3D;segments_tensors, </span><br><span class="line">                        attention_mask&#x3D;masks_tensors, </span><br><span class="line">                        labels&#x3D;labels)</span><br><span class="line"></span><br><span class="line">        loss &#x3D; outputs[0]</span><br><span class="line">        # backward</span><br><span class="line">        loss.backward()</span><br><span class="line">        optimizer.step()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        # 紀錄當前 batch loss</span><br><span class="line">        running_loss +&#x3D; loss.item()</span><br><span class="line">        </span><br><span class="line">    # 計算分類準確率</span><br><span class="line">    _, acc &#x3D; get_predictions(model, trainloader, compute_acc&#x3D;True)</span><br><span class="line"></span><br><span class="line">    print(&#39;[epoch %d] loss: %.3f, acc: %.3f&#39; %</span><br><span class="line">          (epoch + 1, running_loss, acc))</span><br></pre></td></tr></table></figure>
+<h3 id="對測試資料做推論"><a href="#對測試資料做推論" class="headerlink" title="對測試資料做推論"></a>對測試資料做推論</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 建立測試集。這邊我們可以用跟訓練時不同的 batch_size，看你 GPU 多大</span><br><span class="line">testset &#x3D; IMDB_Dataset(&quot;test&quot;, tokenizer&#x3D;tokenizer)</span><br><span class="line">testloader &#x3D; DataLoader(testset, batch_size&#x3D;256, collate_fn&#x3D;create_mini_batch)</span><br><span class="line"></span><br><span class="line"># 用分類模型預測測試集</span><br><span class="line">predictions &#x3D; get_predictions(model, testloader)</span><br><span class="line">predictions</span><br></pre></td></tr></table></figure>
+
+<h3 id="完整程式碼"><a href="#完整程式碼" class="headerlink" title="完整程式碼"></a>完整程式碼</h3><p><a href="">IMDB-BERT</a></p>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://leemeng.tw/attack_on_bert_transfer_learning_in_nlp.html">進擊的 BERT：NLP 界的巨人之力與遷移學習</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@peaceful0907/%E4%BE%86%E7%8E%A9%E9%BB%9Enlp-lstm-vs-bert-on-imdb-dataset-4aa18ecd65e2">來玩點NLP — LSTM vs. BERT on IMDb dataset</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/21/LSTM_IMDB/" rel="prev" title="用LSTM模型分類IMDB電影資料集評論">
+      <i class="fa fa-chevron-left"></i> 用LSTM模型分類IMDB電影資料集評論
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/11/21/frontend_game/" rel="next" title="前端遊戲專案紀錄">
+      前端遊戲專案紀錄 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#BERT-PyTorch"><span class="nav-number">1.</span> <span class="nav-text">BERT(PyTorch)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BC%89%E5%85%A5%E5%A5%97%E4%BB%B6"><span class="nav-number">1.1.</span> <span class="nav-text">載入套件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%96%E5%82%99%E5%8E%9F%E5%A7%8B%E6%96%87%E6%9C%AC%E8%B3%87%E6%96%99"><span class="nav-number">1.2.</span> <span class="nav-text">準備原始文本資料</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%87%E5%8E%9F%E5%A7%8B%E6%96%87%E6%9C%AC%E8%BD%89%E6%8F%9B%E6%88%90BERT%E7%9B%B8%E5%AE%B9%E7%9A%84%E8%BC%B8%E5%85%A5%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.3.</span> <span class="nav-text">將原始文本轉換成BERT相容的輸入格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A5BERT%E7%82%BA%E5%9F%BA%E7%A4%8E%E5%8A%A0%E5%85%A5layers%E6%88%90%E4%B8%8B%E6%B8%B8%E4%BB%BB%E5%8B%99%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.4.</span> <span class="nav-text">以BERT為基礎加入layers成下游任務模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fine-tune%E4%B8%8B%E6%B8%B8%E4%BB%BB%E5%8B%99%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.5.</span> <span class="nav-text">fine-tune下游任務模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8D%E6%B8%AC%E8%A9%A6%E8%B3%87%E6%96%99%E5%81%9A%E6%8E%A8%E8%AB%96"><span class="nav-number">1.6.</span> <span class="nav-text">對測試資料做推論</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">1.7.</span> <span class="nav-text">完整程式碼</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">2.</span> <span class="nav-text">參考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MaDi"
+      src="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DysonMa" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DysonMa" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:madihsiang@gmail.com" title="E-Mail → mailto:madihsiang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/marc_de_shawn" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;marc_de_shawn" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">若要轉載文章，煩請註明作者名稱MaDi與原始連結</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="訪客總數">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="總瀏覽次數">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

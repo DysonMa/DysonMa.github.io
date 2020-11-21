@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="最近寫了一個前端遊戲的專案，過程中踩了滿多雷，花了滿多時間，為了不想以後重複造輪子，趁目前記憶猶新紀錄一下整個過程，提供給未來遇到相似問題的自己參考。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="前端遊戲專案紀錄">
+<meta property="og:url" content="https://dysonma.github.io/2020/11/21/frontend_game/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="最近寫了一個前端遊戲的專案，過程中踩了滿多雷，花了滿多時間，為了不想以後重複造輪子，趁目前記憶猶新紀錄一下整個過程，提供給未來遇到相似問題的自己參考。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/DlC34jI.png">
+<meta property="article:published_time" content="2020-11-21T07:41:03.000Z">
+<meta property="article:modified_time" content="2020-11-21T07:50:01.093Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/DlC34jI.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/11/21/frontend_game/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>前端遊戲專案紀錄 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/11/21/frontend_game/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          前端遊戲專案紀錄
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-11-21 15:41:03 / 修改時間：15:50:01" itemprop="dateCreated datePublished" datetime="2020-11-21T15:41:03+08:00">2020-11-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%B6%B2%E9%A0%81%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">網頁前端</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%B6%B2%E9%A0%81%E5%89%8D%E7%AB%AF/javascript/" itemprop="url" rel="index"><span itemprop="name">javascript</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">閱讀次數：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>最近寫了一個前端遊戲的專案，過程中踩了滿多雷，花了滿多時間，為了不想以後重複造輪子，趁目前記憶猶新紀錄一下整個過程，提供給未來遇到相似問題的自己參考。</p>
+</blockquote>
+<a id="more"></a>
+
+<h3 id="按鍵觸發音效"><a href="#按鍵觸發音效" class="headerlink" title="按鍵觸發音效"></a>按鍵觸發音效</h3><p>js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 播放按鈕音效的函式</span><br><span class="line">function playSoundEffect()&#123;</span><br><span class="line">  var playSoundCorrect &#x3D; new Audio(&quot;.&#x2F;public&#x2F;game1&#x2F;click.mp3&quot;);</span><br><span class="line">  playSoundCorrect.play();</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; 函式持續執行</span><br><span class="line">$(function()&#123;</span><br><span class="line">  &#x2F;&#x2F; 按下元素1的按鈕</span><br><span class="line">  $(元素1).on(&quot;click&quot;,function()&#123;</span><br><span class="line">      playSoundEffect();</span><br><span class="line">  &#125;)</span><br><span class="line">  ...</span><br><span class="line">  ...</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="網頁播放音樂"><a href="#網頁播放音樂" class="headerlink" title="網頁播放音樂"></a>網頁播放音樂</h3><p>html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 加音樂 --&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;audio id&#x3D;&quot;myAudio&quot; autoplay&#x3D;&quot;true&quot; loop&gt;</span><br><span class="line">        &lt;source src&#x3D;&quot;.&#x2F;路徑&#x2F;檔名.mp3&quot; type&#x3D;&quot;audio&#x2F;mpeg&quot;&gt;</span><br><span class="line">    &lt;&#x2F;audio&gt;</span><br><span class="line">&lt;&#x2F;body&gt;</span><br></pre></td></tr></table></figure>
+<p>需要從google網頁的設定去調整播放的控制選項</p>
+<p><a target="_blank" rel="noopener" href="https://yuci119.blogspot.com/2019/11/google-chrome-fix-google-chrome.html?m=1">解決新版google chrome 影片或聲音無法自動播放的問題 (Fix google chrome Autoplay policy)</a></p>
+<h3 id="用D3-js讀檔"><a href="#用D3-js讀檔" class="headerlink" title="用D3.js讀檔"></a>用D3.js讀檔</h3><p>html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- d3 --&gt;</span><br><span class="line">&lt;script src&#x3D;&quot;https:&#x2F;&#x2F;d3js.org&#x2F;d3.v6.min.js&quot;&gt;&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+<p>js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 用D3載入csv</span><br><span class="line">ques_list &#x3D; []</span><br><span class="line">d3.csv(file, function(data)&#123;</span><br><span class="line">  ques_list.push(data);  &#x2F;&#x2F;用table的方式在console呈現json</span><br><span class="line">  return ques_list;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="禁止在網頁上按右鍵、鍵盤…"><a href="#禁止在網頁上按右鍵、鍵盤…" class="headerlink" title="禁止在網頁上按右鍵、鍵盤…"></a>禁止在網頁上按右鍵、鍵盤…</h3><p>js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 禁止進行任何動作</span><br><span class="line">$(document).ready(function() &#123;  </span><br><span class="line">  &#x2F;&#x2F; 禁止按右鍵</span><br><span class="line">  $(document).get(0).oncontextmenu &#x3D; function() &#123;</span><br><span class="line">      return false;</span><br><span class="line">  &#125;;</span><br><span class="line">  &#x2F;&#x2F; 禁止按ctrl&#x2F;alt&#x2F;shift</span><br><span class="line">  $(document).get(0).onkeydown &#x3D; function()&#123;</span><br><span class="line">    if ( event.ctrlKey )&#123;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">    if ( event.altKey )&#123;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">    if ( event.shiftKey )&#123;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  &#x2F;&#x2F; 禁止在網頁選取</span><br><span class="line">  $(document).get(0).onselectstart &#x3D; function()&#123;</span><br><span class="line">    return false;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;); </span><br></pre></td></tr></table></figure>
+
+<h3 id="自定義動畫keyframe"><a href="#自定義動畫keyframe" class="headerlink" title="自定義動畫keyframe"></a>自定義動畫keyframe</h3><p>參考網路上的插件 <a target="_blank" rel="noopener" href="https://github.com/Keyframes/jQuery.Keyframes">jquery-keyframes</a></p>
+<p>遇到的問題: </p>
+<blockquote>
+<p>有一個轉盤，背後有很多題目，每一題對應到一個角度。想客製化轉盤旋轉停止的角度，也就是第五題就停止在第五題對應的角度。</p>
+</blockquote>
+<p>解決方法:</p>
+<blockquote>
+<p>都先轉N圈，最後一圈才決定要轉幾度(depend on 第幾題, i.e. iEnd)，<code>rotate(&#39;+(360*N+iEnd*45)+&#39;deg)&#39;</code>，整體動畫播放才會流暢</p>
+</blockquote>
+<p>html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- jQuery.Keyframes --&gt;</span><br><span class="line">&lt;script type&#x3D;&quot;text&#x2F;javascript&quot; src&#x3D;&#39;.&#x2F;public&#x2F;js&#x2F;jQuery.Keyframes-master&#x2F;dist&#x2F;jquery.keyframes.min.js&#39;&gt;&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 判斷是否支援</span><br><span class="line">var supportedFlag &#x3D; $.keyframe.isSupported(); </span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 定義一個叫做go的動畫</span><br><span class="line">$.keyframe.define([&#123;</span><br><span class="line">    name: &#39;go&#39;,</span><br><span class="line">    &#39;0%&#39;: &#123;&#39;transform&#39;: &#39;translate(-50%,-50%) rotate(0deg)&#39;&#125;,</span><br><span class="line">    &#39;100%&#39;: &#123;&#39;transform&#39;: &#39;translate(-50%,-50%) rotate(&#39;+(1440+iEnd*45)+&#39;deg)&#39;&#125;  </span><br><span class="line">    &#x2F;&#x2F; 都先轉4圈，最後一圈才決定要轉幾度(depend on 第幾題, i.e. iEnd) </span><br><span class="line">&#125;]);</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 在加上go這個class的元素上播放go動畫</span><br><span class="line">$(&#39;元素.go&#39;).playKeyframe(&#123;</span><br><span class="line">    name: &#39;go&#39;,</span><br><span class="line">    duration: &quot;7s&quot;,             &#x2F;&#x2F; 動畫執行時間</span><br><span class="line">    timingFunction: &#39;ease-out&#39;, &#x2F;&#x2F; 快到慢</span><br><span class="line">    iterationCount: &#39;1&#39;,        &#x2F;&#x2F; 只執行一次動畫</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="設定倒數計時器"><a href="#設定倒數計時器" class="headerlink" title="設定倒數計時器"></a>設定倒數計時器</h3><p>js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">stop_time &#x3D; false;  &#x2F;&#x2F; 初期設定尚未停止</span><br><span class="line">sec &#x3D; 60;           &#x2F;&#x2F; 設定倒數時間60秒</span><br><span class="line">var setint;         &#x2F;&#x2F; 設定倒數計時器</span><br><span class="line"></span><br><span class="line">clearInterval(setint); &#x2F;&#x2F; 清空倒數計時器，否則會一直倒數</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 設定每8000毫秒(8秒)的倒數計時器</span><br><span class="line">setint &#x3D; setInterval( function()&#123;</span><br><span class="line">  &#x2F;&#x2F; 預設stop_time&#x3D;true -&gt; 直接return</span><br><span class="line">  if(stop_time)&#123;</span><br><span class="line">    return</span><br><span class="line">  &#125;</span><br><span class="line">  &#x2F;&#x2F; 當倒數結束</span><br><span class="line">  if(sec&#x3D;&#x3D;0)&#123;</span><br><span class="line">      ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;, 8000);</span><br></pre></td></tr></table></figure>
+
+<h3 id="jquery-mobile-跳頁"><a href="#jquery-mobile-跳頁" class="headerlink" title="jquery-mobile 跳頁"></a>jquery-mobile 跳頁</h3><p>下載 <a target="_blank" rel="noopener" href="https://jquerymobile.com/download/">jquery.mobile-1.4.5.min.css</a></p>
+<p>html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;link rel&#x3D;&quot;stylesheet&quot; href&#x3D;&quot;.&#x2F;public&#x2F;jquery.mobile-1.4.5&#x2F;jquery.mobile-1.4.5.min.css&quot;&gt;</span><br><span class="line">&lt;&#x2F;head&gt;</span><br><span class="line"></span><br><span class="line">&lt;script src&#x3D;&#39;https:&#x2F;&#x2F;code.jquery.com&#x2F;jquery-1.11.1.min.js&#39;&gt;&lt;&#x2F;script&gt;</span><br><span class="line">&lt;script src&#x3D;&quot;https:&#x2F;&#x2F;code.jquery.com&#x2F;mobile&#x2F;1.4.5&#x2F;jquery.mobile-1.4.5.min.js&quot;&gt;&lt;&#x2F;script&gt;</span><br><span class="line"></span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;div data-role&#x3D;&quot;page&quot; id&#x3D;&quot;page1&quot;&gt;&lt;&#x2F;div&gt;  &#x2F;&#x2F; 第一頁</span><br><span class="line">    &lt;div data-role&#x3D;&quot;page&quot; id&#x3D;&quot;page2&quot;&gt;&lt;&#x2F;div&gt;  &#x2F;&#x2F; 第二頁</span><br><span class="line">    ...</span><br><span class="line">&lt;&#x2F;body&gt;</span><br></pre></td></tr></table></figure>
+<p>js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$.mobile.changePage(&#39;#page1&#39;,&#123;allowSamePageTransition:true,transition:&quot;slidedown&quot;&#125;); &#x2F;&#x2F; 跳回第一頁</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h3 id="bootstrap-modal-跳視窗"><a href="#bootstrap-modal-跳視窗" class="headerlink" title="bootstrap modal 跳視窗"></a>bootstrap modal 跳視窗</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 避免點擊外部空白而消失modal(重要!!)</span><br><span class="line">$(&quot;#myModal&quot;).modal(&#123;backdrop:&#39;static&#39;,keyboard:false&#125;); </span><br><span class="line">$(&#39;#myModal&#39;).modal(&#39;show&#39;)</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="隨機產生數字"><a href="#隨機產生數字" class="headerlink" title="隨機產生數字"></a>隨機產生數字</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 隨機產生數字 </span><br><span class="line">function randomNum(min, max) &#123;</span><br><span class="line">    return Math.floor(Math.random() * ((max - min)+1) + min);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="隨機sample出n個數量的陣列"><a href="#隨機sample出n個數量的陣列" class="headerlink" title="隨機sample出n個數量的陣列"></a>隨機sample出n個數量的陣列</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">function generateRandomItemsArray(n, originalArray) &#123;</span><br><span class="line">  let res &#x3D; [];</span><br><span class="line">  let clonedArray &#x3D; [...originalArray]; &#x2F;&#x2F; ... operator -&gt; 把迭代物件展開</span><br><span class="line">  if(n &gt; clonedArray.length) n&#x3D;clonedArray.length;</span><br><span class="line">  for(let i&#x3D;1; i&lt;&#x3D;n; i++) &#123;</span><br><span class="line">    const randomIndex &#x3D; Math.floor(Math.random()*clonedArray.length); &#x2F;&#x2F; 1~n</span><br><span class="line">    res.push(clonedArray[randomIndex]);</span><br><span class="line">    clonedArray.splice(randomIndex, 1); &#x2F;&#x2F;把cloneArray隨機抽到的index丟進res，接著刪除cloneArray隨機抽到的那個元素</span><br><span class="line">  &#125;</span><br><span class="line">  return res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Drag-Drop事件"><a href="#Drag-Drop事件" class="headerlink" title="Drag-Drop事件"></a>Drag-Drop事件</h3><p>html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- drag的物件 --&gt;</span><br><span class="line">&lt;div class&#x3D;&#39;draggable&#39;&gt;&lt;&#x2F;div&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- drop的物件 --&gt;</span><br><span class="line">&lt;div class&#x3D;&#39;droppable&#39;&gt;&lt;&#x2F;div&gt;</span><br></pre></td></tr></table></figure>
+
+<p>js</p>
+<p>定義 <code>dragStart</code>, <code>dragEnter</code>, <code>dragOver</code>, <code>dragLeave</code> 四個觸發的函式</p>
+<p>重點:</p>
+<ol>
+<li><code>event.dataTransfer.setData(&quot;text&quot;, 設定drag傳送的資料)</code>: 可以設定drag元素要丟給drop物件的資訊</li>
+<li><code>event.dataTransfer.getData(&quot;text&quot;)</code>: drop物件抓取drag物件傳送的資訊 </li>
+<li><code>dragStart</code>: 觸發事件(event)是<strong>drag元素</strong></li>
+<li><code>dragEnter</code>, <code>dragOver</code>, <code>dragLeave</code>: 觸發事件(event)是<strong>drop元素</strong></li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 被拖曳的物件觸發</span><br><span class="line">function dragStart(event) &#123;</span><br><span class="line">    &#x2F;&#x2F; 設定event傳送id給text</span><br><span class="line">    event.dataTransfer.setData(&quot;text&quot;, event.target.id); &#x2F;&#x2F; or &quot;text&#x2F;plain&quot; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 滑鼠拖曳狀態下，滑鼠進入drop物件，由drop物件觸發</span><br><span class="line">function dragEnter(event) &#123;</span><br><span class="line">    if(event.target.classList &amp;&amp; event.target.classList.contains(&quot;droppable&quot;) &amp;&amp; !event.target.classList.contains(&quot;dropped&quot;)) &#123;</span><br><span class="line">      event.target.classList.add(&quot;droppable-hover&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; 滑鼠拖曳狀態下，滑鼠在drop物件上，由drop物件觸發</span><br><span class="line">function dragOver(event) &#123;</span><br><span class="line">    if(event.target.classList &amp;&amp; event.target.classList.contains(&quot;droppable&quot;) &amp;&amp; !event.target.classList.contains(&quot;dropped&quot;)) &#123;</span><br><span class="line">      event.preventDefault();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; 滑鼠拖曳狀態下，滑鼠離開drop物件，由drop物件觸發</span><br><span class="line">function dragLeave(event) &#123;</span><br><span class="line">    if(event.target.classList &amp;&amp; event.target.classList.contains(&quot;droppable&quot;) &amp;&amp; !event.target.classList.contains(&quot;dropped&quot;)) &#123;</span><br><span class="line">      event.target.classList.remove(&quot;droppable-hover&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>定義 <code>drop</code> 函式，這個函式同時考慮了<strong>電腦滑鼠操作</strong>以及<strong>平板手機操作</strong></p>
+<p>重點:</p>
+<ol>
+<li>區分觸發事件是mouse還是touch: 用<code>event.type</code>去區分，mouse是<code>drop</code>，touch是<code>touchend</code></li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">function drop(event) &#123;</span><br><span class="line">  event.preventDefault();</span><br><span class="line"></span><br><span class="line">  &#x2F;&#x2F; 電腦</span><br><span class="line">  if(event.type&#x3D;&#x3D;&quot;drop&quot;)&#123;</span><br><span class="line">    event.target.classList.remove(&quot;droppable-hover&quot;); &#x2F;&#x2F; 移除hover的class</span><br><span class="line">    var draggableElementBrand &#x3D; event.dataTransfer.getData(&quot;text&quot;);  &#x2F;&#x2F; 用text接收drag夾帶的id</span><br><span class="line">    var droppableElementBrand &#x3D; event.target.getAttribute(&quot;data-brand&quot;); &#x2F;&#x2F; 獲取drop下來的物件的屬性，作為判斷是否放對的依據</span><br><span class="line">  &#125;</span><br><span class="line">  &#x2F;&#x2F; 觸控板</span><br><span class="line">  else if(event.type&#x3D;&#x3D;&quot;touchend&quot;)&#123;</span><br><span class="line">    $(&quot;.droppable-hover&quot;).removeClass(&quot;droppable-hover&quot;)  &#x2F;&#x2F; 每次移動都把有包含hover這個動畫的元素的class去除</span><br><span class="line">    </span><br><span class="line">    event.target.style.zIndex &#x3D; &#39;-10&#39;;  &#x2F;&#x2F; 先藏下去，因為elementFromPoint是找最上層</span><br><span class="line">    var draggableElementBrand &#x3D; event.target.id;  &#x2F;&#x2F; pickup選取的icon</span><br><span class="line">    var drop_element &#x3D; document.elementFromPoint(event.changedTouches[0].clientX, event.changedTouches[0].clientY) &#x2F;&#x2F; elementFromPoint從位置抓元素(drop位置最上方的元素)</span><br><span class="line">    if(drop_element!&#x3D;undefined)&#123;</span><br><span class="line">      var droppableElementBrand &#x3D; drop_element.getAttribute(&quot;data-brand&quot;); </span><br><span class="line">    &#125;</span><br><span class="line">    event.target.style.zIndex &#x3D; &#39;1&#39;; &#x2F;&#x2F; 再放上層，不然會看不見</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  const isCorrectMatching &#x3D; draggableElementBrand&#x3D;&#x3D;&#x3D;droppableElementBrand; &#x2F;&#x2F; 判斷drop&#x2F;drag是否放對</span><br><span class="line"></span><br><span class="line">  &#x2F;&#x2F; drop對</span><br><span class="line">  if(isCorrectMatching) &#123;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 答對的icon去掉touch的觸發</span><br><span class="line">    if(event.type&#x3D;&#x3D;&#39;touchend&#39;)&#123;</span><br><span class="line">      draggableElement.removeAttribute(&quot;ontouchstart&quot;)</span><br><span class="line">      draggableElement.removeAttribute(&quot;ontouchmove&quot;)</span><br><span class="line">      draggableElement.removeAttribute(&quot;ontouchend&quot;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  &#x2F;&#x2F; drop錯</span><br><span class="line">  else&#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  &#x2F;&#x2F; (觸控板)重設回原訂位置</span><br><span class="line">  if (moving) &#123;</span><br><span class="line">      &#x2F;&#x2F; reset our element</span><br><span class="line">      moving.style.left &#x3D; &#39;&#39;;</span><br><span class="line">      moving.style.top &#x3D; &#39;&#39;;</span><br><span class="line">      moving.style.height &#x3D; &#39;&#39;;</span><br><span class="line">      moving.style.width &#x3D; &#39;&#39;;</span><br><span class="line">      moving.style.position &#x3D; &#39;&#39;;</span><br><span class="line"></span><br><span class="line">      &#x2F;&#x2F; moving &#x3D; null;</span><br><span class="line">      event.preventDefault()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>加上事件</p>
+<p>重點:</p>
+<ol>
+<li>drag物件的觸發事件是要加 <code>dragstart</code></li>
+<li>drop物件的觸發事件是要加 <code>dragenter</code>, <code>dragover</code>, <code>dragleave</code>, <code>drop</code></li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 選取可以拖拉的物件</span><br><span class="line">const draggableElements &#x3D; document.querySelectorAll(&quot;.draggable&quot;);</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 所有拖拉物件加上dragstart事件</span><br><span class="line">draggableElements.forEach(elem &#x3D;&gt; &#123;</span><br><span class="line">    elem.addEventListener(&quot;dragstart&quot;, dragStart);</span><br><span class="line">    &#x2F;&#x2F; elem.addEventListener(&quot;drag&quot;, drag);</span><br><span class="line">    &#x2F;&#x2F; elem.addEventListener(&quot;dragend&quot;, dragEnd);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 選取可以置放的物件</span><br><span class="line">droppableElements &#x3D; document.querySelectorAll(&quot;.droppable&quot;); </span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 所有可置放的物件加上drop相關的事件</span><br><span class="line">droppableElements.forEach(elem &#x3D;&gt; &#123;</span><br><span class="line">elem.addEventListener(&quot;dragenter&quot;, dragEnter);</span><br><span class="line">elem.addEventListener(&quot;dragover&quot;, dragOver);</span><br><span class="line">elem.addEventListener(&quot;dragleave&quot;, dragLeave);</span><br><span class="line">elem.addEventListener(&quot;drop&quot;, drop);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="觸控板的touch事件"><a href="#觸控板的touch事件" class="headerlink" title="觸控板的touch事件"></a>觸控板的touch事件</h3><p>參考至 <a target="_blank" rel="noopener" href="https://www.horuskol.net/blog/2020-08-15/drag-and-drop-elements-on-touch-devices/">Drag and drop elements on touch devices</a></p>
+<p>html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- drag的物件 --&gt;</span><br><span class="line">&lt;div class&#x3D;&#39;draggable&#39;  ontouchstart&#x3D;&quot;pickup(event)&quot; ontouchmove&#x3D;&quot;move(event)&quot; ontouchend&#x3D;&quot;drop(event)&quot;&gt;&lt;&#x2F;div&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- drop的物件 --&gt;</span><br><span class="line">&lt;div class&#x3D;&#39;droppable&#39; ontouchend&#x3D;&quot;drop(event)&quot;&gt;&lt;&#x2F;div&gt;</span><br></pre></td></tr></table></figure>
+
+<p>js</p>
+<p>自己定義 <code>pickup</code>, <code>move</code> 兩個函式來做為觸控板的<strong>碰觸</strong>與<strong>移動</strong>事件，至於 <code>drop</code>的函式則合併至Drag-Drop事件的 <code>drop</code>函式</p>
+<p>重點:</p>
+<ol>
+<li><code>event.changedTouches[0]</code>: 所有從上一次觸摸事件到這次觸發事件，狀態發生改變過的Touch對象，<code>[0]</code> 代表找最新的</li>
+<li><code>document.elementFromPoint(x,y)</code>: 從 x, y 座標去找該位置上<strong>最上方</strong>的物件 (因為此時有拖拉元素，所以最上方的物件其實是拖拉的元素，所以將這個拖拉元素先手動藏下去再浮上來) </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">let moving &#x3D; null;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 觸碰板觸碰</span><br><span class="line">function pickup(event) &#123;</span><br><span class="line">  moving &#x3D; event.target;</span><br><span class="line"></span><br><span class="line">  moving.style.height &#x3D; moving.clientHeight;</span><br><span class="line">  moving.style.width &#x3D; moving.clientWidth;</span><br><span class="line">  moving.style.position &#x3D; &#39;absolute&#39;;  &#x2F;&#x2F; or fixed</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 觸碰板移動</span><br><span class="line">function move(event) &#123;</span><br><span class="line">  event.preventDefault()</span><br><span class="line">  </span><br><span class="line">  if (moving) &#123;</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F; 找到觸發元素的位置</span><br><span class="line">    moving.style.left &#x3D; event.changedTouches[0].clientX - moving.clientWidth&#x2F;2 + &quot;px&quot;;</span><br><span class="line">    moving.style.top &#x3D; event.changedTouches[0].clientY + moving.clientWidth&#x2F;2 + &quot;px&quot;;</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F; drop的物件加上droppable-hover這個class才能觸發hover的動畫</span><br><span class="line">    event.target.style.zIndex &#x3D; &#39;-10&#39;; &#x2F;&#x2F; 先藏下去</span><br><span class="line">    var drag_element &#x3D; document.elementFromPoint(event.changedTouches[0].clientX, event.changedTouches[0].clientY) &#x2F;&#x2F; elementFromPoint從位置抓元素(每次移動位置最上方的元素)</span><br><span class="line">    event.target.style.zIndex &#x3D; &#39;1&#39;;   &#x2F;&#x2F; 再浮上來</span><br><span class="line">    </span><br><span class="line">    $(&quot;.droppable-hover&quot;).removeClass(&quot;droppable-hover&quot;)  &#x2F;&#x2F; 每次移動都把有包含hover這個動畫的元素的class去除</span><br><span class="line">    if(drag_element!&#x3D;undefined &amp;&amp; drag_element.className &#x3D;&#x3D; &quot;droppable&quot;)&#123;</span><br><span class="line">      drag_element.classList.add(&quot;droppable-hover&quot;);  &#x2F;&#x2F; 當最上方的元素是droppable的就增加droppable-hover這個class</span><br><span class="line">    &#125;</span><br><span class="line">    event.preventDefault();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>事件對象的位置，圖片節錄至 <a target="_blank" rel="noopener" href="https://tate-young.github.io/2018/03/28/js-touch-drag.html">Touch &amp; Drag 事件</a></p>
+<p><img src="https://i.imgur.com/DlC34jI.png"></p>
+<h3 id="畫布-SVG"><a href="#畫布-SVG" class="headerlink" title="畫布 SVG"></a>畫布 SVG</h3><p>參考至 <a target="_blank" rel="noopener" href="https://www.oxxostudio.tw/articles/201409/svg-23-viewpoint-viewBox.html">SVG 研究之路 (23) - 理解 viewport 與 viewbox</a></p>
+<p>遇到的問題: </p>
+<blockquote>
+<p>輪盤背後要排燈，但輪盤是圓的</p>
+</blockquote>
+<p>解決方法:</p>
+<blockquote>
+<p>先畫一個svg，<code>z-index=-1</code> 代表下移一層，<code>viewbox</code> 設定SVG可視範圍，圖片標籤是<code>&lt;image&gt;</code>非<code>&lt;img&gt;</code>，<strong>座標高寬設定好之後，只需要改變 <code>transform: rotate(旋轉deg)</code> 即可</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;svg style&#x3D;&quot;z-index:-1&quot; viewbox&#x3D;&quot;-50 -50 100 100&quot; version&#x3D;&quot;1.1&quot;&gt;</span><br><span class="line">    &lt;image href&#x3D;&quot;.&#x2F;路徑&#x2F;檔名1.gif&quot; x&#x3D;&quot;-7.5px&quot; y&#x3D;&quot;-49px&quot; height&#x3D;&quot;15px&quot; width&#x3D;&quot;15px&quot;&#x2F;&gt;</span><br><span class="line">    &lt;image href&#x3D;&quot;.&#x2F;路徑&#x2F;檔名2.gif&quot; style&#x3D;&quot;transform:rotate(20deg)&quot; x&#x3D;&quot;-7.5&quot; y&#x3D;&quot;-49&quot;  height&#x3D;&quot;15px&quot; width&#x3D;&quot;15px&quot;&#x2F;&gt;</span><br><span class="line">    &lt;image href&#x3D;&quot;.&#x2F;路徑&#x2F;檔名1.gif&quot; style&#x3D;&quot;transform:rotate(40deg)&quot; x&#x3D;&quot;-7.5&quot; y&#x3D;&quot;-49&quot;  height&#x3D;&quot;15px&quot; width&#x3D;&quot;15px&quot;&#x2F;&gt;</span><br><span class="line">    &lt;image href&#x3D;&quot;.&#x2F;路徑&#x2F;檔名2.gif&quot; style&#x3D;&quot;transform:rotate(60deg)&quot; x&#x3D;&quot;-7.5&quot; y&#x3D;&quot;-49&quot;  height&#x3D;&quot;15px&quot; width&#x3D;&quot;15px&quot;&#x2F;&gt;</span><br><span class="line">    ...</span><br><span class="line">&lt;&#x2F;svg&gt;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/21/bert_PyTorch_IMDB/" rel="prev" title="用BERT(PyTorch)模型分類IMDB電影資料集評論">
+      <i class="fa fa-chevron-left"></i> 用BERT(PyTorch)模型分類IMDB電影資料集評論
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%89%E9%8D%B5%E8%A7%B8%E7%99%BC%E9%9F%B3%E6%95%88"><span class="nav-number">1.</span> <span class="nav-text">按鍵觸發音效</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B6%B2%E9%A0%81%E6%92%AD%E6%94%BE%E9%9F%B3%E6%A8%82"><span class="nav-number">2.</span> <span class="nav-text">網頁播放音樂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8D3-js%E8%AE%80%E6%AA%94"><span class="nav-number">3.</span> <span class="nav-text">用D3.js讀檔</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A6%81%E6%AD%A2%E5%9C%A8%E7%B6%B2%E9%A0%81%E4%B8%8A%E6%8C%89%E5%8F%B3%E9%8D%B5%E3%80%81%E9%8D%B5%E7%9B%A4%E2%80%A6"><span class="nav-number">4.</span> <span class="nav-text">禁止在網頁上按右鍵、鍵盤…</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E7%BE%A9%E5%8B%95%E7%95%ABkeyframe"><span class="nav-number">5.</span> <span class="nav-text">自定義動畫keyframe</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A%E5%80%92%E6%95%B8%E8%A8%88%E6%99%82%E5%99%A8"><span class="nav-number">6.</span> <span class="nav-text">設定倒數計時器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jquery-mobile-%E8%B7%B3%E9%A0%81"><span class="nav-number">7.</span> <span class="nav-text">jquery-mobile 跳頁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bootstrap-modal-%E8%B7%B3%E8%A6%96%E7%AA%97"><span class="nav-number">8.</span> <span class="nav-text">bootstrap modal 跳視窗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9A%A8%E6%A9%9F%E7%94%A2%E7%94%9F%E6%95%B8%E5%AD%97"><span class="nav-number">9.</span> <span class="nav-text">隨機產生數字</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9A%A8%E6%A9%9Fsample%E5%87%BAn%E5%80%8B%E6%95%B8%E9%87%8F%E7%9A%84%E9%99%A3%E5%88%97"><span class="nav-number">10.</span> <span class="nav-text">隨機sample出n個數量的陣列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Drag-Drop%E4%BA%8B%E4%BB%B6"><span class="nav-number">11.</span> <span class="nav-text">Drag-Drop事件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%B8%E6%8E%A7%E6%9D%BF%E7%9A%84touch%E4%BA%8B%E4%BB%B6"><span class="nav-number">12.</span> <span class="nav-text">觸控板的touch事件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%95%AB%E5%B8%83-SVG"><span class="nav-number">13.</span> <span class="nav-text">畫布 SVG</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MaDi"
+      src="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DysonMa" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DysonMa" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:madihsiang@gmail.com" title="E-Mail → mailto:madihsiang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/marc_de_shawn" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;marc_de_shawn" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">若要轉載文章，煩請註明作者名稱MaDi與原始連結</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="訪客總數">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="總瀏覽次數">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

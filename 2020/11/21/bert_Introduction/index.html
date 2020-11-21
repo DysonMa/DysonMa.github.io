@@ -20,27 +20,23 @@
     var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="Table of Contents:  concat() append() merge()">
+  <meta name="description" content="何謂BERT? BERT (Bidirectional Encoder Representations from Transformers) 是一種理解上下文的語言代表模型">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Pandas常用語法整理(三) 合併資料Merge&#x2F;Concat&#x2F;Append">
-<meta property="og:url" content="https://dysonma.github.io/2020/10/31/andas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%89-%E5%90%88%E4%BD%B5%E8%B3%87%E6%96%99Merge-Concat-Append/index.html">
+<meta property="og:title" content="近代最強NLP模型-BERT">
+<meta property="og:url" content="https://dysonma.github.io/2020/11/21/bert_Introduction/index.html">
 <meta property="og:site_name" content="MaDi&#39;s Blog">
-<meta property="og:description" content="Table of Contents:  concat() append() merge()">
+<meta property="og:description" content="何謂BERT? BERT (Bidirectional Encoder Representations from Transformers) 是一種理解上下文的語言代表模型">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://i.imgur.com/qxyfvRN.png">
-<meta property="og:image" content="https://i.imgur.com/jFBVBWs.png">
-<meta property="og:image" content="https://i.imgur.com/sgmhIJ9.png">
-<meta property="og:image" content="https://i.imgur.com/jFBVBWs.png">
-<meta property="og:image" content="https://i.imgur.com/iSRbIdi.png">
-<meta property="og:image" content="https://i.imgur.com/iZoear4.png">
-<meta property="article:published_time" content="2020-10-31T14:26:53.000Z">
-<meta property="article:modified_time" content="2020-11-14T13:59:39.335Z">
+<meta property="og:image" content="https://i.imgur.com/YRqN3Yi.png">
+<meta property="og:image" content="https://i.imgur.com/9jzKUL1.png">
+<meta property="article:published_time" content="2020-11-21T07:36:07.000Z">
+<meta property="article:modified_time" content="2020-11-21T07:49:17.707Z">
 <meta property="article:author" content="MaDi">
 <meta property="article:tag" content="python,AI,學習紀錄">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://i.imgur.com/qxyfvRN.png">
+<meta name="twitter:image" content="https://i.imgur.com/YRqN3Yi.png">
 
-<link rel="canonical" href="https://dysonma.github.io/2020/10/31/andas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%89-%E5%90%88%E4%BD%B5%E8%B3%87%E6%96%99Merge-Concat-Append/">
+<link rel="canonical" href="https://dysonma.github.io/2020/11/21/bert_Introduction/">
 
 
 <script id="page-configurations">
@@ -53,7 +49,7 @@
   };
 </script>
 
-  <title>Pandas常用語法整理(三) 合併資料Merge/Concat/Append | MaDi's Blog</title>
+  <title>近代最強NLP模型-BERT | MaDi's Blog</title>
   
 
 
@@ -164,7 +160,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
-    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/31/andas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%89-%E5%90%88%E4%BD%B5%E8%B3%87%E6%96%99Merge-Concat-Append/">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/11/21/bert_Introduction/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
@@ -177,7 +173,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Pandas常用語法整理(三) 合併資料Merge/Concat/Append
+          近代最強NLP模型-BERT
         </h1>
 
         <div class="post-meta">
@@ -186,27 +182,21 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">發表於</span>
+              
 
-              <time title="創建時間：2020-10-31 22:26:53" itemprop="dateCreated datePublished" datetime="2020-10-31T22:26:53+08:00">2020-10-31</time>
+              <time title="創建時間：2020-11-21 15:36:07 / 修改時間：15:49:17" itemprop="dateCreated datePublished" datetime="2020-11-21T15:36:07+08:00">2020-11-21</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2020-11-14 21:59:39" itemprop="dateModified" datetime="2020-11-14T21:59:39+08:00">2020-11-14</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分類於</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                  <a href="/categories/NLP/" itemprop="url" rel="index"><span itemprop="name">NLP</span></a>
                 </span>
                   ，
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Python/Pandas/" itemprop="url" rel="index"><span itemprop="name">Pandas</span></a>
+                  <a href="/categories/NLP/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
                 </span>
             </span>
 
@@ -218,20 +208,6 @@
               <span class="post-meta-item-text">閱讀次數：</span>
               <span id="busuanzi_value_page_pv"></span>
             </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2020/10/31/andas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%89-%E5%90%88%E4%BD%B5%E8%B3%87%E6%96%99Merge-Concat-Append/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/10/31/andas常用語法整理-三-合併資料Merge-Concat-Append/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
 
         </div>
       </header>
@@ -242,45 +218,61 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Table-of-Contents"><a href="#Table-of-Contents" class="headerlink" title="Table of Contents:"></a>Table of Contents:</h1><blockquote>
-<ol>
-<li>concat()</li>
-<li>append()</li>
-<li>merge()</li>
-</ol>
+        <h2 id="何謂BERT"><a href="#何謂BERT" class="headerlink" title="何謂BERT?"></a>何謂BERT?</h2><blockquote>
+<p>BERT (Bidirectional Encoder Representations from Transformers)</p>
+<p>是一種理解上下文的語言代表模型</p>
 </blockquote>
 <a id="more"></a>
 
-<hr>
-<h2 id="合併資料"><a href="#合併資料" class="headerlink" title="合併資料"></a>合併資料</h2><h3 id="concat"><a href="#concat" class="headerlink" title="concat()"></a>concat()</h3><blockquote>
-<p>pd.concat( <strong>[df1, df2], join</strong>)</p>
+<h3 id="簡述BERT"><a href="#簡述BERT" class="headerlink" title="簡述BERT"></a>簡述BERT</h3><ol>
+<li><strong>BERT其實就是Transformer中很多層的Encoder</strong></li>
+<li>是Google以無監督的方式利用大量的無標註文本集結而成的語言代表模型(LM)。</li>
+<li>透過<strong>自注意力機制</strong>、<strong>雙向深度模型</strong>以及大量的無標註文本訓練而成</li>
+</ol>
+<h3 id="預訓練任務"><a href="#預訓練任務" class="headerlink" title="預訓練任務"></a>預訓練任務</h3><p><img src="https://i.imgur.com/YRqN3Yi.png"></p>
+<p>Google在預訓練BERT的過程中，讓他<strong>同時</strong>進行兩項任務</p>
+<ul>
+<li>克漏字填空 (Masked Language Model, MLM)</li>
+<li>後文預測 (Next Sentence Prediction, NSP)</li>
+</ul>
+<p>兩項任務為了達成的目的:</p>
+<ul>
+<li>MLM: 為了讓BERT更能夠表現出<strong>每個詞彙在不同情境下的repr.</strong></li>
+<li>NLS: 為了讓BERT更清楚的表現出<strong>兩個句子間的關係</strong></li>
+</ul>
+<h3 id="何謂repr"><a href="#何謂repr" class="headerlink" title="何謂repr.?"></a>何謂repr.?</h3><blockquote>
+<p><code>repr.</code>: 指的是一個可以用來代表某詞彙（在某個語境下）的多維連續向量（continuous vector）。</p>
 </blockquote>
-<p>將兩個DataFrame合併起來, join可以選擇: (1) <code>outer</code> : 聯集 (2) <code>inner</code> : 交集</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">demo1 &#x3D; pd.DataFrame(&#123;&#39;球員&#39;:[&#39;Kobe&#39;,&#39;Curry&#39;],&#39;號碼&#39;:[24,30],&#39;球隊&#39;:[&#39;湖人&#39;,&#39;勇士&#39;]&#125;)</span><br><span class="line">demo2 &#x3D; pd.DataFrame(&#123;&#39;球員&#39;:[&#39;Lebron&#39;,&#39;林書豪&#39;],&#39;號碼&#39;:[23,17]&#125;)</span><br></pre></td></tr></table></figure>
-<p><img src="https://i.imgur.com/qxyfvRN.png"></p>
-<p><strong>outer(聯集):</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.concat([demo1,demo2],join&#x3D;&#39;outer&#39;)</span><br></pre></td></tr></table></figure>
-<p><img src="https://i.imgur.com/jFBVBWs.png"></p>
-<p><strong>inner(交集):</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.concat([demo1,demo2],join&#x3D;&#39;inner&#39;)</span><br></pre></td></tr></table></figure>
-<p><img src="https://i.imgur.com/sgmhIJ9.png"></p>
-<h3 id="append"><a href="#append" class="headerlink" title="append()"></a>append()</h3><blockquote>
-<p>df1.append(df2)</p>
+<p>這些能夠適應不同情境以及表現兩句子間關係的repr.就是近年來盛行的<code>contextual word representation</code>，跟以往沒有上下文資訊的<code>Word2Vec</code>、<code>Glove</code>的詞嵌入向量有極大的不同。</p>
+<p>除此之外，BERT在做完tokenizer後的token有五個特殊角色，分別是:</p>
+<blockquote>
+<p><code>CLS</code>: 在做分類任務時其<strong>最後一層的 repr. 會被視為整個輸入序列的 repr.</strong></p>
+<p><code>SEP</code>: <strong>兩個句子的文本之間</strong>插入這個 token 以做區隔</p>
+<p><code>UNK</code>: 用來取代<strong>沒有出現</strong>在 BERT 字典裡頭的字</p>
+<p><code>PAD</code>: 採用<strong>zero padding時將長度不一的輸入序列補齊</strong>以方便做 batch 運算</p>
+<p><code>MASK</code>: 未知遮罩，僅在預訓練階段會用到</p>
 </blockquote>
-<p>用法同 <code>pd.concat([df1,df2],join=&#39;outer&#39;)</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo1.append(demo2)</span><br></pre></td></tr></table></figure>
-<p><img src="https://i.imgur.com/jFBVBWs.png"></p>
-<h3 id="merge"><a href="#merge" class="headerlink" title="merge()"></a>merge()</h3><blockquote>
-<p>pd.merge(df1, df2, <strong>how</strong>, <strong>on</strong>)</p>
+<p><img src="https://i.imgur.com/9jzKUL1.png"></p>
+<p>用PyTorch執行程式碼的時候，關注的是圖中的三種id tensors:</p>
+<blockquote>
+<ol>
+<li><p><code>tokens_tensor</code>: 用tokenizer轉換來代表<strong>每個token的index</strong></p>
+</li>
+<li><p><code>segments_tensor</code>: 用來<strong>區分兩個句子。第一句為0，第二句為1</strong>。<code>SEP</code>為0</p>
+</li>
+<li><p><code>masks_tensor</code>: 用來<strong>決定自注意力機制關注的位置</strong>。0代表讓BERT不關注，通常為paddding，1代表讓BERT關注該位置。</p>
+</li>
+</ol>
 </blockquote>
-<p>將兩個DataFrame以交集,聯集,差集..等方式join起來,<code>how</code> 可以定義要用何種方式連結資料，ex: <code>outer</code>,<code>inner</code>,<code>left</code>,<code>right</code></p>
-<p>此處再多建立一個DataFrame</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo3 &#x3D; pd.DataFrame(&#123;&#39;球隊&#39;:[&#39;湖人&#39;,&#39;勇士&#39;],&#39;經紀人&#39;:[&#39;MD&#39;,&#39;MaDi&#39;]&#125;)</span><br></pre></td></tr></table></figure>
-<p><img src="https://i.imgur.com/iSRbIdi.png"></p>
-<p>將demo1與demo3連結起來，預設會以兩個DataFrame的<strong>共同欄位(球隊)作為join</strong>的依據，而<strong>參數 <code>on</code> 則可以自定義join的欄位依據</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.merge(demo1,demo3, on&#x3D;&#39;球隊&#39;)</span><br></pre></td></tr></table></figure>
-<p><img src="https://i.imgur.com/iZoear4.png"></p>
-<h2 id="參考"><a href="#參考" class="headerlink" title="參考:"></a>參考:</h2><p><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10200433">[Day12]Learning Pandas - 資料合併</a></p>
+<p>當實際應用時，每個batch內的輸入序列長短不一，為了要變成矩陣讓GPU平行運算，我們會採用zero-padding的方式來保證它們長度都一致。所以 <strong><code>PAD</code>處的<code>segments_tensor</code>以及<code>masks_tensor</code>都是 0。</strong></p>
+<h3 id="總結"><a href="#總結" class="headerlink" title="總結"></a>總結</h3><p>簡而言之，用一句話來形容BERT:</p>
+<blockquote>
+<p>BERT 是一個強大的語言代表模型，給它一段文本序列，它能回傳一段相同長度且蘊含上下文資訊的 word repr. 序列，對下游的 NLP 任務很有幫助</p>
+</blockquote>
+<p>[引述自<a target="_blank" rel="noopener" href="https://leemeng.tw/attack_on_bert_transfer_learning_in_nlp.html">進擊的 BERT：NLP 界的巨人之力與遷移學習</a>]</p>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://leemeng.tw/attack_on_bert_transfer_learning_in_nlp.html">進擊的 BERT：NLP 界的巨人之力與遷移學習</a></li>
+</ul>
 
     </div>
 
@@ -296,12 +288,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/10/31/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%BA%8C-astype-%E8%99%95%E7%90%86%E7%A9%BA%E5%80%BC%E8%B3%87%E6%96%99-stack-unstack/" rel="prev" title="Pandas常用語法整理(二) astype/處理空值資料/stack/unstack">
-      <i class="fa fa-chevron-left"></i> Pandas常用語法整理(二) astype/處理空值資料/stack/unstack
+    <a href="/2020/11/14/nlp-process/" rel="prev" title="NLP自然語言處理的小小心得">
+      <i class="fa fa-chevron-left"></i> NLP自然語言處理的小小心得
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/10/31/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E5%9B%9B-%E8%B3%87%E6%96%99%E5%88%86%E7%B5%84-Groupby-%E9%AB%98%E6%95%88%E7%8E%87%E9%81%8B%E7%AE%97%E5%87%BD%E5%BC%8Feval-query/" rel="next" title="Pandas常用語法整理(四) 資料分組 Groupby/高效率運算函式eval,query">
-      Pandas常用語法整理(四) 資料分組 Groupby/高效率運算函式eval,query <i class="fa fa-chevron-right"></i>
+    <a href="/2020/11/21/LSTM_IMDB/" rel="next" title="用LSTM模型分類IMDB電影資料集評論">
+      用LSTM模型分類IMDB電影資料集評論 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -315,13 +307,6 @@
 
           </div>
           
-    
-  <div class="comments">
-    <div id="disqus_thread">
-      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
-    </div>
-  </div>
-  
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -368,7 +353,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Table-of-Contents"><span class="nav-number">1.</span> <span class="nav-text">Table of Contents:</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%88%E4%BD%B5%E8%B3%87%E6%96%99"><span class="nav-number">1.1.</span> <span class="nav-text">合併資料</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#concat"><span class="nav-number">1.1.1.</span> <span class="nav-text">concat()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#append"><span class="nav-number">1.1.2.</span> <span class="nav-text">append()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#merge"><span class="nav-number">1.1.3.</span> <span class="nav-text">merge()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">1.2.</span> <span class="nav-text">參考:</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E8%AC%82BERT"><span class="nav-number">1.</span> <span class="nav-text">何謂BERT?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B0%A1%E8%BF%B0BERT"><span class="nav-number">1.1.</span> <span class="nav-text">簡述BERT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A0%90%E8%A8%93%E7%B7%B4%E4%BB%BB%E5%8B%99"><span class="nav-number">1.2.</span> <span class="nav-text">預訓練任務</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%95%E8%AC%82repr"><span class="nav-number">1.3.</span> <span class="nav-text">何謂repr.?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B8%BD%E7%B5%90"><span class="nav-number">1.4.</span> <span class="nav-text">總結</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">2.</span> <span class="nav-text">參考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -384,14 +369,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
   </nav>
@@ -505,37 +490,6 @@
   
 
   
-
-<script>
-  function loadCount() {
-    var d = document, s = d.createElement('script');
-    s.src = 'https://dysonma.disqus.com/count.js';
-    s.id = 'dsq-count-scr';
-    (d.head || d.body).appendChild(s);
-  }
-  // defer loading until the whole page loading is completed
-  window.addEventListener('load', loadCount, false);
-</script>
-<script>
-  var disqus_config = function() {
-    this.page.url = "https://dysonma.github.io/2020/10/31/andas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%89-%E5%90%88%E4%BD%B5%E8%B3%87%E6%96%99Merge-Concat-Append/";
-    this.page.identifier = "2020/10/31/andas常用語法整理-三-合併資料Merge-Concat-Append/";
-    this.page.title = "Pandas常用語法整理(三) 合併資料Merge/Concat/Append";
-    };
-  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
-    if (window.DISQUS) {
-      DISQUS.reset({
-        reload: true,
-        config: disqus_config
-      });
-    } else {
-      var d = document, s = d.createElement('script');
-      s.src = 'https://dysonma.disqus.com/embed.js';
-      s.setAttribute('data-timestamp', '' + +new Date());
-      (d.head || d.body).appendChild(s);
-    }
-  });
-</script>
 
 </body>
 </html>
