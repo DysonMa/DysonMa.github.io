@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="深度學習需要建立模型，建立的過程中常常會忽略某些細節以及語法，因此寫了一篇記錄方便自己未來查閱。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Keras] 深度學習模型">
+<meta property="og:url" content="https://dysonma.github.io/2020/12/05/Keras-%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92%E6%A8%A1%E5%9E%8B/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="深度學習需要建立模型，建立的過程中常常會忽略某些細節以及語法，因此寫了一篇記錄方便自己未來查閱。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/TqRghGw.png">
+<meta property="og:image" content="https://i.imgur.com/CWSx13i.png">
+<meta property="og:image" content="https://i.imgur.com/FbBgedd.png">
+<meta property="og:image" content="https://i.imgur.com/oek6VW4.png">
+<meta property="og:image" content="https://i.imgur.com/yA33scQ.png">
+<meta property="article:published_time" content="2020-12-04T16:09:59.000Z">
+<meta property="article:modified_time" content="2020-12-04T16:10:29.315Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/TqRghGw.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/12/05/Keras-%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92%E6%A8%A1%E5%9E%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>[Keras] 深度學習模型 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/12/05/Keras-%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92%E6%A8%A1%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [Keras] 深度學習模型
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-12-05 00:09:59 / 修改時間：00:10:29" itemprop="dateCreated datePublished" datetime="2020-12-05T00:09:59+08:00">2020-12-05</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">閱讀次數：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>深度學習需要建立模型，建立的過程中常常會忽略某些細節以及語法，因此寫了一篇記錄方便自己未來查閱。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="資料前處理"><a href="#資料前處理" class="headerlink" title="資料前處理"></a>資料前處理</h2><h3 id="zero-padding"><a href="#zero-padding" class="headerlink" title="zero-padding"></a>zero-padding</h3><p>為了讓所有輸入序列的長度一致，<code>zero-padding</code>設定<code>MAX_SEQUENCE_LENGTH</code>作為容許的最大輸入長度，<strong>若長度超過此輸入序列的長度，爾後的資料會被刪掉；若長度不足輸入序列的長度，則在資料前面補零。</strong></p>
+<p>Keras內建有<code>sequence.pad_sequences</code>函式協助我們做到zero-padding的功能</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X_train &#x3D; keras.preprocessing.sequence.pad_sequences(train_data,maxlen&#x3D;MAX_SEQUENCE_LENGTH)</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="One-Hot-Encoding"><a href="#One-Hot-Encoding" class="headerlink" title="One-Hot Encoding"></a>One-Hot Encoding</h3><p>又稱作一位有效編碼，舉例來說，有一個分類長這樣:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">烏龜: 1, 烏賊: 2, 老虎: 3 </span><br><span class="line"></span><br><span class="line">array([[1, 0, 0],   &#x2F;&#x2F; 烏龜</span><br><span class="line">       [0, 1, 0],   &#x2F;&#x2F; 烏賊</span><br><span class="line">       [0, 0, 1]])  &#x2F;&#x2F; 老虎</span><br></pre></td></tr></table></figure>
+<p>轉換後的好處是更有機率的概念，且特徵能夠擴張。</p>
+<p>Keras內建有<code>utils.to_categorical</code>函式協助我們做到One-Hot Encoding的功能</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Y_train &#x3D; keras.utils.to_categorical(train_labels)</span><br></pre></td></tr></table></figure>
+<p><strong>&lt;p.s&gt; 用DataFrame做One-Hot Encoding</strong><br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df &#x3D; pd.DataFrame(&#123;&#39;gender&#39;:[&#39;male&#39;,&#39;female&#39;,&#39;male&#39;,&#39;female&#39;],&#39;class&#39;:[&#39;Lion&#39;,&#39;Tiger&#39;,&#39;Fish&#39;,&#39;Tiger&#39;]&#125;)</span><br></pre></td></tr></table></figure><br><img src="https://i.imgur.com/TqRghGw.png"></p>
+<p>pandas做One-Hot Encoding</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.get_dummies(df)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/CWSx13i.png"></p>
+<p>選定某列作One-Hot Encoding</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.get_dummies(df.gender)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/FbBgedd.png"></p>
+<p>如果今天資料長這樣，可以看到<code>class</code>欄位裡有<code>&quot;/&quot;</code>符號連結各種班級名稱，而我們希望將它切開來做One-Hot Encoding</p>
+<p><img src="https://i.imgur.com/oek6VW4.png"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df[&#39;class&#39;].str.get_dummies(&#39;&#x2F;&#39;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/yA33scQ.png"></p>
+<h3 id="切分訓練與測試資料"><a href="#切分訓練與測試資料" class="headerlink" title="切分訓練與測試資料"></a>切分訓練與測試資料</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">from sklearn.model_selection import train_test_split</span><br><span class="line">x_train, x_val, y_train, y_val &#x3D; train_test_split(X_train, Y_train, test_size&#x3D;VALIDATION_RATIO, random_state&#x3D;RANDOM_STATE)</span><br></pre></td></tr></table></figure>
+
+<h2 id="模型建立"><a href="#模型建立" class="headerlink" title="模型建立"></a>模型建立</h2><blockquote>
+<p>Define a set of function - Neural Network</p>
+</blockquote>
+<p>Keras中有兩種建立模型的方式:</p>
+<ol>
+<li><code>Sequential Model</code>：一種簡單的模型，單一輸入、單一輸出，按順序一層一層的由上往下執行。</li>
+<li><code>Functional API</code>：支援多個輸入、多個輸出</li>
+</ol>
+<h3 id="1-Sequential-Model"><a href="#1-Sequential-Model" class="headerlink" title="1. Sequential Model"></a>1. Sequential Model</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">from keras.models import Sequential</span><br><span class="line"></span><br><span class="line">#常用的layers</span><br><span class="line">from keras.layers import Input, Embedding, LSTM, Dense, Dropout, Flatten</span><br><span class="line"></span><br><span class="line"># 用add把層接在一起</span><br><span class="line">model.add(keras.Input(shape&#x3D;(250, 250, 3)))  # 250x250 RGB images</span><br><span class="line">model.add(layers.Conv2D(32, 5, strides&#x3D;2, activation&#x3D;&quot;relu&quot;))</span><br><span class="line">model.add(layers.Conv2D(32, 3, activation&#x3D;&quot;relu&quot;))</span><br><span class="line">model.add(layers.MaxPooling2D(3))</span><br></pre></td></tr></table></figure>
+<h3 id="2-Functional-API"><a href="#2-Functional-API" class="headerlink" title="2. Functional API"></a>2. Functional API</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">from keras.models import Model</span><br><span class="line"></span><br><span class="line">#常用的layers</span><br><span class="line">from keras.layers import Input, Embedding, LSTM, Dense, Dropout, Flatten</span><br><span class="line"></span><br><span class="line"># 每一層都可以調用，接著串起來</span><br><span class="line">inputs &#x3D; Input(shape&#x3D;(784,))</span><br><span class="line">d1 &#x3D; Dense(64, activation&#x3D;&#39;relu&#39;)(inputs)</span><br><span class="line">d2 &#x3D; Dense(64, activation&#x3D;&#39;relu&#39;)(d1)</span><br><span class="line">predictions &#x3D; Dense(10, activation&#x3D;&#39;softmax&#39;)(d2)</span><br><span class="line"></span><br><span class="line">model &#x3D; Model(inputs&#x3D;inputs, outputs&#x3D;predictions)</span><br></pre></td></tr></table></figure>
+
+<h4 id="Input-輸入層"><a href="#Input-輸入層" class="headerlink" title="Input(輸入層)"></a>Input(輸入層)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Input(shape&#x3D;None, batch_size&#x3D;None, name&#x3D;None, dtype&#x3D;None,...)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>shape</code>: tuple型態的輸入，不包含batch_size，ex: <code>shape=(32,)</code><br><code>name</code>: 自己命名<br><code>dtype</code>: 預期進入輸入層的資料型態</p>
+</blockquote>
+<p>ex: <code>Input(shape=(100,), dtype=&#39;int32&#39;, name=&#39;main_input&#39;)</code></p>
+<h4 id="Embedding-嵌入層"><a href="#Embedding-嵌入層" class="headerlink" title="Embedding(嵌入層)"></a>Embedding(嵌入層)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Embedding(input_dim, output_dim, input_length&#x3D;None)</span><br></pre></td></tr></table></figure>
+<ol>
+<li>詞嵌入，把維度展開，ex: [[4], [20]] -&gt; [[0.25, 0.1], [0.6, -0.2]]</li>
+<li>只能用在模型的第一層</li>
+</ol>
+<h4 id="Dense-全連接層"><a href="#Dense-全連接層" class="headerlink" title="Dense(全連接層)"></a>Dense(全連接層)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Dense(units, activation&#x3D;None, ...)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>units</code>: 輸出的維度<br><code>activation</code>: 預設None為線性</p>
+</blockquote>
+<p>若Dense是輸入層，則要給定<code>input_dim</code> or <code>input_shape</code>，否則就會自動抓上一層的output當作這層的input</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">model.add(Dense(32, input_dim&#x3D;784))</span><br><span class="line">model.add(Dense(32, input_shape&#x3D;(784,)))</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># Dense作為輸入層，輸入維度128，輸出維度256，活化函數為relu</span><br><span class="line">model.add(Dense(units&#x3D;256, input_dim&#x3D;128, activation&#x3D;&#39;relu&#39;)) </span><br><span class="line"></span><br><span class="line"># Dense作為隱藏層，自動抓上一層為這層的輸入維度，輸出維度10，活化函數為softmax</span><br><span class="line">model.add(Dense(units&#x3D;10, activation&#x3D;&#39;softmax&#39;))</span><br></pre></td></tr></table></figure>
+
+<h4 id="LSTM-長短期記憶網路層"><a href="#LSTM-長短期記憶網路層" class="headerlink" title="LSTM(長短期記憶網路層)"></a>LSTM(長短期記憶網路層)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LSTM(units, activation&#x3D;&#39;tanh&#39;, recurrent_activation&#x3D;&#39;hard_sigmoid&#39;, dropout&#x3D;0.0 ...)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>units</code>: 輸出的維度<br><code>activation</code>: 活化函數，預設None為線性<br><code>dropout</code>: 丟棄比例，0~1</p>
+</blockquote>
+<h4 id="Dropout"><a href="#Dropout" class="headerlink" title="Dropout"></a>Dropout</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Dropout(rate)</span><br></pre></td></tr></table></figure>
+<p>Dropout會在訓練中每次更新時，都以一定比例將輸入的神經元丟棄掉(設置為0)，有助於防止over-fitting，尤其是LSTM更需要這個步驟。<code>rate</code>: 0~1之間</p>
+<h4 id="Flatten"><a href="#Flatten" class="headerlink" title="Flatten"></a>Flatten</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Flatten()</span><br></pre></td></tr></table></figure>
+<p>把輸入展開，不影響總神經元數量</p>
+<h2 id="模型編譯"><a href="#模型編譯" class="headerlink" title="模型編譯"></a>模型編譯</h2><blockquote>
+<p>Step2. Goodness of function - cross entropy (loss)</p>
+<p>值得注意的是，cross entropy在Keras裏頭的寫法是<code>categorical_crossentropy</code></p>
+<p>Step3. Pick the best function (optimizer、metrics)</p>
+<p>其中，optimizer有Adam、RMSprop…，但其實都是Gradien Descent的方法</p>
+</blockquote>
+<p>程式碼:</p>
+<blockquote>
+<p>model.compile(優化器, 損失函數, 衡量標準)</p>
+</blockquote>
+<p>多分類問題</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">model.compile(optimizer&#x3D;&#39;rmsprop&#39;,</span><br><span class="line">              loss&#x3D;&#39;categorical_crossentropy&#39;,</span><br><span class="line">              metrics&#x3D;[&#39;accuracy&#39;])</span><br></pre></td></tr></table></figure>
+<p>二分類問題</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">model.compile(optimizer&#x3D;&#39;rmsprop&#39;,</span><br><span class="line">              loss&#x3D;&#39;binary_crossentropy&#39;,</span><br><span class="line">              metrics&#x3D;[&#39;accuracy&#39;])</span><br></pre></td></tr></table></figure>
+<p>回歸問題</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">model.compile(optimizer&#x3D;&#39;rmsprop&#39;,</span><br><span class="line">              loss&#x3D;&#39;mse&#39;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="訓練"><a href="#訓練" class="headerlink" title="訓練"></a>訓練</h2><p>一般的訓練方法:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">history &#x3D; model.fit(x, y, batch_size&#x3D;32, epochs&#x3D;10, verbose&#x3D;1, validation_split&#x3D;0.0, shuffle&#x3D;True, ...)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>x</code>: input<br><code>y</code>: label<br><code>batch_size</code>: 每次訓練看幾筆訓練資料<br><code>epochs</code>: 模型訓練過程中總共要看幾次<br><code>verbose</code>=1 代表輸出進度條紀錄, 0則代表不紀錄</p>
+</blockquote>
+<p>訓練完會返回一個<code>history</code>物件，紀錄訓練過程中每個epoch的<code>acc</code>,<code>val</code>..等資訊</p>
+<p>除此之外，訓練完也可以用<code>evaluate</code>去判斷訓練的好壞</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">model.evaluate(x, y, batch_size&#x3D;32, verbose&#x3D;1...)</span><br></pre></td></tr></table></figure>
+<p>生成器(generate)的訓練方法:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">model.fit_generator(generator, steps_per_epoch&#x3D;None, epochs&#x3D;1, verbose&#x3D;1, validation_data&#x3D;None, validation_steps&#x3D;None, shuffle&#x3D;True...)</span><br></pre></td></tr></table></figure>
+
+<p>使用生成器(generate)逐批生成的數據，按批次訓練模型。生成器與模型並行可以提高效率</p>
+<blockquote>
+<p><code>generator</code>: 一個生成器，生成器的輸出應為<code>(inputs, targets)</code></p>
+<p><code>steps_per_epoch</code>: 在一個epoch完成並開始下一個epoch之前從generator產生的總步數，即<code>資料數量/batch大小</code></p>
+</blockquote>
+<p>generator常搭配yield使用，在使用BERT模型時需要使用model.fit_generator()</p>
+<h2 id="繪圖觀察loss-acc"><a href="#繪圖觀察loss-acc" class="headerlink" title="繪圖觀察loss/acc"></a>繪圖觀察loss/acc</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import matplotlib.pyplot as plt</span><br><span class="line">%matplotlib inline</span><br><span class="line"></span><br><span class="line"># 從history中撈取每個epoch的資料</span><br><span class="line">acc &#x3D; history.history[&#39;accuracy&#39;]</span><br><span class="line">val_acc &#x3D; history.history[&#39;val_accuracy&#39;]</span><br><span class="line">loss &#x3D; history.history[&#39;loss&#39;]</span><br><span class="line">val_loss &#x3D; history.history[&#39;val_loss&#39;]</span><br><span class="line"></span><br><span class="line">epochs &#x3D; range(1, len(acc) + 1)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>繪圖函式</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def plot_fig(epochs,train,val,train_label,val_label,type):</span><br><span class="line">  plt.plot(epochs, train, &#39;bo&#39;, label&#x3D;train_label)</span><br><span class="line">  plt.plot(epochs, val, &#39;b&#39;, label&#x3D;val_label)</span><br><span class="line">  plt.title(&#39;Training and validation &#39;+type)</span><br><span class="line">  plt.xlabel(&#39;Epochs&#39;)</span><br><span class="line">  plt.ylabel(type)</span><br><span class="line">  plt.legend()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>loss圖</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plot_fig(epochs,loss,val_loss,&#39;train loss&#39;,&#39;validation loss&#39;,&#39;loss&#39;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>acc圖</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plot_fig(epochs,acc,val_acc,&#39;train acc&#39;,&#39;validation acc&#39;,&#39;acc&#39;)</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="預測"><a href="#預測" class="headerlink" title="預測"></a>預測</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">model.predict(x, batch_size&#x3D;32, verbose&#x3D;0)</span><br></pre></td></tr></table></figure>
+<p>返回預測值的numpy array</p>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://keras-cn.readthedocs.io/en/latest/getting_started/sequential_model/">快速开始序贯（Sequential）模型</a></li>
+<li><a target="_blank" rel="noopener" href="https://keras.io/zh/layers/recurrent/#lstm">Keras 中文文檔</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/05/ML-DL-%E8%B3%87%E6%96%99%E5%89%8D%E8%99%95%E7%90%86/" rel="prev" title="ML/DL 資料前處理">
+      <i class="fa fa-chevron-left"></i> ML/DL 資料前處理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/05/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E5%B8%B8%E8%A6%8B%E7%9A%84%E8%A9%95%E4%BC%B0%E6%8C%87%E6%A8%99/" rel="next" title="機器學習-常見的評估指標">
+      機器學習-常見的評估指標 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B3%87%E6%96%99%E5%89%8D%E8%99%95%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">資料前處理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#zero-padding"><span class="nav-number">1.1.</span> <span class="nav-text">zero-padding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#One-Hot-Encoding"><span class="nav-number">1.2.</span> <span class="nav-text">One-Hot Encoding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%87%E5%88%86%E8%A8%93%E7%B7%B4%E8%88%87%E6%B8%AC%E8%A9%A6%E8%B3%87%E6%96%99"><span class="nav-number">1.3.</span> <span class="nav-text">切分訓練與測試資料</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E5%BB%BA%E7%AB%8B"><span class="nav-number">2.</span> <span class="nav-text">模型建立</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Sequential-Model"><span class="nav-number">2.1.</span> <span class="nav-text">1. Sequential Model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Functional-API"><span class="nav-number">2.2.</span> <span class="nav-text">2. Functional API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Input-%E8%BC%B8%E5%85%A5%E5%B1%A4"><span class="nav-number">2.2.1.</span> <span class="nav-text">Input(輸入層)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Embedding-%E5%B5%8C%E5%85%A5%E5%B1%A4"><span class="nav-number">2.2.2.</span> <span class="nav-text">Embedding(嵌入層)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Dense-%E5%85%A8%E9%80%A3%E6%8E%A5%E5%B1%A4"><span class="nav-number">2.2.3.</span> <span class="nav-text">Dense(全連接層)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LSTM-%E9%95%B7%E7%9F%AD%E6%9C%9F%E8%A8%98%E6%86%B6%E7%B6%B2%E8%B7%AF%E5%B1%A4"><span class="nav-number">2.2.4.</span> <span class="nav-text">LSTM(長短期記憶網路層)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Dropout"><span class="nav-number">2.2.5.</span> <span class="nav-text">Dropout</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Flatten"><span class="nav-number">2.2.6.</span> <span class="nav-text">Flatten</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E7%B7%A8%E8%AD%AF"><span class="nav-number">3.</span> <span class="nav-text">模型編譯</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A8%93%E7%B7%B4"><span class="nav-number">4.</span> <span class="nav-text">訓練</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B9%AA%E5%9C%96%E8%A7%80%E5%AF%9Floss-acc"><span class="nav-number">5.</span> <span class="nav-text">繪圖觀察loss&#x2F;acc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A0%90%E6%B8%AC"><span class="nav-number">6.</span> <span class="nav-text">預測</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">7.</span> <span class="nav-text">參考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MaDi"
+      src="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DysonMa" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DysonMa" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:madihsiang@gmail.com" title="E-Mail → mailto:madihsiang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/marc_de_shawn" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;marc_de_shawn" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">若要轉載文章，煩請註明作者名稱MaDi與原始連結</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="訪客總數">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="總瀏覽次數">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

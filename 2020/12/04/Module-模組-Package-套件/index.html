@@ -20,23 +20,20 @@
     var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="何謂BERT? BERT (Bidirectional Encoder Representations from Transformers) 是一種理解上下文的語言代表模型">
+  <meta name="description" content="前言 在開發程式的過程中，程式碼會愈寫愈多，規模也會愈來愈大，這時候如果都把所有程式碼放在同一個檔案裏頭會變得難以維護跟管理，所以適時的拆解程式碼，並把相關性高的程式碼分門別類丟進不同的檔案中，就能方便主程式呼叫，提高重用性。常見的方法有模組跟套件。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="近代最強NLP模型-BERT">
-<meta property="og:url" content="https://dysonma.github.io/2020/11/21/bert_Introduction/index.html">
+<meta property="og:title" content="Module(模組)&#x2F;Package(套件)">
+<meta property="og:url" content="https://dysonma.github.io/2020/12/04/Module-%E6%A8%A1%E7%B5%84-Package-%E5%A5%97%E4%BB%B6/index.html">
 <meta property="og:site_name" content="MaDi&#39;s Blog">
-<meta property="og:description" content="何謂BERT? BERT (Bidirectional Encoder Representations from Transformers) 是一種理解上下文的語言代表模型">
+<meta property="og:description" content="前言 在開發程式的過程中，程式碼會愈寫愈多，規模也會愈來愈大，這時候如果都把所有程式碼放在同一個檔案裏頭會變得難以維護跟管理，所以適時的拆解程式碼，並把相關性高的程式碼分門別類丟進不同的檔案中，就能方便主程式呼叫，提高重用性。常見的方法有模組跟套件。">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://i.imgur.com/YRqN3Yi.png">
-<meta property="og:image" content="https://i.imgur.com/9jzKUL1.png">
-<meta property="article:published_time" content="2020-11-21T07:36:07.000Z">
-<meta property="article:modified_time" content="2020-11-21T07:58:54.110Z">
+<meta property="article:published_time" content="2020-12-04T15:49:13.000Z">
+<meta property="article:modified_time" content="2020-12-04T15:49:21.328Z">
 <meta property="article:author" content="MaDi">
 <meta property="article:tag" content="python,AI,學習紀錄">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://i.imgur.com/YRqN3Yi.png">
 
-<link rel="canonical" href="https://dysonma.github.io/2020/11/21/bert_Introduction/">
+<link rel="canonical" href="https://dysonma.github.io/2020/12/04/Module-%E6%A8%A1%E7%B5%84-Package-%E5%A5%97%E4%BB%B6/">
 
 
 <script id="page-configurations">
@@ -49,7 +46,7 @@
   };
 </script>
 
-  <title>近代最強NLP模型-BERT | MaDi's Blog</title>
+  <title>Module(模組)/Package(套件) | MaDi's Blog</title>
   
 
 
@@ -160,7 +157,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
-    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/11/21/bert_Introduction/">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/12/04/Module-%E6%A8%A1%E7%B5%84-Package-%E5%A5%97%E4%BB%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
@@ -173,7 +170,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          近代最強NLP模型-BERT
+          Module(模組)/Package(套件)
         </h1>
 
         <div class="post-meta">
@@ -184,16 +181,7 @@
               <span class="post-meta-item-text">發表於</span>
               
 
-              <time title="創建時間：2020-11-21 15:36:07 / 修改時間：15:58:54" itemprop="dateCreated datePublished" datetime="2020-11-21T15:36:07+08:00">2020-11-21</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分類於</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/NLP%E8%87%AA%E7%84%B6%E8%AA%9E%E8%A8%80%E8%99%95%E7%90%86/" itemprop="url" rel="index"><span itemprop="name">NLP自然語言處理</span></a>
-                </span>
+              <time title="創建時間：2020-12-04 23:49:13 / 修改時間：23:49:21" itemprop="dateCreated datePublished" datetime="2020-12-04T23:49:13+08:00">2020-12-04</time>
             </span>
 
           
@@ -214,60 +202,58 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="何謂BERT"><a href="#何謂BERT" class="headerlink" title="何謂BERT?"></a>何謂BERT?</h2><blockquote>
-<p>BERT (Bidirectional Encoder Representations from Transformers)</p>
-<p>是一種理解上下文的語言代表模型</p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>在開發程式的過程中，程式碼會愈寫愈多，規模也會愈來愈大，這時候如果都把所有程式碼放在同一個檔案裏頭會變得難以維護跟管理，所以適時的拆解程式碼，並把<strong>相關性高的程式碼分門別類丟進不同的檔案中，就能方便主程式呼叫，提高重用性</strong>。常見的方法有<strong>模組</strong>跟<strong>套件</strong>。</p>
 </blockquote>
 <a id="more"></a>
 
-<h3 id="簡述BERT"><a href="#簡述BERT" class="headerlink" title="簡述BERT"></a>簡述BERT</h3><ol>
-<li><strong>BERT其實就是Transformer中很多層的Encoder</strong></li>
-<li>是Google以無監督的方式利用大量的無標註文本集結而成的語言代表模型(LM)。</li>
-<li>透過<strong>自注意力機制</strong>、<strong>雙向深度模型</strong>以及大量的無標註文本訓練而成</li>
-</ol>
-<h3 id="預訓練任務"><a href="#預訓練任務" class="headerlink" title="預訓練任務"></a>預訓練任務</h3><p><img src="https://i.imgur.com/YRqN3Yi.png"></p>
-<p>Google在預訓練BERT的過程中，讓他<strong>同時</strong>進行兩項任務</p>
-<ul>
-<li>克漏字填空 (Masked Language Model, MLM)</li>
-<li>後文預測 (Next Sentence Prediction, NSP)</li>
-</ul>
-<p>兩項任務為了達成的目的:</p>
-<ul>
-<li>MLM: 為了讓BERT更能夠表現出<strong>每個詞彙在不同情境下的repr.</strong></li>
-<li>NLS: 為了讓BERT更清楚的表現出<strong>兩個句子間的關係</strong></li>
-</ul>
-<h3 id="何謂repr"><a href="#何謂repr" class="headerlink" title="何謂repr.?"></a>何謂repr.?</h3><blockquote>
-<p><code>repr.</code>: 指的是一個可以用來代表某詞彙（在某個語境下）的多維連續向量（continuous vector）。</p>
+<h2 id="Module-模組"><a href="#Module-模組" class="headerlink" title="Module(模組)"></a>Module(模組)</h2><blockquote>
+<p><strong>將相關性較高的程式碼抽出來放在不同的檔案內，而每個檔案就是模組。</strong> 由主程式去呼叫模組的程式碼就可以提高重用性。</p>
 </blockquote>
-<p>這些能夠適應不同情境以及表現兩句子間關係的repr.就是近年來盛行的<code>contextual word representation</code>，跟以往沒有上下文資訊的<code>Word2Vec</code>、<code>Glove</code>的詞嵌入向量有極大的不同。</p>
-<p>除此之外，BERT在做完tokenizer後的token有五個特殊角色，分別是:</p>
-<blockquote>
-<p><code>CLS</code>: 在做分類任務時其<strong>最後一層的 repr. 會被視為整個輸入序列的 repr.</strong></p>
-<p><code>SEP</code>: <strong>兩個句子的文本之間</strong>插入這個 token 以做區隔</p>
-<p><code>UNK</code>: 用來取代<strong>沒有出現</strong>在 BERT 字典裡頭的字</p>
-<p><code>PAD</code>: 採用<strong>zero padding時將長度不一的輸入序列補齊</strong>以方便做 batch 運算</p>
-<p><code>MASK</code>: 未知遮罩，僅在預訓練階段會用到</p>
-</blockquote>
-<p><img src="https://i.imgur.com/9jzKUL1.png"></p>
-<p>用PyTorch執行程式碼的時候，關注的是圖中的三種id tensors:</p>
-<blockquote>
+<p>舉一個銀行帳戶的例子來說，現在有兩個模組 <code>info.py</code>, <code>spending.py</code>:</p>
+<p><code>info.py</code> 模組</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 取得帳戶名稱</span><br><span class="line">def get_name():</span><br><span class="line">    return MaDi</span><br><span class="line">    </span><br><span class="line"># 取得存款</span><br><span class="line">def get_deposit():</span><br><span class="line">    return 50000</span><br></pre></td></tr></table></figure>
+<p><code>spending.py</code> 模組</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def earn(money):</span><br><span class="line">    ...</span><br><span class="line">    </span><br><span class="line">def spend(money):</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+
+<p>載入模組的方法:</p>
 <ol>
-<li><p><code>tokens_tensor</code>: 用tokenizer轉換來代表<strong>每個token的index</strong></p>
-</li>
-<li><p><code>segments_tensor</code>: 用來<strong>區分兩個句子。第一句為0，第二句為1</strong>。<code>SEP</code>為0</p>
-</li>
-<li><p><code>masks_tensor</code>: 用來<strong>決定自注意力機制關注的位置</strong>。0代表讓BERT不關注，通常為paddding，1代表讓BERT關注該位置。</p>
-</li>
+<li><code>import 模組.py</code>: 整個模組載入，如果要用內部的函式或類別則要由模組名稱去呼叫，ex: <code>info.get_name()</code></li>
+<li><code>from 模組 import 函式/類別</code>: 只載入模組中的特定物件，可以直接使用模組內的函式或類別，ex: <code>get_name()</code></li>
 </ol>
+<p>在C、C#編譯語言裏頭，常常稱這種方式為另一個名稱<code>library</code>，如動態庫檔名為<code>xxx.dll</code>，兩者都是提供功能給使用者呼叫，但在python中常以模組稱之。</p>
+<h2 id="Package-套件"><a href="#Package-套件" class="headerlink" title="Package(套件)"></a>Package(套件)</h2><blockquote>
+<p>當模組數量變多的時候，就要準備一個容器去裝他們。而這裡的容器就是資料夾，<strong>當一個資料夾中包含一個或多個模組，並擁有<code>__init__.py</code>來撰寫初始化的程式碼，這個資料夾就是套件。</strong> 原則一樣是把相似的模組組織成套件，以利維護與重用性。</p>
 </blockquote>
-<p>當實際應用時，每個batch內的輸入序列長短不一，為了要變成矩陣讓GPU平行運算，我們會採用zero-padding的方式來保證它們長度都一致。所以 <strong><code>PAD</code>處的<code>segments_tensor</code>以及<code>masks_tensor</code>都是 0。</strong></p>
-<h3 id="總結"><a href="#總結" class="headerlink" title="總結"></a>總結</h3><p>簡而言之，用一句話來形容BERT:</p>
-<blockquote>
-<p>BERT 是一個強大的語言代表模型，給它一段文本序列，它能回傳一段相同長度且蘊含上下文資訊的 word repr. 序列，對下游的 NLP 任務很有幫助</p>
+<p>舉例來說，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">account&#x2F;            # 套件名稱</span><br><span class="line">    __init__.py     # 內容可為空，但一定要有此檔</span><br><span class="line">    info.py         # 模組1</span><br><span class="line">    spending.py     # 模組2</span><br><span class="line">    subpackage&#x2F;     # 套件中也可以有子套件</span><br><span class="line">        module3.py  # 子套件中再有模組</span><br></pre></td></tr></table></figure>
+
+<p>從套件中載入模組的方法:</p>
+<ol>
+<li><code>import 套件.模組</code>:  ex: <code>import account.info</code></li>
+<li><code>from 套件 import 模組</code>: ex: <code>from account import info </code></li>
+</ol>
+<p><strong><code>__init__.py</code>可以不用撰寫任何程式碼，但一定要在資料夾內才能使該資料夾變為套件。</strong></p>
+<h3 id="dir"><a href="#dir" class="headerlink" title="dir()"></a>dir()</h3><blockquote>
+<p>dir(模組名稱)</p>
 </blockquote>
-<p>[引述自<a target="_blank" rel="noopener" href="https://leemeng.tw/attack_on_bert_transfer_learning_in_nlp.html">進擊的 BERT：NLP 界的巨人之力與遷移學習</a>]</p>
+<p>python內建的函式，可以**查看模組內有哪些屬性(Attributes)與方法(Method)**。</p>
+<p>其中，最特殊的是<code>__name__</code>，代表該模組的名稱，可以用來區分程式目前執行的角色。</p>
+<p>舉例來說，在 <code>info.py</code>的模組中加上<code>print(__name__)</code>到最後一行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 取得帳戶名稱</span><br><span class="line">def get_name():</span><br><span class="line">    return MaDi</span><br><span class="line">    </span><br><span class="line"># 取得存款</span><br><span class="line">def get_deposit():</span><br><span class="line">    return 50000</span><br><span class="line"></span><br><span class="line"># 模組名稱</span><br><span class="line">print(__name__)</span><br></pre></td></tr></table></figure>
+<p>如果直接執行<code>info.py</code>，<code>__name__</code> 會回傳 <code>__main__</code>，但如果是從主程式去呼叫<code>info.py</code>，則<code>__name__</code> 會回傳 <code>account.info</code>。</p>
+<p>也就是說，當程式執行的角色不同，模組的名稱也會改變，<strong>直接運行程式碼則模組名稱為<code>__main__</code>。</strong></p>
+<p>所以我們可以透過以下方式去區分<strong>模組是自己直接被執行or被主程式呼叫</strong>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 載入模組要做的事...</span><br><span class="line"></span><br><span class="line">if __name__ &#x3D;&#x3D; &quot;__main__&quot;:</span><br><span class="line">    # 直接執行摸組要做的事...</span><br></pre></td></tr></table></figure>
+
+
+
 <h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><ul>
-<li><a target="_blank" rel="noopener" href="https://leemeng.tw/attack_on_bert_transfer_learning_in_nlp.html">進擊的 BERT：NLP 界的巨人之力與遷移學習</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.learncodewithmike.com/2020/01/python-module-and-package.html">解析Python模組(Module)和套件(Package)的概念</a></li>
+<li><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10223780">python day17 (module、package)</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/%E5%AE%85%E7%94%B7%E9%9B%9C%E5%AD%B8%E7%AD%86%E8%A8%98/python%E7%9A%84%E5%8C%85%E8%A3%9D%E6%A9%9F%E5%88%B6-function-class-module-package-29bd8defb20e">Python的包裝機制 — Function, Class, Module, Package</a></li>
+<li><a target="_blank" rel="noopener" href="http://hn28082251.blogspot.com/2019/05/python-if-name-main.html">簡易理解python中的if <strong>name</strong> == ‘main’ 的作用和原理</a></li>
 </ul>
 
     </div>
@@ -284,12 +270,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/11/14/nlp-process/" rel="prev" title="NLP自然語言處理的小小心得">
-      <i class="fa fa-chevron-left"></i> NLP自然語言處理的小小心得
+    <a href="/2020/11/21/frontend_game/" rel="prev" title="前端遊戲專案紀錄">
+      <i class="fa fa-chevron-left"></i> 前端遊戲專案紀錄
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/11/21/LSTM_IMDB/" rel="next" title="用LSTM模型分類IMDB電影資料集評論">
-      用LSTM模型分類IMDB電影資料集評論 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/12/04/random%E6%A8%A1%E7%B5%84%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95/" rel="next" title="random模組常用語法">
+      random模組常用語法 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -349,7 +335,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E8%AC%82BERT"><span class="nav-number">1.</span> <span class="nav-text">何謂BERT?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B0%A1%E8%BF%B0BERT"><span class="nav-number">1.1.</span> <span class="nav-text">簡述BERT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A0%90%E8%A8%93%E7%B7%B4%E4%BB%BB%E5%8B%99"><span class="nav-number">1.2.</span> <span class="nav-text">預訓練任務</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%95%E8%AC%82repr"><span class="nav-number">1.3.</span> <span class="nav-text">何謂repr.?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B8%BD%E7%B5%90"><span class="nav-number">1.4.</span> <span class="nav-text">總結</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">2.</span> <span class="nav-text">參考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Module-%E6%A8%A1%E7%B5%84"><span class="nav-number">2.</span> <span class="nav-text">Module(模組)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Package-%E5%A5%97%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">Package(套件)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#dir"><span class="nav-number">3.1.</span> <span class="nav-text">dir()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">參考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

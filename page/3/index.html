@@ -20,33 +20,31 @@
     var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="問題 Q1: 為什麼 Python 輸出中文到csv檔後，用Excel開啟卻會亂碼? Q2: 為什麼 Python 讀取文件首行多了”\ufeff”字符串，程式報錯?">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Python輸出or讀取的亂碼問題">
-<meta property="og:url" content="https://dysonma.github.io/2020/10/29/Python%E8%BC%B8%E5%87%BAor%E8%AE%80%E5%8F%96%E7%9A%84%E4%BA%82%E7%A2%BC%E5%95%8F%E9%A1%8C/index.html">
+  <meta name="description" content="持續學習新技術，反走過必留下痕跡">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MaDi&#39;s Blog">
+<meta property="og:url" content="https://dysonma.github.io/page/3/index.html">
 <meta property="og:site_name" content="MaDi&#39;s Blog">
-<meta property="og:description" content="問題 Q1: 為什麼 Python 輸出中文到csv檔後，用Excel開啟卻會亂碼? Q2: 為什麼 Python 讀取文件首行多了”\ufeff”字符串，程式報錯?">
+<meta property="og:description" content="持續學習新技術，反走過必留下痕跡">
 <meta property="og:locale" content="zh_TW">
-<meta property="article:published_time" content="2020-10-29T15:53:57.000Z">
-<meta property="article:modified_time" content="2020-11-14T13:55:23.411Z">
 <meta property="article:author" content="MaDi">
 <meta property="article:tag" content="python,AI,學習紀錄">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://dysonma.github.io/2020/10/29/Python%E8%BC%B8%E5%87%BAor%E8%AE%80%E5%8F%96%E7%9A%84%E4%BA%82%E7%A2%BC%E5%95%8F%E9%A1%8C/">
+<link rel="canonical" href="https://dysonma.github.io/page/3/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : false,
-    isPost : true,
+    isHome : true,
+    isPost : false,
     lang   : 'zh-TW'
   };
 </script>
 
-  <title>Python輸出or讀取的亂碼問題 | MaDi's Blog</title>
+  <title>MaDi's Blog</title>
   
 
 
@@ -150,10 +148,9 @@
         <div class="content-wrap">
           
 
-          <div class="content post posts-expand">
+          <div class="content index posts-expand">
             
-
-    
+      
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
@@ -169,9 +166,10 @@
       <meta itemprop="name" content="MaDi's Blog">
     </span>
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Python輸出or讀取的亂碼問題
-        </h1>
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/29/Python%E8%BC%B8%E5%87%BAor%E8%AE%80%E5%8F%96%E7%9A%84%E4%BA%82%E7%A2%BC%E5%95%8F%E9%A1%8C/" class="post-title-link" itemprop="url">Python輸出or讀取的亂碼問題</a>
+        </h2>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -200,13 +198,6 @@
             </span>
 
           
-            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">閱讀次數：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span>
 
         </div>
       </header>
@@ -217,64 +208,278 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="問題"><a href="#問題" class="headerlink" title="問題"></a>問題</h2><blockquote>
+          <h2 id="問題"><a href="#問題" class="headerlink" title="問題"></a>問題</h2><blockquote>
 <p>Q1: 為什麼 Python 輸出中文到csv檔後，用Excel開啟卻會亂碼?</p>
 <p>Q2: 為什麼 Python 讀取文件首行多了”\ufeff”字符串，程式報錯?</p>
 </blockquote>
-<a id="more"></a>
-<hr>
-<h2 id="問題一"><a href="#問題一" class="headerlink" title="問題一"></a>問題一</h2><blockquote>
-<p>Q1: 為什麼 Python 輸出中文到csv檔後，用Excel開啟卻會亂碼?</p>
-</blockquote>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><blockquote>
-<p>Excel 以 ANSI 格式開啟，不會做編碼識別</p>
-</blockquote>
-<h2 id="解決方法"><a href="#解決方法" class="headerlink" title="解決方法"></a>解決方法</h2><blockquote>
-<p>encoding採用 <strong>utf-8-sig</strong> 作為輸出即可。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.to_csv(&#39;123.csv&#39;,encoding&#x3D;&#39;utf-8-sig&#39;)</span><br></pre></td></tr></table></figure>
-
-<h2 id="問題二"><a href="#問題二" class="headerlink" title="問題二"></a>問題二</h2><blockquote>
-<p>Q: Python 讀取文件首行多了”\ufeff”字符串，程式報錯?</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">with open(&quot;%s.txt&quot; % line, &#39;r&#39;, encoding&#x3D;&#39;utf-8&#39;) as f1:</span><br><span class="line"></span><br><span class="line">FileNotFoundError: [Errno 2] No such file or directory: &#39;\ufeffA.txt&#39;</span><br></pre></td></tr></table></figure>
-<p>要打開的路徑比預期A.txt多了一串字符”\ufeff”, 顯然無法正確打開文件.</p>
-<h2 id="原因-1"><a href="#原因-1" class="headerlink" title="原因"></a>原因</h2><blockquote>
-<p><strong>首行出現的”\ufeff“叫BOM(“ByteOrder Mark”)，用來聲明該文件的編碼信息.</strong></p>
-<p>”utf-8“ 是以字節為編碼單元,它的字節順序在所有系統中都是一樣的,沒有字節序問題,因此它不需要BOM,所以當用”utf-8”編碼方式讀取帶有BOM的文件時,它會把BOM當做是文件內容來處理, 也就會發生上面的錯誤.</p>
-</blockquote>
-<h2 id="解決方法-1"><a href="#解決方法-1" class="headerlink" title="解決方法"></a>解決方法</h2><blockquote>
-<p>encoding採用 <strong>utf-8-sig</strong> 作為讀取即可。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">with open(&quot;B.txt&quot;, &#39;r&#39;, encoding&#x3D;&#39;utf-8-sig&#39;) as f:</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/29/Python%E8%BC%B8%E5%87%BAor%E8%AE%80%E5%8F%96%E7%9A%84%E4%BA%82%E7%A2%BC%E5%95%8F%E9%A1%8C/#more" rel="contents">
+                閱讀全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
     </div>
 
     
     
     
-
       <footer class="post-footer">
-
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2020/10/29/Markdown%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/" rel="prev" title="Markdown語法整理">
-      <i class="fa fa-chevron-left"></i> Markdown語法整理
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/10/29/Numpy%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/" rel="next" title="Numpy常用語法整理">
-      Numpy常用語法整理 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
+        <div class="post-eof"></div>
       </footer>
-    
   </article>
   
   
   
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/29/Markdown%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/29/Markdown%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/" class="post-title-link" itemprop="url">Markdown語法整理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-10-29 23:48:50" itemprop="dateCreated datePublished" datetime="2020-10-29T23:48:50+08:00">2020-10-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-11-14 21:55:37" itemprop="dateModified" datetime="2020-11-14T21:55:37+08:00">2020-11-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>markdown語法相當好用，不僅輕鬆省去排版的煩惱，也支援相當多的文件撰寫，是一個不能錯過的好東西，所以一定要把它好好的學起來，為了避免未來忘記markdown語法，所以寫了這篇文章來記錄一下~</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/29/Markdown%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/#more" rel="contents">
+                閱讀全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/29/Anaconda%E8%99%9B%E6%93%AC%E7%92%B0%E5%A2%83%E5%BB%BA%E7%AB%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/29/Anaconda%E8%99%9B%E6%93%AC%E7%92%B0%E5%A2%83%E5%BB%BA%E7%AB%8B/" class="post-title-link" itemprop="url">Anaconda虛擬環境建立</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-10-29 23:38:08" itemprop="dateCreated datePublished" datetime="2020-10-29T23:38:08+08:00">2020-10-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-11-14 21:53:39" itemprop="dateModified" datetime="2020-11-14T21:53:39+08:00">2020-11-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="問題"><a href="#問題" class="headerlink" title="問題"></a>問題</h2><h3 id="1-當遇到套件版本與環境版本不相容的時候"><a href="#1-當遇到套件版本與環境版本不相容的時候" class="headerlink" title="1. 當遇到套件版本與環境版本不相容的時候"></a><strong>1. 當遇到套件版本與環境版本不相容的時候</strong></h3><blockquote>
+<p>ex: 影像辨識的dlib套件跟不上python3.8</p>
+</blockquote>
+<h3 id="2-為了方便管理套件"><a href="#2-為了方便管理套件" class="headerlink" title="2. 為了方便管理套件"></a><strong>2. 為了方便管理套件</strong></h3><blockquote>
+<p>不想要一個環境下裝一大堆套件QQ，進而避免兩個環境的套件互相衝突</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/29/Anaconda%E8%99%9B%E6%93%AC%E7%92%B0%E5%A2%83%E5%BB%BA%E7%AB%8B/#more" rel="contents">
+                閱讀全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/28/%E5%9F%B7%E8%A1%8C%E6%AA%94%E8%A8%AD%E5%AE%9Awindows%E5%B7%A5%E4%BD%9C%E6%8E%92%E7%A8%8B%E9%81%87%E5%88%B0%E7%9A%84%E8%B7%AF%E5%BE%91%E5%95%8F%E9%A1%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/28/%E5%9F%B7%E8%A1%8C%E6%AA%94%E8%A8%AD%E5%AE%9Awindows%E5%B7%A5%E4%BD%9C%E6%8E%92%E7%A8%8B%E9%81%87%E5%88%B0%E7%9A%84%E8%B7%AF%E5%BE%91%E5%95%8F%E9%A1%8C/" class="post-title-link" itemprop="url">執行檔設定windows工作排程遇到的路徑問題</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-10-28 20:39:14" itemprop="dateCreated datePublished" datetime="2020-10-28T20:39:14+08:00">2020-10-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-11-14 21:53:33" itemprop="dateModified" datetime="2020-11-14T21:53:33+08:00">2020-11-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="問題"><a href="#問題" class="headerlink" title="問題"></a>問題</h2><blockquote>
+<p>Q: 為什麼py檔透過pyinstaller壓成exe檔之後，放到windows工作排程卻找不到路徑?</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/28/%E5%9F%B7%E8%A1%8C%E6%AA%94%E8%A8%AD%E5%AE%9Awindows%E5%B7%A5%E4%BD%9C%E6%8E%92%E7%A8%8B%E9%81%87%E5%88%B0%E7%9A%84%E8%B7%AF%E5%BE%91%E5%95%8F%E9%A1%8C/#more" rel="contents">
+                閱讀全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一頁"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+  </nav>
 
 
 
@@ -326,7 +531,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%95%8F%E9%A1%8C"><span class="nav-number">1.</span> <span class="nav-text">問題</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%95%8F%E9%A1%8C%E4%B8%80"><span class="nav-number">2.</span> <span class="nav-text">問題一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0"><span class="nav-number">3.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E6%B1%BA%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">解決方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%95%8F%E9%A1%8C%E4%BA%8C"><span class="nav-number">5.</span> <span class="nav-text">問題二</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0-1"><span class="nav-number">6.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E6%B1%BA%E6%96%B9%E6%B3%95-1"><span class="nav-number">7.</span> <span class="nav-text">解決方法</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

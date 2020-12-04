@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="用機器學習去做分類問題的時候，會需要透過一些統計指標去輔助，才能正確地檢驗分類的結果，並快速地修正問題，達到更好的分類結果。近期案子上剛好在處理分類的問題，就順手把一些學過的評估指標做個整理，並搭配網站上的資源記錄成簡短的心得以供未來的自己參考。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="機器學習-常見的評估指標">
+<meta property="og:url" content="https://dysonma.github.io/2020/12/05/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E5%B8%B8%E8%A6%8B%E7%9A%84%E8%A9%95%E4%BC%B0%E6%8C%87%E6%A8%99/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="用機器學習去做分類問題的時候，會需要透過一些統計指標去輔助，才能正確地檢驗分類的結果，並快速地修正問題，達到更好的分類結果。近期案子上剛好在處理分類的問題，就順手把一些學過的評估指標做個整理，並搭配網站上的資源記錄成簡短的心得以供未來的自己參考。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/5kKhqs8.png">
+<meta property="og:image" content="https://i.imgur.com/EoyROPJ.png">
+<meta property="og:image" content="https://i.imgur.com/tNxDWkx.png">
+<meta property="og:image" content="https://i.imgur.com/03ulgoK.png">
+<meta property="og:image" content="https://i.imgur.com/YI5hF6r.png">
+<meta property="og:image" content="https://i.imgur.com/q3uu1Wd.png">
+<meta property="og:image" content="https://i.imgur.com/9T1hdES.png">
+<meta property="og:image" content="https://i.imgur.com/80xeoN1.png">
+<meta property="og:image" content="https://i.imgur.com/8Ag8EqL.png">
+<meta property="og:image" content="https://i.imgur.com/Uaz5UFX.png">
+<meta property="og:image" content="https://i.imgur.com/FPVLJjr.png">
+<meta property="article:published_time" content="2020-12-04T16:12:13.000Z">
+<meta property="article:modified_time" content="2020-12-04T16:16:16.630Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/5kKhqs8.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/12/05/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E5%B8%B8%E8%A6%8B%E7%9A%84%E8%A9%95%E4%BC%B0%E6%8C%87%E6%A8%99/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>機器學習-常見的評估指標 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/12/05/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E5%B8%B8%E8%A6%8B%E7%9A%84%E8%A9%95%E4%BC%B0%E6%8C%87%E6%A8%99/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          機器學習-常見的評估指標
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-12-05 00:12:13 / 修改時間：00:16:16" itemprop="dateCreated datePublished" datetime="2020-12-05T00:12:13+08:00">2020-12-05</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">閱讀次數：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>用機器學習去做分類問題的時候，會需要透過一些統計指標去輔助，才能正確地檢驗分類的結果，並快速地修正問題，達到更好的分類結果。近期案子上剛好在處理分類的問題，就順手把一些學過的評估指標做個整理，並搭配網站上的資源記錄成簡短的心得以供未來的自己參考。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="1-二分類模型的評估指標"><a href="#1-二分類模型的評估指標" class="headerlink" title="1. 二分類模型的評估指標"></a>1. 二分類模型的評估指標</h2><h3 id="混淆矩陣-Confusion-Matrix"><a href="#混淆矩陣-Confusion-Matrix" class="headerlink" title="混淆矩陣 Confusion Matrix"></a>混淆矩陣 Confusion Matrix</h3><p>分類的結果可以用以下矩陣來表示，分為四種象限:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. True Positive (TP): 實際上是正樣本且被預測為正樣本</span><br><span class="line">2. False Positive (FP): 實際上是負樣本但被誤判為正樣本</span><br><span class="line">3. False Negative (FN): 實際上是正樣本但被誤判為負樣本</span><br><span class="line">4. True Negative (TN): 實際上是負樣本且被預測為負樣本</span><br></pre></td></tr></table></figure>
+
+<p>1, 4點是我們希望的結果,2, 3點則是誤判的結果。</p>
+<p>簡單理解:</p>
+<blockquote>
+<p><strong>第一個 <code>True/False</code> 代表預測是否正確</strong></p>
+<p><strong>第二個<code>Positive/Negative</code>則是代表預測的結果(答成哪一類)</strong></p>
+</blockquote>
+<p><img src="https://i.imgur.com/5kKhqs8.png"><br><a target="_blank" rel="noopener" href="https://www.ycc.idv.tw/confusion-matrix.html">圖片來源</a></p>
+<h3 id="準確度-Accuracy"><a href="#準確度-Accuracy" class="headerlink" title="準確度(Accuracy)"></a>準確度(Accuracy)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">準確度(Accuracy) &#x3D; (TP+TN)&#x2F;(TP+FP+FN+TN)</span><br></pre></td></tr></table></figure>
+<p>準確度是<strong>最常用的指標，但在某些情況下會失效</strong>。</p>
+<blockquote>
+<p>例如: 某類數量佔很多的時候，直接把該類分到一邊，準確度就會大幅提高，但其實根本沒分到類，最常見的例子就是信用卡盜刷</p>
+</blockquote>
+<p>準確度背後的意思是指，整體模型表現裡正確分類的比例是多少</p>
+<h3 id="精確度-Precision-與召回率-Recall"><a href="#精確度-Precision-與召回率-Recall" class="headerlink" title="精確度(Precision)與召回率(Recall)"></a>精確度(Precision)與召回率(Recall)</h3><p>從混淆矩陣繼續延伸可以得到以下兩個指標:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">精確度(Precision) &#x3D; TP&#x2F;(TP+FP)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>所有被預測為正確的樣本中，有多少比例是實際正確的。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">召回率(Recall) &#x3D; TP&#x2F;(TP+FN)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>所有實際正確的樣本中，有多少比例是被預測為正確的。</p>
+</blockquote>
+<p>這兩個指標<strong>都只關注在實際的正樣本</strong>，不考慮TN的結果，因為通常TN會是答對的Null Hypothesis，白話而言就是無聊的正確結果。</p>
+<p>總結，精確度希望模型能夠預測更準，召回率則是希望正確的樣本都能夠被判斷(偵測)出來。</p>
+<p>在不同的情境下，precision和recall的使用時機就不同，端看關注的問題是屬於哪一面。</p>
+<h3 id="F1-Score"><a href="#F1-Score" class="headerlink" title="F1-Score"></a>F1-Score</h3><blockquote>
+<p>大多數情況下，我們不會偏廢precision或recall，而是希望兩者分配合理的權重，為了<strong>綜合考量precision與recall</strong>，所以產生了這個F1-Score的指標。</p>
+</blockquote>
+<p><img src="https://i.imgur.com/EoyROPJ.png"><br><a target="_blank" rel="noopener" href="https://www.ycc.idv.tw/confusion-matrix.html">圖片來源</a></p>
+<p>因為F1-Score的公式中，是固定TP，有不同的分母，符合調和數列的型態，所以公式型態也是採用<strong>調和平均</strong>。整理之後可得F1-Score長這樣:<br><img src="https://i.imgur.com/tNxDWkx.png"></p>
+<blockquote>
+<p>F1-Score的值落在0~1之間。</p>
+</blockquote>
+<p>而precision與recall之間的權重也可以透過一個beta值來調整，這就是F1 Measure。F1-Score只是F1 Measure的特例。</p>
+<p><img src="https://i.imgur.com/03ulgoK.png"></p>
+<blockquote>
+<p>當beta=1就是F1-Score，代表precision與recall同等重要。</p>
+<p>當beta=0就是precision，反之，當beta趨近於無限大，就是Recall</p>
+</blockquote>
+<p>所以如果希望多看一點precision，就把beta調小一點，如果希望多看一點recall，就把beta調大一點。</p>
+<h3 id="ROC-曲線"><a href="#ROC-曲線" class="headerlink" title="ROC 曲線"></a>ROC 曲線</h3><p>ROC需要三個元素:</p>
+<blockquote>
+<ol>
+<li>TPR(Sensitivity) = TP/(TP+FN)，等同recall</li>
+<li>FPR(Specificity) = FP/(FP+TN)，所有負樣本被誤判為正樣比的比例</li>
+<li>閥值</li>
+</ol>
+</blockquote>
+<p><img src="https://i.imgur.com/YI5hF6r.png"><br><a target="_blank" rel="noopener" href="https://www.ycc.idv.tw/confusion-matrix.html">圖片來源</a></p>
+<p>二分類的模型中，會設定一個閥值(threshold)，當預測的結果大於此閥值，就被認定為正樣本，反之為負樣本。</p>
+<p>透過不同的閥值、TPR與FPR，就可以畫出ROC曲線圖，底下的面積就是AUC，AUC愈大愈好。</p>
+<p><img src="https://i.imgur.com/q3uu1Wd.png"><br><a target="_blank" rel="noopener" href="https://www.ycc.idv.tw/confusion-matrix.html">圖片來源</a></p>
+<h2 id="2-多分類模型的評估指標"><a href="#2-多分類模型的評估指標" class="headerlink" title="2. 多分類模型的評估指標"></a>2. 多分類模型的評估指標</h2><p>跟二元分類一樣會有多元分類的混淆矩陣。</p>
+<p>有三種指標可以觀察:</p>
+<ol>
+<li>整體正確率or錯誤率</li>
+<li>單一類別的正確率or錯誤率</li>
+<li>Cohen’s kappa coefficient (Kappa)</li>
+</ol>
+<h3 id="Cohen’s-kappa-coefficient-Kappa"><a href="#Cohen’s-kappa-coefficient-Kappa" class="headerlink" title="Cohen’s kappa coefficient (Kappa)"></a>Cohen’s kappa coefficient (Kappa)</h3><blockquote>
+<p>用來平衡類別之間正確性的一種指標，把<strong>數量極大的某個類別消除掉的指標</strong>。</p>
+</blockquote>
+<p>白話來說，就是避免當單一類別的數量超大的時候，直接把分類的結果分為該類就會達到很高的正確率。</p>
+<p>Kappa計算方式:</p>
+<p><img src="https://i.imgur.com/9T1hdES.png"></p>
+<blockquote>
+<p>p0就是百分比混淆矩陣的對角線元素相加。</p>
+<p>pc就是把把每類別做加總。(實際第i類別的總和乘上預測第i類別的總和)</p>
+</blockquote>
+<p>舉例來說:</p>
+<p><img src="https://i.imgur.com/80xeoN1.png"></p>
+<blockquote>
+<p>Kappa的值介於-1~1之間，值正的愈大，模型愈好。</p>
+</blockquote>
+<h2 id="3-總結"><a href="#3-總結" class="headerlink" title="3. 總結"></a>3. 總結</h2><p><img src="https://i.imgur.com/8Ag8EqL.png"><br><a target="_blank" rel="noopener" href="https://www.ycc.idv.tw/confusion-matrix.html">圖片來源</a></p>
+<h2 id="4-程式碼"><a href="#4-程式碼" class="headerlink" title="4. 程式碼"></a>4. 程式碼</h2><h3 id="Confusion-Matrix"><a href="#Confusion-Matrix" class="headerlink" title="[Confusion Matrix]"></a>[Confusion Matrix]</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"># 基本</span><br><span class="line">import pandas as pd</span><br><span class="line"></span><br><span class="line">#繪圖</span><br><span class="line">import seaborn as sns</span><br><span class="line">import matplotlib.pyplot as plt</span><br><span class="line"></span><br><span class="line">#混淆矩陣</span><br><span class="line">from sklearn.metrics import confusion_matrix</span><br><span class="line"></span><br><span class="line"># 建立分類的編號</span><br><span class="line">data &#x3D; &#123;0:&#39;政黑版&#39;, 1:&#39;土木版&#39;, 2:&#39;八卦版&#39;, 3:&#39;表特版&#39;&#125;</span><br><span class="line"></span><br><span class="line"># 假設分類後的結果長這樣</span><br><span class="line">y_true &#x3D; [1,1,0,3,2,2]</span><br><span class="line">y_pred &#x3D; [0,1,1,3,3,2]</span><br><span class="line"></span><br><span class="line"># 計算混淆矩陣</span><br><span class="line">lbl &#x3D; list(data.keys())</span><br><span class="line">arr &#x3D; confusion_matrix(y_true, y_pred, labels&#x3D;lbl)</span><br><span class="line"></span><br><span class="line"># 繪熱圖</span><br><span class="line">df_cm &#x3D; pd.DataFrame(arr, index &#x3D; [i for i in lbl], columns &#x3D; [i for i in lbl])</span><br><span class="line">plt.rcParams[&#39;font.sans-serif&#39;] &#x3D; [&#39;Microsoft JhengHei&#39;]  # 顯示中文</span><br><span class="line">plt.figure(figsize &#x3D; (8,5))  </span><br><span class="line"></span><br><span class="line">sns.heatmap(df_cm, annot&#x3D;True, cmap&#x3D;&quot;YlGnBu&quot;);</span><br><span class="line"></span><br><span class="line">plt.ylabel(&#39;y_true&#39;)</span><br><span class="line">plt.xlabel(&#39;y_pred&#39;);</span><br><span class="line">plt.tight_layout()</span><br></pre></td></tr></table></figure>
+<p>arr</p>
+<blockquote>
+<p>[[0, 1, 0, 0],<br>  [1, 1, 0, 0],<br>  [0, 0, 1, 1],<br>  [0, 0, 0, 1]]</p>
+</blockquote>
+<p>熱圖:<br><img src="https://i.imgur.com/Uaz5UFX.png"></p>
+<h3 id="Accuracy"><a href="#Accuracy" class="headerlink" title="[Accuracy]"></a>[Accuracy]</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">from sklearn.metrics import accuracy_score</span><br><span class="line"></span><br><span class="line"># 答對的比例(0~1)</span><br><span class="line">accuracy_score(y_true, y_pred)   # 0.5</span><br><span class="line"></span><br><span class="line"># 答對幾個(0~樣本數量)</span><br><span class="line">accuracy_score(y_true, y_pred, normalize&#x3D;False) #3</span><br></pre></td></tr></table></figure>
+
+<h3 id="Precision-Recall-F1-Score"><a href="#Precision-Recall-F1-Score" class="headerlink" title="[Precision/Recall/F1-Score]"></a>[Precision/Recall/F1-Score]</h3><p>這裡Precision, Recall, F1-Score在python程式碼中有一個參數<code>average</code>可以自由調整，有<code>None</code>,<code>binary</code>,<code>micro</code>, <code>macro</code>, <code>weighted</code>五種可以選擇，預設是<code>binary</code>，但是<code>binary</code>是專屬於二分類使用，而<code>micro</code>, <code>macro</code>, <code>weighted</code> 則是適用於多分類。 <code>None</code>則兩種時機皆可使用，它會<strong>回傳每個類別的指標。</strong></p>
+<p>在多分類的時候需要特別了解<code>micro</code>,<code>macro</code>,<code>weighted</code>這三種概念才能知道在什麼情境下使用:</p>
+<ol>
+<li><code>micro</code>: 讓所有類別的每個<strong>樣本</strong>都具有相同的權重，<strong>把所有樣本合在一起</strong>來計算指標</li>
+<li><code>macro</code>: 讓每個<strong>類別</strong>具有相同的權重，用<strong>算術平均數</strong>去計算每個類別的指標。</li>
+<li><code>weighted</code>: 由<strong>各類別的數量去計算加權值</strong>，解決<code>macro</code>可能遇到的label數量不平衡的問題。</li>
+</ol>
+<p>舉前一個例子來說，各個ptt版的預測分類可以由混淆矩陣得到下表:</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">TP</th>
+<th align="center">FP</th>
+<th align="center">FN</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0 政黑板</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">1 土木板</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">2 八卦板</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">3 表特板</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+</tr>
+</tbody></table>
+<p>此處以計算Precision為例，先計算各類別的Precision:</p>
+<blockquote>
+<p>Precision = TP/(TP+FP)</p>
+</blockquote>
+<p>P0 = 0/(0+1) = 0<br>P1 = 1/(1+1) = 0.5<br>P2 = 1/(1+0) = 1<br>P3 = 1/(1+1) = 0.5</p>
+<p>這其實就是<code>None</code>會回傳的值。</p>
+<ul>
+<li><p><strong>計算 <code>micro</code> precision:</strong></p>
+<p> 把所有樣本考慮在一起來計算，所以回頭看 y_true, y_pred 的資料</p>
+<blockquote>
+<p>y_true = [1,1,0,3,2,2]<br>y_pred = [0,1,1,3,3,2]</p>
+</blockquote>
+<p> 全部樣本中有答對的有3筆，剩下3筆是沒答對的，所以 micro precision = 3/(3+3) = 0.5</p>
+</li>
+<li><p><strong>計算 <code>macro</code> precision:</strong></p>
+<p> 用算術平均數來計算，所以 macro precision = (P0+P1+P2+P3)/4 = 0.5</p>
+</li>
+<li><p><strong>計算 <code>weighted</code> precision:</strong></p>
+<p> 先計算每個類別佔所有樣本中的比例，再分別加權計算，所以 weighted precision = (1/6)xP0 + (1/3)xP1 + (1/3)xP2 + (1/6)xP3 = 0.5833 </p>
+<p>同理，Recall,  F1-Score也可以這樣計算</p>
+<p>最後，整理一下<code>micro</code>, <code>macro</code>這兩個指標帶給我們的資訊:</p>
+<blockquote>
+<p>當各類別數量相差甚大的時候:</p>
+<ol>
+<li>想要讓weight集中偏向於樣本數量大者，用<code>micro</code></li>
+<li>想要讓weight集中偏向於樣本數量小者，用<code>macro</code></li>
+</ol>
+<p>同樣地，我們可以透過這兩個指標回頭檢查類別</p>
+<ol>
+<li>當<code>micro</code>&lt;&lt;<code>macro</code>，回頭檢查樣本數量大的類別 </li>
+<li>當<code>macro</code>&lt;&lt;<code>micro</code>，回頭檢查樣本數量小的類別 </li>
+</ol>
+</blockquote>
+</li>
+</ul>
+<p>以下是程式碼</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">from sklearn.metrics import precision_score</span><br><span class="line">from sklearn.metrics import recall_score</span><br><span class="line">from sklearn.metrics import f1_score</span><br><span class="line">from sklearn.metrics import classification_report  # 全部指標的report</span><br><span class="line"></span><br><span class="line"># 精確度(Precision)</span><br><span class="line">precision_score(y_true, y_pred, average&#x3D;None)    # [0, 0.5, 1, 0.5]</span><br><span class="line">precision_score(y_true, y_pred, average&#x3D;&#39;micro&#39;) # 0.5</span><br><span class="line">precision_score(y_true, y_pred, average&#x3D;&#39;macro&#39;) # 0.5</span><br><span class="line">precision_score(y_true, y_pred, average&#x3D;&#39;weighted&#39;) # 0.58333</span><br><span class="line"></span><br><span class="line"># 召回率(Recall)</span><br><span class="line">recall_score(y_true, y_pred, average&#x3D;None)    # [0, 0.5, 0.5, 1]</span><br><span class="line">recall_score(y_true, y_pred, average&#x3D;&#39;micro&#39;) # 0.5</span><br><span class="line">recall_score(y_true, y_pred, average&#x3D;&#39;macro&#39;) # 0.5</span><br><span class="line">recall_score(y_true, y_pred, average&#x3D;&#39;weighted&#39;) # 0.5</span><br><span class="line"></span><br><span class="line"># F1-Score</span><br><span class="line">f1_score(y_true, y_pred, average&#x3D;None)    # [0, 0.5, 0.6667, 0.6667]</span><br><span class="line">f1_score(y_true, y_pred, average&#x3D;&#39;micro&#39;) # 0.5</span><br><span class="line">f1_score(y_true, y_pred, average&#x3D;&#39;macro&#39;) # 0.45833</span><br><span class="line">f1_score(y_true, y_pred, average&#x3D;&#39;weighted&#39;) # 0.4999</span><br><span class="line"></span><br><span class="line"># 綜合指標的report</span><br><span class="line">print(classification_report(y_true,y_pred))</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/FPVLJjr.png"></p>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.ycc.idv.tw/confusion-matrix.html">如何辨別機器學習模型的好壞？秒懂Confusion Matrix</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/%E6%95%B8%E5%AD%B8-%E4%BA%BA%E5%B7%A5%E6%99%BA%E6%85%A7%E8%88%87%E8%9F%92%E8%9B%87/smote-enn-%E8%A7%A3%E6%B1%BA%E6%95%B8%E6%93%9A%E4%B8%8D%E5%B9%B3%E8%A1%A1%E5%BB%BA%E6%A8%A1%E7%9A%84%E6%8E%A1%E6%A8%A3%E6%96%B9%E6%B3%95-cdb6324b711e">smote-enn-解決數據不平衡建模的採樣方法</a></li>
+<li><a target="_blank" rel="noopener" href="https://chih-sheng-huang821.medium.com/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E7%B5%B1%E8%A8%88%E6%96%B9%E6%B3%95-%E6%A8%A1%E5%9E%8B%E8%A9%95%E4%BC%B0-%E9%A9%97%E8%AD%89%E6%8C%87%E6%A8%99-b03825ff0814">機器學習-統計方法-模型評估-驗證指標</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/hfutdog/article/details/88085878">sklearn计算准确率、精确率、召回率、F1 score</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/05/Keras-%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92%E6%A8%A1%E5%9E%8B/" rel="prev" title="[Keras] 深度學習模型">
+      <i class="fa fa-chevron-left"></i> [Keras] 深度學習模型
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BA%8C%E5%88%86%E9%A1%9E%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%A9%95%E4%BC%B0%E6%8C%87%E6%A8%99"><span class="nav-number">1.</span> <span class="nav-text">1. 二分類模型的評估指標</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B7%E6%B7%86%E7%9F%A9%E9%99%A3-Confusion-Matrix"><span class="nav-number">1.1.</span> <span class="nav-text">混淆矩陣 Confusion Matrix</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%96%E7%A2%BA%E5%BA%A6-Accuracy"><span class="nav-number">1.2.</span> <span class="nav-text">準確度(Accuracy)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B2%BE%E7%A2%BA%E5%BA%A6-Precision-%E8%88%87%E5%8F%AC%E5%9B%9E%E7%8E%87-Recall"><span class="nav-number">1.3.</span> <span class="nav-text">精確度(Precision)與召回率(Recall)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#F1-Score"><span class="nav-number">1.4.</span> <span class="nav-text">F1-Score</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ROC-%E6%9B%B2%E7%B7%9A"><span class="nav-number">1.5.</span> <span class="nav-text">ROC 曲線</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%A4%9A%E5%88%86%E9%A1%9E%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%A9%95%E4%BC%B0%E6%8C%87%E6%A8%99"><span class="nav-number">2.</span> <span class="nav-text">2. 多分類模型的評估指標</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Cohen%E2%80%99s-kappa-coefficient-Kappa"><span class="nav-number">2.1.</span> <span class="nav-text">Cohen’s kappa coefficient (Kappa)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%B8%BD%E7%B5%90"><span class="nav-number">3.</span> <span class="nav-text">3. 總結</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">4.</span> <span class="nav-text">4. 程式碼</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Confusion-Matrix"><span class="nav-number">4.1.</span> <span class="nav-text">[Confusion Matrix]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Accuracy"><span class="nav-number">4.2.</span> <span class="nav-text">[Accuracy]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Precision-Recall-F1-Score"><span class="nav-number">4.3.</span> <span class="nav-text">[Precision&#x2F;Recall&#x2F;F1-Score]</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">參考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MaDi"
+      src="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DysonMa" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DysonMa" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:madihsiang@gmail.com" title="E-Mail → mailto:madihsiang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/marc_de_shawn" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;marc_de_shawn" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">若要轉載文章，煩請註明作者名稱MaDi與原始連結</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="訪客總數">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="總瀏覽次數">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
