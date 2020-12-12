@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="何謂推薦系統推薦系統是指:  一種信息過濾系統，用於預測用戶對物品的『評分』或『偏好』">
+<meta property="og:type" content="article">
+<meta property="og:title" content="談談推薦系統">
+<meta property="og:url" content="https://dysonma.github.io/2020/12/12/%E8%AB%87%E8%AB%87%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="何謂推薦系統推薦系統是指:  一種信息過濾系統，用於預測用戶對物品的『評分』或『偏好』">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/jDr6yh0.png">
+<meta property="og:image" content="https://i.imgur.com/gQD65d5.png">
+<meta property="og:image" content="https://i.imgur.com/VNauvik.png">
+<meta property="article:published_time" content="2020-12-12T03:47:25.000Z">
+<meta property="article:modified_time" content="2020-12-12T03:50:42.323Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/jDr6yh0.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/12/12/%E8%AB%87%E8%AB%87%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>談談推薦系統 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/12/12/%E8%AB%87%E8%AB%87%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          談談推薦系統
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-12-12 11:47:25 / 修改時間：11:50:42" itemprop="dateCreated datePublished" datetime="2020-12-12T11:47:25+08:00">2020-12-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92/" itemprop="url" rel="index"><span itemprop="name">機器學習/深度學習</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">閱讀次數：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="何謂推薦系統"><a href="#何謂推薦系統" class="headerlink" title="何謂推薦系統"></a>何謂推薦系統</h2><p>推薦系統是指:</p>
+<blockquote>
+<p>一種信息過濾系統，用於預測用戶對物品的『評分』或『偏好』</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="I-內容過濾-content-based-recommendation"><a href="#I-內容過濾-content-based-recommendation" class="headerlink" title="I. 內容過濾(content-based recommendation)"></a>I. 內容過濾(content-based recommendation)</h2><blockquote>
+<p>利用物品類型與風格進行推薦，<strong>根據你過去喜歡的產品，去推薦給你相似的產品。</strong></p>
+</blockquote>
+<p>內容過濾又分為三個部分:</p>
+<blockquote>
+<p><strong>1. Item representation</strong><br>每一個 <strong>物品(item)</strong> 選出其特徵來代表此物品</p>
+<p><strong>2. Profile learning</strong><br>根據<strong>使用者</strong>過去對某物品的喜好程度的數據來學習該使用者的偏好</p>
+<p><strong>3. Recommendation generation</strong><br>比較前兩者，為使用者推薦一組相關性最大的物品。</p>
+</blockquote>
+<h2 id="II-協同過濾-collaborative-filtering-簡稱CF"><a href="#II-協同過濾-collaborative-filtering-簡稱CF" class="headerlink" title="II. 協同過濾(collaborative filtering, 簡稱CF)"></a>II. 協同過濾(collaborative filtering, 簡稱CF)</h2><blockquote>
+<p><strong>假設同樣一個物品的喜愛者，在某種程度上也會有其他共同的喜愛</strong></p>
+</blockquote>
+<p>協同過濾中要找到與使用者有相同品味的其他使用者分為兩種方式:</p>
+<h3 id="1-以記憶為基礎-Memory-based"><a href="#1-以記憶為基礎-Memory-based" class="headerlink" title="1. 以記憶為基礎(Memory-based)"></a>1. 以記憶為基礎(Memory-based)</h3><h4 id="1-1-以使用者為基礎-User-based"><a href="#1-1-以使用者為基礎-User-based" class="headerlink" title="1.1 以使用者為基礎(User-based)"></a>1.1 以使用者為基礎(User-based)</h4><blockquote>
+<p>先找出喜好行為與你類似的使用者，再將他們喜好的內容推薦給你，將有很大的機率會激起你的興趣</p>
+</blockquote>
+<p>舉例來說: </p>
+<p>當A,B兩人經過演算法計算後已知是共同喜好者，當A對新上映的某電影有興趣的時候，系統會推薦這部新上映的電影給B，這是<strong>基於使用者</strong>的推薦方式，<strong>前提是假設有共同喜好者的這群人都會對同樣性質的新事物有相似的喜好</strong></p>
+<h4 id="1-2-以物品為基礎-Item-based"><a href="#1-2-以物品為基礎-Item-based" class="headerlink" title="1.2 以物品為基礎(Item-based)"></a>1.2 以物品為基礎(Item-based)</h4><blockquote>
+<p>計算物品(item)間的相似程度，以item的角度去判斷</p>
+</blockquote>
+<p>舉例來說: </p>
+<p>當電影<code>天能</code>, <code>鬼滅之刃</code>都被A,B,C三人評為10分的高分，則此時D看了<code>天能</code>，系統會推薦給他<code>鬼滅之刃</code>，因為這是<strong>基於物品的角度，兩部電影都被評高分，代表兩部電影某種程度上是相似的。</strong></p>
+<h3 id="2-以模型為基礎-Model-based"><a href="#2-以模型為基礎-Model-based" class="headerlink" title="2. 以模型為基礎(Model-based)"></a>2. 以模型為基礎(Model-based)</h3><p>以記憶為基礎的方法會受限於資料量的多寡，為了解決前述以記憶為基礎的方式會有 <strong>資料稀疏</strong> 的問題，因此主張<strong>預先用歷史數據訓練出一個模型，再將它拿來做預測</strong></p>
+<h3 id="協同過濾的常見缺點"><a href="#協同過濾的常見缺點" class="headerlink" title="協同過濾的常見缺點:"></a>協同過濾的常見缺點:</h3><h4 id="冷啟動-Cold-Start"><a href="#冷啟動-Cold-Start" class="headerlink" title="冷啟動(Cold Start)"></a>冷啟動(Cold Start)</h4><blockquote>
+<p>顧名思義，指的是<strong>沒有足夠的使用者與物品間的資料</strong>，導致剛起步的推薦系統，其推薦效果較差</p>
+</blockquote>
+<h4 id="稀疏性問題-Sparsity"><a href="#稀疏性問題-Sparsity" class="headerlink" title="稀疏性問題(Sparsity)"></a>稀疏性問題(Sparsity)</h4><blockquote>
+<p>指的是當推薦系統的規模變大，使用者與商品的資料都變多的時候，很難再有重疊的可能性，白話來說就是<strong>使用者很難把數量急劇增加的的全部商品瀏覽完，那他喜愛物品的資訊將無法提高推薦系統的效果</strong>，此現象隨資料量愈大，稀疏性也愈大。</p>
+</blockquote>
+<h2 id="常見衡量距離-相似度-的方法"><a href="#常見衡量距離-相似度-的方法" class="headerlink" title="常見衡量距離(相似度)的方法"></a>常見衡量距離(相似度)的方法</h2><p>在分類或推薦系統的演算法中，常常使用距離來衡量兩者資料的相似度。</p>
+<h3 id="歐式距離"><a href="#歐式距離" class="headerlink" title="歐式距離"></a>歐式距離</h3><p>在一個n維空間中，兩個向量之間的距離就是廣義的歐式距離<br><img src="https://i.imgur.com/jDr6yh0.png"></p>
+<h3 id="餘弦相似度"><a href="#餘弦相似度" class="headerlink" title="餘弦相似度"></a>餘弦相似度</h3><p>在一個n維空間中，兩個向量之間的夾角就是餘弦相似度。</p>
+<p>距離愈短，相似度愈高，而<strong>餘弦相似度愈高，就代表兩個向量的距離愈接近</strong>。<br><img src="https://i.imgur.com/gQD65d5.png"></p>
+<p>除此之外，也可以用<strong>餘弦距離(Cosine_Distance)</strong> 來衡量兩個點(A,B)在空間上的距離</p>
+<blockquote>
+<p><strong>Cosine_Distance (A, B) = 1 - Cosine_Similarity (A, B)</strong></p>
+</blockquote>
+<p>當餘弦距離等於0就代表相同，餘弦距離等於1就代表完全不同。</p>
+<p>python程式碼:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">v1 &#x3D; [1,2,3]</span><br><span class="line">v2 &#x3D; [2,5,7]</span><br><span class="line"></span><br><span class="line"># 自己刻一個餘弦相似度的函式</span><br><span class="line">def DIY_cosine_similarity(v1,v2):</span><br><span class="line">    dot &#x3D; sum(e1*e2 for e1,e2 in zip(v1,v2)) #或用numpy套件 dot &#x3D; np.dot(v1,v2)</span><br><span class="line">    norm1 &#x3D; sum(e1**2 for e1 in v1)**0.5</span><br><span class="line">    norm2 &#x3D; sum(e2**2 for e2 in v2)**0.5</span><br><span class="line">    return dot&#x2F;(norm1*norm2)</span><br><span class="line"></span><br><span class="line"># 用sklearn內建的餘弦相似度</span><br><span class="line">from sklearn.metrics.pairwise import cosine_similarity</span><br><span class="line"></span><br><span class="line">print(DIY_cosine_similarity(v1,v2)) # 0.9986254289035239</span><br><span class="line">print(cosine_similarity([v1],[v2])) # [[0.99862543]]</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="比較歐式距離與餘弦相似度"><a href="#比較歐式距離與餘弦相似度" class="headerlink" title="比較歐式距離與餘弦相似度"></a>比較歐式距離與餘弦相似度</h3><blockquote>
+<p>比起歐式距離，餘弦相似度更在乎的是<strong>夾角(方向)上的差異，而非絕對的長度</strong></p>
+</blockquote>
+<p>以下圖為例，<strong>當A點不動，B點持續在同方向上向外平移，會造成餘弦相似度不變(因為夾角不變)，但歐式距離會改變(兩點相對距離變長)。</strong> 因為兩種衡量距離的方式不同，資料分析適用的模型也會不同。</p>
+<p><img src="https://i.imgur.com/VNauvik.png"></p>
+<ul>
+<li>歐式距離強調<strong>特徵的絕對差異</strong>，適用情境為使用者的<strong>行為指標分析</strong>、使用者<strong>價值的相似度</strong>…</li>
+<li>餘弦相似度強調的則是<strong>方向上的差異</strong>，適用情境為<strong>使用者對內容評分來區分喜好</strong>…</li>
+</ul>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://medium.com/if-lab-ai/%E5%B0%B1%E9%80%99%E6%A8%A3%E6%87%82ai-%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1%E7%B3%BB%E5%88%971-%E4%BB%80%E9%BA%BC%E6%98%AF%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1-f1e08b36aa68">就這樣懂AI — 推薦系統系列1：什麼是推薦系統</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.thenewslens.com/article/117821">Netflix與YouTube的「推薦系統」如何挑選影片給我？</a></li>
+<li><a target="_blank" rel="noopener" href="https://kknews.cc/zh-tw/code/gr4y3py.html">利用python構建一個推薦系統，這個技術是出了名的強大！</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.itread01.com/content/1548153030.html">餘弦相似度 與 歐式距離 選擇</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.itread01.com/content/1547931443.html">模式識別相似性測度距離計算—幾種距離對比</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/12/NLP%E6%96%B7%E8%A9%9E%E7%B5%B1%E8%A8%88%E5%88%86%E6%9E%90-II-NLTK%E3%80%81wordnet/" rel="prev" title="NLP斷詞統計分析(II)-NLTK、wordnet">
+      <i class="fa fa-chevron-left"></i> NLP斷詞統計分析(II)-NLTK、wordnet
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/12/Python%E5%AF%A6%E4%BD%9C%E9%9B%BB%E5%BD%B1%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1/" rel="next" title="Python實作電影推薦系統">
+      Python實作電影推薦系統 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E8%AC%82%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1"><span class="nav-number">1.</span> <span class="nav-text">何謂推薦系統</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#I-%E5%85%A7%E5%AE%B9%E9%81%8E%E6%BF%BE-content-based-recommendation"><span class="nav-number">2.</span> <span class="nav-text">I. 內容過濾(content-based recommendation)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#II-%E5%8D%94%E5%90%8C%E9%81%8E%E6%BF%BE-collaborative-filtering-%E7%B0%A1%E7%A8%B1CF"><span class="nav-number">3.</span> <span class="nav-text">II. 協同過濾(collaborative filtering, 簡稱CF)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%BB%A5%E8%A8%98%E6%86%B6%E7%82%BA%E5%9F%BA%E7%A4%8E-Memory-based"><span class="nav-number">3.1.</span> <span class="nav-text">1. 以記憶為基礎(Memory-based)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-%E4%BB%A5%E4%BD%BF%E7%94%A8%E8%80%85%E7%82%BA%E5%9F%BA%E7%A4%8E-User-based"><span class="nav-number">3.1.1.</span> <span class="nav-text">1.1 以使用者為基礎(User-based)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-%E4%BB%A5%E7%89%A9%E5%93%81%E7%82%BA%E5%9F%BA%E7%A4%8E-Item-based"><span class="nav-number">3.1.2.</span> <span class="nav-text">1.2 以物品為基礎(Item-based)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%BB%A5%E6%A8%A1%E5%9E%8B%E7%82%BA%E5%9F%BA%E7%A4%8E-Model-based"><span class="nav-number">3.2.</span> <span class="nav-text">2. 以模型為基礎(Model-based)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%94%E5%90%8C%E9%81%8E%E6%BF%BE%E7%9A%84%E5%B8%B8%E8%A6%8B%E7%BC%BA%E9%BB%9E"><span class="nav-number">3.3.</span> <span class="nav-text">協同過濾的常見缺點:</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%B7%E5%95%9F%E5%8B%95-Cold-Start"><span class="nav-number">3.3.1.</span> <span class="nav-text">冷啟動(Cold Start)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A8%80%E7%96%8F%E6%80%A7%E5%95%8F%E9%A1%8C-Sparsity"><span class="nav-number">3.3.2.</span> <span class="nav-text">稀疏性問題(Sparsity)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A6%8B%E8%A1%A1%E9%87%8F%E8%B7%9D%E9%9B%A2-%E7%9B%B8%E4%BC%BC%E5%BA%A6-%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">常見衡量距離(相似度)的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%90%E5%BC%8F%E8%B7%9D%E9%9B%A2"><span class="nav-number">4.1.</span> <span class="nav-text">歐式距離</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A4%98%E5%BC%A6%E7%9B%B8%E4%BC%BC%E5%BA%A6"><span class="nav-number">4.2.</span> <span class="nav-text">餘弦相似度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%94%E8%BC%83%E6%AD%90%E5%BC%8F%E8%B7%9D%E9%9B%A2%E8%88%87%E9%A4%98%E5%BC%A6%E7%9B%B8%E4%BC%BC%E5%BA%A6"><span class="nav-number">4.3.</span> <span class="nav-text">比較歐式距離與餘弦相似度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">參考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MaDi"
+      src="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DysonMa" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DysonMa" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:madihsiang@gmail.com" title="E-Mail → mailto:madihsiang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/marc_de_shawn" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;marc_de_shawn" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">若要轉載文章，煩請註明作者名稱MaDi與原始連結</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="訪客總數">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="總瀏覽次數">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

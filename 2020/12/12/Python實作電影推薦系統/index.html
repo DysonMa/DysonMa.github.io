@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="電影推薦系統實作資料採用公開資料集 MovieLens 做為數據，這裡只用ratings.csv和movies.csv，並參考網路上的資源實作內容過濾與協同過濾的程式。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python實作電影推薦系統">
+<meta property="og:url" content="https://dysonma.github.io/2020/12/12/Python%E5%AF%A6%E4%BD%9C%E9%9B%BB%E5%BD%B1%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="電影推薦系統實作資料採用公開資料集 MovieLens 做為數據，這裡只用ratings.csv和movies.csv，並參考網路上的資源實作內容過濾與協同過濾的程式。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/l5l9gE1.png">
+<meta property="og:image" content="https://i.imgur.com/DYkRAqj.png">
+<meta property="og:image" content="https://i.imgur.com/8nWwr8l.png">
+<meta property="og:image" content="https://i.imgur.com/SG69Aqz.png">
+<meta property="og:image" content="https://i.imgur.com/BLU4buH.png">
+<meta property="og:image" content="https://i.imgur.com/l5l9gE1.png">
+<meta property="og:image" content="https://i.imgur.com/DG6O8xV.png">
+<meta property="og:image" content="https://i.imgur.com/wqdez2I.png">
+<meta property="og:image" content="https://i.imgur.com/r0L2nQ5.png">
+<meta property="article:published_time" content="2020-12-12T03:48:24.000Z">
+<meta property="article:modified_time" content="2020-12-12T03:48:35.381Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/l5l9gE1.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/12/12/Python%E5%AF%A6%E4%BD%9C%E9%9B%BB%E5%BD%B1%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>Python實作電影推薦系統 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/12/12/Python%E5%AF%A6%E4%BD%9C%E9%9B%BB%E5%BD%B1%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Python實作電影推薦系統
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-12-12 11:48:24 / 修改時間：11:48:35" itemprop="dateCreated datePublished" datetime="2020-12-12T11:48:24+08:00">2020-12-12</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">閱讀次數：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="電影推薦系統實作"><a href="#電影推薦系統實作" class="headerlink" title="電影推薦系統實作"></a>電影推薦系統實作</h2><p>資料採用公開資料集 <a target="_blank" rel="noopener" href="http://movielens.org/">MovieLens</a> 做為數據，這裡只用ratings.csv和movies.csv，並參考網路上的資源實作<strong>內容過濾</strong>與<strong>協同過濾</strong>的程式。</p>
+<a id="more"></a>
+
+<h3 id="I-內容過濾"><a href="#I-內容過濾" class="headerlink" title="I. 內容過濾"></a>I. 內容過濾</h3><blockquote>
+<p><strong>根據你過去喜歡的產品，去推薦給你相似的產品。</strong></p>
+</blockquote>
+<p><strong>流程:</strong></p>
+<ol>
+<li>建立特徵矩陣，計算每個使用者過往對每一種 <strong>電影類型(genres)</strong> 的平均評分</li>
+<li>計算 <strong>使用者</strong> 與 <strong>電影</strong> 的餘弦相似度(距離)</li>
+<li>推薦 <strong>某使用者可能喜愛的電影</strong> 或 <strong>某電影可能喜愛的受眾</strong></li>
+</ol>
+<p>引入套件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">import numpy as np</span><br><span class="line">import pandas as pd</span><br><span class="line">from sklearn.metrics.pairwise import paired_distances,cosine_similarity</span><br></pre></td></tr></table></figure>
+<p>下載公開資料集，並依照檔案路徑讀取資料</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">movies &#x3D; pd.read_csv(&#39;.&#x2F;ml-latest-small&#x2F;movies.csv&#39;)</span><br><span class="line">rate &#x3D; pd.read_csv(&#39;.&#x2F;ml-latest-small&#x2F;ratings.csv&#39;)</span><br><span class="line"></span><br><span class="line">display(movies.head())</span><br><span class="line">display(rate.head())</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/l5l9gE1.png"></p>
+<p>合併資料做成DataFrame</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># movies留下movieId與genres(電影分類)</span><br><span class="line"># rate留下userId與movieId</span><br><span class="line"># 把movies與rate以movieId合併成一個df</span><br><span class="line"></span><br><span class="line">movies.drop(&#39;title&#39;,axis&#x3D;1,inplace&#x3D;True)</span><br><span class="line">rate.drop([&#39;rating&#39;, &#39;timestamp&#39;],axis&#x3D;1,inplace&#x3D;True)</span><br><span class="line">df &#x3D; pd.merge(rate, movies, on&#x3D;&#39;movieId&#39;)</span><br><span class="line">df.head()</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/DYkRAqj.png"></p>
+<p>建立特徵矩陣:</p>
+<blockquote>
+<p>movie_arr =  <code>movieId</code> 對 <code>genres做完One-Hot Encoding</code> 的矩陣，背後意義是<strong>電影Id對應到何種電影類型</strong></p>
+<p>user_arr = <code>UserId</code> 對 <code>genres做完One-Hot Encoding後使用者對每個電影類型的平均評分</code> 的矩陣，背後意義是<strong>UserId對應到某種電影類型的平均評分</strong></p>
+</blockquote>
+<p>舉例來說，假設user1有10筆觀看紀錄，其中<code>Adventure</code>占了六筆，則One-Hot Encoding的<code>Adventure</code>這個欄位就是0.6分。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 建立movie的特徵矩陣</span><br><span class="line">oneHot &#x3D; movies[&quot;genres&quot;].str.get_dummies(&quot;|&quot;) # One-Hot Encoding</span><br><span class="line">movie_arr &#x3D; pd.concat([movies, oneHot], axis&#x3D;1)</span><br><span class="line">movie_arr.drop(&quot;genres&quot;,axis&#x3D;1,inplace&#x3D;True)</span><br><span class="line">movie_arr.set_index(&quot;movieId&quot;,inplace&#x3D;True)</span><br><span class="line">display(movie_arr.head())</span><br><span class="line"></span><br><span class="line"># 建立user的特徵矩陣</span><br><span class="line">oneHot &#x3D; df[&quot;genres&quot;].str.get_dummies(&quot;|&quot;) # One-Hot Encoding</span><br><span class="line">user_arr &#x3D; pd.concat([df, oneHot], axis&#x3D;1)</span><br><span class="line">user_arr.drop([&quot;movieId&quot;,&quot;genres&quot;],axis&#x3D;1,inplace&#x3D;True)</span><br><span class="line">user_arr &#x3D; user_arr.groupby(&#39;userId&#39;).mean()</span><br><span class="line">display(user_arr.head())</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/8nWwr8l.png"></p>
+<p>計算 <strong>使用者與電影的餘弦相似度(距離)</strong> 來建立使用者與電影的相似度矩陣</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># user-movie相似度矩陣</span><br><span class="line">similar_matrix &#x3D; cosine_similarity(user_arr.values, movie_arr.values)</span><br><span class="line">similar_matrix &#x3D; pd.DataFrame(similar_matrix, index &#x3D; user_arr.index, columns &#x3D; movie_arr.index)</span><br><span class="line">similar_matrix</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/SG69Aqz.png"></p>
+<p>定義兩個函式分別取得<strong>前幾個最相似的電影</strong>與<strong>前幾個最相似的使用者</strong>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 取得與特定user最相似的前num部movie</span><br><span class="line">def get_the_most_similar_movies(searchUserId, num):</span><br><span class="line">  vec &#x3D; similar_matrix.loc[searchUserId].values</span><br><span class="line">  sorted_index &#x3D; np.argsort(-vec)[:num]   #找距離最短</span><br><span class="line">  return list(similar_matrix.columns[sorted_index])</span><br><span class="line"></span><br><span class="line"># 取得與特定movie最相似的前num部movie</span><br><span class="line">def get_the_most_similar_users(searchMovieId, num):</span><br><span class="line">  movie_vec &#x3D; similar_matrix[searchMovieId].values </span><br><span class="line">  sorted_index &#x3D; np.argsort(-movie_vec)[:num]  #找距離最短</span><br><span class="line">  return list(similar_matrix.index[sorted_index])  </span><br></pre></td></tr></table></figure>
+<p>設定欲搜尋的電影id和使用者id</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># sort最相似的資料</span><br><span class="line">searchMovieId &#x3D; 1</span><br><span class="line">searchUserId &#x3D; 2</span><br><span class="line">num &#x3D; 10</span><br></pre></td></tr></table></figure>
+<p>開始搜尋</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">similar_movies_index &#x3D; get_the_most_similar_movies(searchUserId, num)</span><br><span class="line">similar_user_index &#x3D; get_the_most_similar_users(searchMovieId, num)</span><br><span class="line">print(similar_movies_index)</span><br><span class="line">print(similar_user_index)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[7007, 20, 145, 5027, 1432, 5628, 67923, 96861, 41997, 26344]<br>[401, 388, 252, 161, 20, 539, 306, 276, 234, 605]</p>
+</blockquote>
+<p>列出推薦電影與使用者的名單</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 重新讀入movies.csv為了要有title</span><br><span class="line">movies &#x3D; pd.read_csv(&#39;.&#x2F;ml-latest-small&#x2F;movies.csv&#39;)</span><br><span class="line"></span><br><span class="line"># 列出推薦名單</span><br><span class="line">df_recommend_movies &#x3D; pd.DataFrame(&#123;f&#39;推薦給[使用者&#123;searchUserId&#125;]的前&#123;num&#125;部電影&#39;:movies[movies.movieId.isin(similar_movies_index)].title[:num]&#125;).reset_index()</span><br><span class="line">df_recommend_movies.drop(&#39;index&#39;,axis&#x3D;1,inplace&#x3D;True)</span><br><span class="line">df_recommend_users &#x3D; pd.DataFrame(&#123;f&#39;可能會喜歡[電影&#123;searchMovieId&#125;]的前&#123;num&#125;個使用者&#39;:rate[rate.userId.isin(similar_user_index)].userId.unique()[:num]&#125;).reset_index()</span><br><span class="line">df_recommend_users.drop(&#39;index&#39;,axis&#x3D;1,inplace&#x3D;True)</span><br><span class="line"></span><br><span class="line">pd.concat([df_recommend_movies,df_recommend_users],axis&#x3D;1)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/BLU4buH.png"></p>
+<h2 id="II-基於使用者為基礎的協同過濾法"><a href="#II-基於使用者為基礎的協同過濾法" class="headerlink" title="II. 基於使用者為基礎的協同過濾法"></a>II. 基於使用者為基礎的協同過濾法</h2><blockquote>
+<p><strong>先找出喜好行為與你類似的使用者，再將他們喜好的內容推薦給你，將有很大的機率會激起你的興趣</strong></p>
+</blockquote>
+<p><strong>流程:</strong></p>
+<ol>
+<li>找到與使用者有共同喜好的其他使用者</li>
+<li>將這些其他使用者看過的最高評分的電影推薦給使用者</li>
+</ol>
+<p>引入套件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">import numpy as np</span><br><span class="line">import pandas as pd</span><br><span class="line">from sklearn.metrics.pairwise import paired_distances,cosine_similarity</span><br></pre></td></tr></table></figure>
+<p>下載公開資料集，並依照檔案路徑讀取資料</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">movies &#x3D; pd.read_csv(&#39;.&#x2F;ml-latest-small&#x2F;movies.csv&#39;)</span><br><span class="line">rate &#x3D; pd.read_csv(&#39;.&#x2F;ml-latest-small&#x2F;ratings.csv&#39;)</span><br><span class="line"></span><br><span class="line">display(movies.head())</span><br><span class="line">display(rate.head())</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/l5l9gE1.png"></p>
+<p>合併資料做成DataFrame</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">movies.drop(&#39;genres&#39;,axis&#x3D;1,inplace&#x3D;True)</span><br><span class="line">rate.drop(&#39;timestamp&#39;,axis&#x3D;1,inplace&#x3D;True)</span><br><span class="line">df &#x3D; pd.merge(rate,movies,on&#x3D;&#39;movieId&#39;)</span><br><span class="line">df</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/DG6O8xV.png"><br>看一下資料的分布</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">groups &#x3D; df.groupby(&#39;userId&#39;)</span><br><span class="line">pd.DataFrame(groups.size(),columns&#x3D;[&#39;count&#39;]).plot();</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/wqdez2I.png"></p>
+<p>定義<code>find_common_movies</code> 函式，目的是找出使用者與其他使用者共同看過的電影id</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">def find_common_movies(user, other_users):</span><br><span class="line">  s1 &#x3D; set(user.movieId.values)</span><br><span class="line">  s2 &#x3D; set(other_users.movieId.values) </span><br><span class="line">  return s1.intersection(s2)</span><br></pre></td></tr></table></figure>
+<p>因為sklearn裡面的cosine_similarity是常數計算，為了計算向量之間的餘弦相似度，特別客製化一個函式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">def vec2matrix_cosine_similarity(vec1,vec2):</span><br><span class="line">  vec1 &#x3D; np.mat(vec1)</span><br><span class="line">  vec2 &#x3D; np.mat(vec2)</span><br><span class="line">  cos &#x3D; float(vec1*vec2.T)&#x2F;(np.linalg.norm(vec1)*np.linalg.norm(vec2))</span><br><span class="line">  sim &#x3D; 0.5 + 0.5 * cos</span><br><span class="line">  return sim</span><br></pre></td></tr></table></figure>
+<p>由使用者與其他使用者共同看過的電影id的rating去計算兩者的餘弦相似度</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">def cal_cosine_similarity_from_rating(user,other_users,common_moviesId):</span><br><span class="line">  user_rating &#x3D; user[user.movieId.isin(common_moviesId)].sort_values(by&#x3D;&quot;movieId&quot;)[&quot;rating&quot;].values.reshape(1,len(common_moviesId))</span><br><span class="line">  other_user_rating &#x3D; other_users[other_users.movieId.isin(common_moviesId)].sort_values(by&#x3D;&quot;movieId&quot;)[&quot;rating&quot;].values.reshape(1,len(common_moviesId))</span><br><span class="line">  sim &#x3D; vec2matrix_cosine_similarity(user_rating,other_user_rating)</span><br><span class="line">  return sim</span><br><span class="line"></span><br><span class="line">def cal_each_user_similarity(userId):</span><br><span class="line">  user_similarity &#x3D; []</span><br><span class="line">  for other_userId in df.userId.unique():</span><br><span class="line">    if other_userId &#x3D;&#x3D; userId:</span><br><span class="line">      continue</span><br><span class="line">    user &#x3D; groups.get_group(userId)</span><br><span class="line">    other_users &#x3D; groups.get_group(other_userId)</span><br><span class="line">    common_moviesId &#x3D; find_common_movies(user,other_users)</span><br><span class="line">    # 避免都無關，common_moviesId &#x3D; &#123;&#125;</span><br><span class="line">    if common_moviesId !&#x3D; set():</span><br><span class="line">      sim &#x3D; cal_cosine_similarity_from_rating(user,other_users,common_moviesId)</span><br><span class="line">      user_similarity.append([other_userId,sim])</span><br><span class="line">  return user_similarity</span><br></pre></td></tr></table></figure>
+<p>找出前num數量個相似的使用者Id</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def top_num_similar_users(user_Id, num):</span><br><span class="line">  user_similarity &#x3D; cal_each_user_similarity(user_Id)</span><br><span class="line">  user_similarity &#x3D; sorted(user_similarity, key&#x3D;lambda x: x[1], reverse&#x3D;True)</span><br><span class="line">  similar_users &#x3D; [x[0] for x in user_similarity][0:num]</span><br><span class="line">  return similar_users</span><br></pre></td></tr></table></figure>
+<p>由這些相似的使用者再找出他們評分最高的電影作為推薦</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">def recommend(user_Id, num&#x3D;10):</span><br><span class="line">  # 找尋最相近的前num個使用者</span><br><span class="line">  similar_users &#x3D; top_num_similar_users(user_Id, num)</span><br><span class="line">  # 欲搜尋的user_Id看過的電影</span><br><span class="line">  seen_movies &#x3D; df.loc[df.userId&#x3D;&#x3D;user_Id,&quot;movieId&quot;].values</span><br><span class="line">  # 由其他相似的使用者看過的電影來找出欲搜尋的user_Id沒看過的電影</span><br><span class="line">  other_similarUsers_seen_movies &#x3D; df.loc[df.userId.isin(similar_users),&quot;movieId&quot;].values</span><br><span class="line">  not_seen_movies &#x3D; set(other_similarUsers_seen_movies)-set(seen_movies)</span><br><span class="line">  # 計算這些沒看過的電影的平均評分</span><br><span class="line">  movie_groups &#x3D; df.loc[df.movieId.isin(not_seen_movies)].groupby(&#39;movieId&#39;)</span><br><span class="line">  top_num_movies &#x3D; movie_groups.mean().sort_values(by&#x3D;&#39;rating&#39;, ascending&#x3D;False)[:num].index</span><br><span class="line">  return df.loc[df.movieId.isin(top_num_movies), &quot;title&quot;].unique()</span><br></pre></td></tr></table></figure>
+<p>設定欲搜尋的使用者Id與推薦電影的數量num，並透過基於使用者的協同過濾法去推薦電影</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># sort最相似的資料</span><br><span class="line">searchUserId &#x3D; 3</span><br><span class="line">num &#x3D; 10</span><br><span class="line"></span><br><span class="line"># 透過協同過濾法推薦給searchUserId前num個電影</span><br><span class="line">recommend_top_num_movies &#x3D; recommend(searchUserId, num)</span><br><span class="line"></span><br><span class="line"># 列出推薦名單</span><br><span class="line">df_recommend_movies &#x3D; pd.DataFrame(&#123;f&#39;推薦給[使用者&#123;searchUserId&#125;]的前&#123;num&#125;部電影&#39;:recommend_top_num_movies&#125;).reset_index()</span><br><span class="line">df_recommend_movies.drop(&#39;index&#39;,axis&#x3D;1,inplace&#x3D;True)</span><br><span class="line">df_recommend_movies</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/r0L2nQ5.png"></p>
+<h2 id="程式碼"><a href="#程式碼" class="headerlink" title="程式碼"></a>程式碼</h2><p><a target="_blank" rel="noopener" href="https://github.com/DysonMa/Recommendation-System/blob/main/recommendation_system-content_based.py">based on content</a><br><a target="_blank" rel="noopener" href="https://github.com/DysonMa/Recommendation-System/blob/main/recommendation_system-User_based_CF.py">based on user CF</a></p>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://medium.com/qiubingcheng/%E5%8D%8A%E5%B0%8F%E6%99%82%E6%89%93%E9%80%A0%E7%B0%A1%E5%96%AE%E5%AF%A6%E7%94%A8%E7%9A%84%E9%9B%BB%E5%BD%B1%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1-%E9%99%84%E5%AE%8C%E6%95%B4python%E7%A8%8B%E5%BC%8F%E7%A2%BC-b372769939af">半小時打造簡單實用的電影推薦系統(附完整python程式碼)</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/qiubingcheng/%E4%BB%A5python%E5%AF%A6%E7%8F%BE%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1%E7%9A%84%E5%8D%94%E5%90%8C%E9%81%8E%E6%BF%BE%E7%AE%97%E6%B3%95-d35cc1a1ec8a">以Python實現推薦系統的協同過濾算法</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/12/%E8%AB%87%E8%AB%87%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1/" rel="prev" title="談談推薦系統">
+      <i class="fa fa-chevron-left"></i> 談談推薦系統
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%BB%E5%BD%B1%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1%E5%AF%A6%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">電影推薦系統實作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#I-%E5%85%A7%E5%AE%B9%E9%81%8E%E6%BF%BE"><span class="nav-number">1.1.</span> <span class="nav-text">I. 內容過濾</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#II-%E5%9F%BA%E6%96%BC%E4%BD%BF%E7%94%A8%E8%80%85%E7%82%BA%E5%9F%BA%E7%A4%8E%E7%9A%84%E5%8D%94%E5%90%8C%E9%81%8E%E6%BF%BE%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">II. 基於使用者為基礎的協同過濾法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">3.</span> <span class="nav-text">程式碼</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">參考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MaDi"
+      src="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DysonMa" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DysonMa" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:madihsiang@gmail.com" title="E-Mail → mailto:madihsiang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/marc_de_shawn" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;marc_de_shawn" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">若要轉載文章，煩請註明作者名稱MaDi與原始連結</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="訪客總數">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="總瀏覽次數">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

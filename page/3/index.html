@@ -75,7 +75,11 @@
   </style>
 </noscript>
 
-</head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
   <div class="container use-motion">
@@ -150,6 +154,356 @@
 
           <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/31/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%BA%8C-astype-%E8%99%95%E7%90%86%E7%A9%BA%E5%80%BC%E8%B3%87%E6%96%99-stack-unstack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/31/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%BA%8C-astype-%E8%99%95%E7%90%86%E7%A9%BA%E5%80%BC%E8%B3%87%E6%96%99-stack-unstack/" class="post-title-link" itemprop="url">Pandas常用語法整理(二) astype/處理空值資料/stack/unstack</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-10-31 22:17:48" itemprop="dateCreated datePublished" datetime="2020-10-31T22:17:48+08:00">2020-10-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-11-14 22:00:52" itemprop="dateModified" datetime="2020-11-14T22:00:52+08:00">2020-11-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/Pandas/" itemprop="url" rel="index"><span itemprop="name">Pandas</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Table-of-Contents"><a href="#Table-of-Contents" class="headerlink" title="Table of Contents:"></a>Table of Contents:</h1><blockquote>
+<ol>
+<li>轉換DataFrame資料型態: <strong>astype</strong> </li>
+<li>處理空值資料: <strong>isnull/notnull/dropna/fillna</strong></li>
+<li>MultiIndex與DataFrame的轉換: <strong>stack/unstack</strong></li>
+</ol>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/31/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%BA%8C-astype-%E8%99%95%E7%90%86%E7%A9%BA%E5%80%BC%E8%B3%87%E6%96%99-stack-unstack/#more" rel="contents">
+                閱讀全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/30/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%80-%E5%BB%BA%E7%AB%8BSeries-DataFrame-%E5%8F%96%E5%80%BC-%E8%B3%87%E6%96%99%E9%81%8B%E7%AE%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/30/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%80-%E5%BB%BA%E7%AB%8BSeries-DataFrame-%E5%8F%96%E5%80%BC-%E8%B3%87%E6%96%99%E9%81%8B%E7%AE%97/" class="post-title-link" itemprop="url">Pandas常用語法整理(一) 建立Series/DataFrame/取值/資料運算</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-10-30 19:24:01" itemprop="dateCreated datePublished" datetime="2020-10-30T19:24:01+08:00">2020-10-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-11-14 22:00:22" itemprop="dateModified" datetime="2020-11-14T22:00:22+08:00">2020-11-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/Pandas/" itemprop="url" rel="index"><span itemprop="name">Pandas</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="什麼是Pandas"><a href="#什麼是Pandas" class="headerlink" title="什麼是Pandas?"></a>什麼是Pandas?</h2><blockquote>
+<p>Pandas是Python中常用的套件之一，簡單來說，就是把 <strong>Excel的表格觀念丟到Python裡，常見的Excel功能都可以在Pandas裡完成，例如欄位的加總、分群、樞紐分析表、小計、畫折線圖、圓餅圖等等…</strong> ，其中Pandas中的資料型態DataFrame更是可以仿照SQL進行資料的處理與運算，與另一個套件numpy都是Python做資料處理常見的工具之一。</p>
+</blockquote>
+<p>為了避免將來忘記Pandas語法的操作，特別寫了一系列的文章來記錄，以便未來查閱~</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/30/Pandas%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86-%E4%B8%80-%E5%BB%BA%E7%AB%8BSeries-DataFrame-%E5%8F%96%E5%80%BC-%E8%B3%87%E6%96%99%E9%81%8B%E7%AE%97/#more" rel="contents">
+                閱讀全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/30/[Python]%20Lambda%E5%87%BD%E5%BC%8F%E8%AA%9E%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/30/%5BPython%5D%20Lambda%E5%87%BD%E5%BC%8F%E8%AA%9E%E6%B3%95/" class="post-title-link" itemprop="url">[Python] Lambda函式語法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-10-30 19:21:39" itemprop="dateCreated datePublished" datetime="2020-10-30T19:21:39+08:00">2020-10-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-11-14 21:53:23" itemprop="dateModified" datetime="2020-11-14T21:53:23+08:00">2020-11-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="什麼是Lambda語法"><a href="#什麼是Lambda語法" class="headerlink" title="什麼是Lambda語法?"></a>什麼是Lambda語法?</h2><blockquote>
+<p>Lambda函式，是一種匿名函式，<strong>不需要定義函式名稱，只有一行運算式，語法非常簡潔，功能強大</strong>，程式語言如Java、C#及Python等都支援Lambda函式，適用於小型運算</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/30/%5BPython%5D%20Lambda%E5%87%BD%E5%BC%8F%E8%AA%9E%E6%B3%95/#more" rel="contents">
+                閱讀全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/10/29/Numpy%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/29/Numpy%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/" class="post-title-link" itemprop="url">Numpy常用語法整理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-10-29 23:59:42" itemprop="dateCreated datePublished" datetime="2020-10-29T23:59:42+08:00">2020-10-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-11-21 15:31:59" itemprop="dateModified" datetime="2020-11-21T15:31:59+08:00">2020-11-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/Numpy/" itemprop="url" rel="index"><span itemprop="name">Numpy</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="什麼是Numpy"><a href="#什麼是Numpy" class="headerlink" title="什麼是Numpy?"></a>什麼是Numpy?</h2><blockquote>
+<p>Python中有很多套件可以使用，numpy是最常用的其中之一，<strong>擅長處理數據計算，舉凡是矩陣、陣列、多重維度的計算</strong>都可以透過numpy這個套件來完成，它的底層是以C和Fortran來實作，所以運算速度更快，也具備平行處理的能力，可以將操作動作一次套用在大型陣列上，與其他重量級套件(如:pandas,SciPy,Scikit-Learn)共同組成資料科學的堅強後盾。</p>
+</blockquote>
+<p>為了避免未來忘記numpy的語法，將一些常用到的語法記錄下來以供未來查閱~</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/29/Numpy%E5%B8%B8%E7%94%A8%E8%AA%9E%E6%B3%95%E6%95%B4%E7%90%86/#more" rel="contents">
+                閱讀全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
       
   
   
@@ -546,7 +900,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">28</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
@@ -663,6 +1017,8 @@
 
 
 
+
+  
 
   
 

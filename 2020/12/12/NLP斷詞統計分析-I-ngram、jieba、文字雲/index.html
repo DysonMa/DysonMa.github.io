@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在實作NLP自然語言處理的時候，常常會需要做斷詞的統計分析，大多時候是為了統計哪一個詞出現最多次，以作為分析的要點。 所以，本篇文章簡單的應用某電商評論網爬下來的評論做字詞處理，剔除停用字之後找出頻率最高的字詞，並做成文字雲。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NLP斷詞統計分析(I)-ngram、jieba、文字雲">
+<meta property="og:url" content="https://dysonma.github.io/2020/12/12/NLP%E6%96%B7%E8%A9%9E%E7%B5%B1%E8%A8%88%E5%88%86%E6%9E%90-I-ngram%E3%80%81jieba%E3%80%81%E6%96%87%E5%AD%97%E9%9B%B2/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="在實作NLP自然語言處理的時候，常常會需要做斷詞的統計分析，大多時候是為了統計哪一個詞出現最多次，以作為分析的要點。 所以，本篇文章簡單的應用某電商評論網爬下來的評論做字詞處理，剔除停用字之後找出頻率最高的字詞，並做成文字雲。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/Y4KjM49.png">
+<meta property="og:image" content="https://i.imgur.com/NINchSV.png">
+<meta property="og:image" content="https://i.imgur.com/OmmiDkV.png">
+<meta property="og:image" content="https://i.imgur.com/NCQk6bY.png">
+<meta property="og:image" content="https://i.imgur.com/a2p3C5U.png">
+<meta property="article:published_time" content="2020-12-12T03:38:23.000Z">
+<meta property="article:modified_time" content="2020-12-12T03:50:04.205Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/Y4KjM49.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/12/12/NLP%E6%96%B7%E8%A9%9E%E7%B5%B1%E8%A8%88%E5%88%86%E6%9E%90-I-ngram%E3%80%81jieba%E3%80%81%E6%96%87%E5%AD%97%E9%9B%B2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>NLP斷詞統計分析(I)-ngram、jieba、文字雲 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/12/12/NLP%E6%96%B7%E8%A9%9E%E7%B5%B1%E8%A8%88%E5%88%86%E6%9E%90-I-ngram%E3%80%81jieba%E3%80%81%E6%96%87%E5%AD%97%E9%9B%B2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NLP斷詞統計分析(I)-ngram、jieba、文字雲
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-12-12 11:38:23 / 修改時間：11:50:04" itemprop="dateCreated datePublished" datetime="2020-12-12T11:38:23+08:00">2020-12-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92/" itemprop="url" rel="index"><span itemprop="name">機器學習/深度學習</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">閱讀次數：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>在實作NLP自然語言處理的時候，常常會需要做<strong>斷詞的統計分析</strong>，大多時候是為了統計哪一個詞出現最多次，以作為分析的要點。</p>
+<p>所以，本篇文章簡單的應用某電商評論網爬下來的評論做字詞處理，剔除停用字之後找出頻率最高的字詞，並做成文字雲。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="jieba斷詞"><a href="#jieba斷詞" class="headerlink" title="jieba斷詞"></a>jieba斷詞</h2><blockquote>
+<p><code>jieba</code>是中文斷詞最常用的套件之一</p>
+</blockquote>
+<p>共分為三種模式:</p>
+<ol>
+<li><strong>精確模式</strong>：<strong>精確地</strong>切開句子，適合文本分析。</li>
+<li><strong>全模式</strong>：把句子中<strong>所有可以成詞的詞語都掃描出來</strong>，速度非常快，但不太精準</li>
+<li><strong>搜尋引擎模式</strong>：在精確模式的基礎上，<strong>對長詞再次切分，提高recall，常用於搜尋引擎。</strong></li>
+</ol>
+<p>預設使用<code>精確模式</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">import jieba</span><br><span class="line"></span><br><span class="line">txt &#x3D; &#39;人民有錢，國家安全&#39;</span><br><span class="line">print(&#39;|&#39;.join(jieba.cut(txt, cut_all&#x3D;False)))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>人民|有|錢|，|國家|安全</p>
+</blockquote>
+<p>另外，也可以透過詞性去斷詞:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import jieba.posseg as pseg</span><br><span class="line"></span><br><span class="line">text &#x3D; &#39;今日流的口水，會是明日流的汗水&#39; #節錄自博班學長的精神喊話</span><br><span class="line">words &#x3D; pseg.cut(text)</span><br><span class="line">print([i for i in words])</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[pair(‘今日’, ‘t’), pair(‘流’, ‘v’), pair(‘的’, ‘uj’), pair(‘口水’, ‘n’), pair(‘，’, ‘x’), pair(‘會’, ‘v’), pair(‘是’, ‘v’), pair(‘明日’, ‘t’), pair(‘流’, ‘v’), pair(‘的’, ‘uj’), pair(‘汗水’, ‘n’)]</p>
+</blockquote>
+<p>每個pair裏頭的第二個元素就是詞性，當詞性是<code>x</code>的時候，代表無意義，比如說這句裏頭的逗號。所以可以剔除掉詞性無意義的字詞。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(&#39;|&#39;.join([word for word, flag in words if flag !&#x3D; &#39;x&#39;]))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>今日|流|的|口水|會|是|明日|流|的|汗水</p>
+</blockquote>
+<h3 id="tf-idf-term-frequency–inverse-document-frequency"><a href="#tf-idf-term-frequency–inverse-document-frequency" class="headerlink" title="tf-idf (term frequency–inverse document frequency)"></a>tf-idf (term frequency–inverse document frequency)</h3><p><em>維基百科:</em></p>
+<blockquote>
+<ol>
+<li><p>是一種用於<strong>資訊檢索與文字挖掘的常用加權技術。</strong> </p>
+</li>
+<li><p>tf-idf是一種統計方法，用以<strong>評估一字詞對於一個檔案集或一個語料庫中的其中一份檔案的重要程度。字詞的重要性隨著它在檔案中出現的次數成正比增加，但同時會隨著它在語料庫中出現的頻率成反比下降。</strong> </p>
+</li>
+<li><p>tf-idf加權的各種形式常被<strong>搜尋引擎</strong>應用，作為檔案與用戶查詢之間相關程度的度量或評級。</p>
+</li>
+</ol>
+</blockquote>
+<p>數學式長這樣:</p>
+<blockquote>
+<p>$W_x,_y = tf_x,_y \times \log(\frac{N}{df_x})$</p>
+</blockquote>
+<p>$W_x,_y$ : 文本y裡面出現x的權重<br>$tf_x,_y$ : 文本y裡出現x的頻率<br>N : 文本總字詞數量<br>$df_x$ : 含有x的文本數量</p>
+<p>這邊節錄金庸小說裡面的某段文字做分析:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">text &#x3D; &#39;&#39;&#39; 黃藥師接在手中，觸手似覺包中是個人頭，打將開來，赫然是個新割下的首級，頭戴方巾，</span><br><span class="line">            頦下有須，面目卻不相識。歐陽鋒笑道：「兄弟今晨西來，在一所書院歇足，聽得這腐儒在對學生講書，</span><br><span class="line">            說甚麼要做忠臣孝子，兄弟聽得厭煩，將這腐儒殺了。你我東邪西毒，可說是臭味相投了。」說罷縱聲長笑。</span><br><span class="line">            黃藥師臉上色變，說道：「我平生最敬的是忠臣孝子。」俯身抓土成坑，將那人頭埋下，恭恭敬敬的作了三個揖。</span><br><span class="line">            歐陽鋒討了個沒趣，哈哈笑道：「黃老邪徒有虛名，原來也是個為禮法所拘之人。」</span><br><span class="line">            黃藥師凜然道：「忠孝乃大節所在，並非禮法！」</span><br><span class="line">          &#39;&#39;&#39;</span><br></pre></td></tr></table></figure>
+<p>載入套件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import jieba.analyse</span><br></pre></td></tr></table></figure>
+
+<p>用<code>extract_tags</code>函式把文本中的關鍵字詞抓出來</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># withWeight&#x3D;True -&gt; 返回權重</span><br><span class="line">jieba.analyse.extract_tags(text, topK&#x3D;5, withWeight&#x3D;True)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[(‘歐陽鋒’, 0.3919595902590164),<br> (‘聽得’, 0.3919595902590164),<br> (‘禮法’, 0.3919595902590164),<br> (‘忠臣孝子’, 0.38026532980327865),<br> (‘腐儒’, 0.3771404058754098)]</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># withWeight&#x3D;False -&gt; 返回排名</span><br><span class="line">jieba.analyse.extract_tags(text, topK&#x3D;5, withWeight&#x3D;False)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[‘歐陽鋒’, ‘聽得’, ‘禮法’, ‘忠臣孝子’, ‘腐儒’]</p>
+</blockquote>
+<h2 id="停用字-stopWords"><a href="#停用字-stopWords" class="headerlink" title="停用字(stopWords)"></a>停用字(stopWords)</h2><blockquote>
+<p>在做斷詞分析的時候，為了<strong>避免不必要的字詞進入統計</strong>而造成雜訊。我們常常會把他們剔除掉，而這些沒有用的字詞就稱作<strong>停用字</strong>。</p>
+<p>例如: 的、不但、可是、而且、&gt;…</p>
+</blockquote>
+<p>常用的停用字可以在網路上下載到英文、中文的版本，有不同的機構與學校推出來的版本，端看你想分析的問題用哪一個比較好。大部分的檔案類型都是txt，用程式讀取進來就可以做停用字的剔除。</p>
+<h2 id="ngram-基本NLP模型"><a href="#ngram-基本NLP模型" class="headerlink" title="ngram: 基本NLP模型"></a>ngram: 基本NLP模型</h2><blockquote>
+<p>ngram是一種語言模型(Language Model)，是學習NLP自然語言處理的入門模型。透過ngram可以統計出各個不同長度的字詞出現的次數，</p>
+</blockquote>
+<p><strong>語言模型，指的是用來計算一個句子的機率的模型。</strong> </p>
+<p>一個句子(S)是由一連串的字詞(Wi)所組成:</p>
+<blockquote>
+<p>S = W1,W2,W3…</p>
+</blockquote>
+<p>而一個句子中每個字出現的機率就用P(S)來代表。</p>
+<p>舉例來說，當有一句話長這樣 <code>下雨天，等等出門記得帶__</code>，這個空格大多數人都會填<code>雨傘</code>。而ngram模型就是透過機率的方式去找出填空中出現機率最大的字詞。</p>
+<p>談到機率模型，我們採用馬可夫鍊的假設，一個句子中<strong>第i個字會跟整句第一個字到第i-1個字有關</strong>。</p>
+<p>白話來說，就是指<strong>下一個字要填什麼跟前文有關，但是只需跟前幾個字有關，不需要回溯至整段句子</strong>，此舉可以減少機率的計算量。</p>
+<p>依據馬可夫鍊的假設，我們可以定義最簡單的機率模型為:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P(S) &#x3D; P(W1)*P(W2)*...*P(Wn)</span><br></pre></td></tr></table></figure>
+<p>代表所有字詞都是獨立的，與前後文無關，因為模型每次只取一個字詞，所以又稱<strong>一元語言模型(unigram)**。同理，若每次取到兩個或三個字詞，則稱為</strong>二元語言模型(bigram)、三元語言模型(trigram)**。</p>
+<p>而每個字詞的機率就用 <strong>Maximum Likelihood Estimation</strong> 來計算。</p>
+<p>舉例來說，假設有一句話:</p>
+<p><code>川普拜登誰會當選總統</code></p>
+<p>而每個字詞出現的機率就直接用Maximum Likelihood的方式來計算。</p>
+<blockquote>
+<p>P(川)=1/10，P(普)=1/10，P(拜)=1/10…</p>
+</blockquote>
+<p>如果是用unigram的模型，整句的機率就是</p>
+<blockquote>
+<p>P(川普拜登誰會當選總統)=P(川) * P(普) * … * P(統)</p>
+</blockquote>
+<p>也就是<strong>這十個不同的字詞會形成一個十維的向量，每個維度分別存有該字詞的機率。</strong></p>
+<p>如果今天用trigram的模型去推下一個字詞的機率，也就是說每三個字詞作分析統計，數學式長這樣:</p>
+<p><img src="https://i.imgur.com/Y4KjM49.png"></p>
+<p>利用 <strong>統計次數來相除就可以求得下一個字詞的機率。</strong> (程式碼在後頭)</p>
+<p>這時候會不禁想問…</p>
+<p><strong>既然取到三個字的trigram表現不錯，那為什麼不取到四元模型(four-gram)、五元模型(five-gram)呢?</strong></p>
+<p>原因有兩個:</p>
+<blockquote>
+<ol>
+<li>當取的字數太多的時候，會有太多字與字的組合，導致<strong>維度爆炸</strong></li>
+<li>當字數取得愈多，整體出現的機率愈低，甚至會<strong>低到等於零(沒有出現在語料庫)</strong><br>ex: P(今天下大雨不想去上班)=0</li>
+</ol>
+</blockquote>
+<h2 id="程式碼實作"><a href="#程式碼實作" class="headerlink" title="程式碼實作"></a>程式碼實作</h2><h3 id="1-資料預處理，剔除停用字"><a href="#1-資料預處理，剔除停用字" class="headerlink" title="1. 資料預處理，剔除停用字:"></a>1. 資料預處理，剔除停用字:</h3><p>先從某電商評論網爬下資料</p>
+<p><img src="https://i.imgur.com/NINchSV.png"></p>
+<p> 將<code>Review</code>欄位的所有語句蒐集起來做成語料庫(corpus)。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 建立語料庫</span><br><span class="line">corpus &#x3D; &quot;&quot;.join(df[&#39;Review&#39;].values)</span><br><span class="line">corpus[:100]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>‘差评，才买的连电源充不上电，问售后不知道咋回事，不知道干啥吃的东西出问题直接推卸厂家解决。\n原装充电头与变压器接口不匹配。\n赠送的HP转接器：HDMI接口无法正常连接，电脑无法识别显示器用了快5天了，’</p>
+</blockquote>
+<p>載入停用字(stopWords)做剔除</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">stopWords&#x3D;[]</span><br><span class="line"></span><br><span class="line"># 自己上網下載的</span><br><span class="line">with open(&#39;.&#x2F;stopwords_download&#x2F;cn_stopwords.txt&#39;, &#39;r&#39;, encoding&#x3D;&#39;UTF-8&#39;) as file:</span><br><span class="line">    for data in file.readlines():</span><br><span class="line">        data &#x3D; data.strip()</span><br><span class="line">        stopWords.append(data)</span><br><span class="line"></span><br><span class="line"># 移除停用字及跳行符號</span><br><span class="line">remaind &#x3D; list(filter(lambda a: a not in stopWords and a !&#x3D; &#39;\n&#39; and a!&#x3D; &#39;\r&#39; and a!&#x3D; &#39; &#39;, corpus))</span><br><span class="line">remaind &#x3D; &quot;&quot;.join(remaind)</span><br><span class="line">remaind[:200]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>‘差评买电源充电问售知道回事知道干吃东西出问题直接推卸厂家解决原装充电头变压器接口匹配赠送HP转接器HDMI接口法正常接电脑法识显示器快天运行速度行蛮漂亮时候开机时候会出现错误音响时候会炸音机箱面划痕开机杂音LOL界面切换会闪屏买电脑音响问题换样破音声音.刚两天扬声器没声音.运行速度快点软件半天没反应.机时间短时cpu温度忽高忽低散热.包装简陋.赠品电源适配器.十天左右时间价格直降刚买周声卡坏网页超’</p>
+</blockquote>
+<h3 id="2-建立ngram統計字數的函式"><a href="#2-建立ngram統計字數的函式" class="headerlink" title="2. 建立ngram統計字數的函式"></a>2. 建立ngram統計字數的函式</h3><p>自己建立n-gram函式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 計算句子input_strs裏頭長度為length的字詞</span><br><span class="line">def ngrams(input_strs, length):</span><br><span class="line">    for input_str in input_strs.split(&quot;\n&quot;):</span><br><span class="line">        for i in range(len(input_str)-length+1):</span><br><span class="line">            yield input_str[i:i+length]</span><br></pre></td></tr></table></figure>
+
+<p>載入<code>Counter</code>套件來統計次數。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">from collections import Counter</span><br></pre></td></tr></table></figure>
+
+<p><strong>unigram</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">uni_freq &#x3D; Counter(ngrams(remaind, 1))</span><br><span class="line">print(&quot;&quot;.join([&quot; %s : %s \n&quot; % (w[0], w[1]) for w in uni_freq.most_common(20)]))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>电 : 1700<br> 没 : 1228<br> 买 : 1224<br> 脑 : 1161<br> 机 : 1155<br> 开 : 923<br> …</p>
+</blockquote>
+<p><strong>bigram</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bi_freq &#x3D; Counter(ngrams(remaind, 2))</span><br><span class="line">print(&quot;&quot;.join([&quot; %s : %s \n&quot; % (w[0], w[1]) for w in bi_freq.most_common(20)]))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>电脑 : 1153<br> 问题 : 645<br> 客服 : 559<br> 开机 : 426<br> 屏幕 : 361<br> …</p>
+</blockquote>
+<p>trigram以上的語句處理也是一樣的程序，就不再贅述。</p>
+<h3 id="3-應用馬可夫鍊假設的ngram模型"><a href="#3-應用馬可夫鍊假設的ngram模型" class="headerlink" title="3. 應用馬可夫鍊假設的ngram模型"></a>3. 應用馬可夫鍊假設的ngram模型</h3><p>接著，用程式碼來實作一下馬克夫鍊假設的機率模型。</p>
+<p>首先，是**一元語言模型(unigram)**，假設所有的字出現的機率都是獨立事件，與前文無關。</p>
+<p>$P(w_1, w_2, w_3, w_4, …, w_n) =P(w_1) \times P(w_2) \times P(w_3) \times … \times P(w_n)$</p>
+<p>$P(w_i) = \frac{Count(w_i)}{Count(all_words)}$</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">def uni_prob(w0):</span><br><span class="line">    count_uni_freq &#x3D; uni_freq.get(w0, 0) #查w0這個字出現的次數，若查不到就回傳0(機率為零)</span><br><span class="line">    count_total &#x3D; len(corpus)</span><br><span class="line">    return count_uni_freq&#x2F;count_total</span><br></pre></td></tr></table></figure>
+
+<p>我們在這裡用這兩句話來測試unigram各字詞的機率</p>
+<p>第一句: <code>没电脑包</code><br>第二句: <code>脑包没电</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(uni_prob(&quot;没&quot;)*uni_prob(&quot;电&quot;)*uni_prob(&quot;脑&quot;)*uni_prob(&quot;包&quot;))</span><br><span class="line">print(uni_prob(&quot;脑&quot;)*uni_prob(&quot;包&quot;)*uni_prob(&quot;没&quot;)*uni_prob(&quot;电&quot;))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>9.988092183101805e-10<br>9.988092183101807e-10</p>
+</blockquote>
+<p>可以看到同樣的字句在不同排列下，unigram計算出來的句子機率是相同的，符合預期，因為我們假設每個字詞都是獨立事件。</p>
+<p>再來看看**二元語言模型(bi-gram)**，bigram是假設下一個字出現的機率與上一個字有關，所以會考慮前一個字的機率，也就是會有條件機率的概念。</p>
+<p>$P(w_1, w_2, w_3, w_4, …, w_n) =P(w_1) \times P(w_2|w_1) \times P(w_3|w_2) \times … \times P(w_n|w_{n-1})$</p>
+<p>$P(w_2|w_1) =\frac{P(w_1, w_2)}{P(w_1)}<br>\approx \frac{Count(w_1, w_2)}{Count(w_1)}$</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">def bi_prob(w1, w0):</span><br><span class="line">    count_bi_freq &#x3D; bi_freq.get(w0+w1, 0)</span><br><span class="line">    count_uni_freq &#x3D; uni_freq.get(w0, 1)</span><br><span class="line">    return count_bi_freq&#x2F;count_uni_freq</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(uni_prob(&quot;没&quot;)*bi_prob(&quot;电&quot;,&quot;没&quot;)*bi_prob(&quot;脑&quot;,&quot;电&quot;)*bi_prob(&quot;包&quot;,&quot;脑&quot;))</span><br><span class="line">print(uni_prob(&quot;脑&quot;)*bi_prob(&quot;包&quot;,&quot;脑&quot;)*bi_prob(&quot;没&quot;,&quot;包&quot;)*bi_prob(&quot;电&quot;,&quot;没&quot;))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>7.1921451918833e-06<br>8.034481451300942e-07</p>
+</blockquote>
+<p>結果可以看到用bigram來計算，<code>没电脑包</code>比<code>脑包没电</code>有更大的機率出現在句子中。</p>
+<p>最後是**三元語言模型(tri-gram)**，trigram假設所有的字出現的機率，僅和前一個字以及前兩個字有關，一樣是用條件機率來計算。</p>
+<p>$P(w_1, w_2, w_3, w_4, …, w_n) =P(w_1) \times P(w_2|w_1) \times P(w_3|w_2,w_1) \times … \times P(w_n|w_{n-1},w_{n-2})$</p>
+<p>$P(w_3|w_1,w_2) =\frac{P(w_1, w_2,w_3)}{P(w_1,w_2)}<br>\approx \frac{Count(w_1, w_2,w_3)}{Count(w_1,w_2)}$</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">def tri_prob(w2, w0, w1):</span><br><span class="line">    count_tri_freq &#x3D; tri_freq.get(w0+w1+w2, 0)</span><br><span class="line">    count_bi_freq &#x3D; bi_freq.get(w0+w1, 1)</span><br><span class="line">    return count_tri_freq&#x2F;count_bi_freq</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(uni_prob(&quot;没&quot;)*bi_prob(&quot;电&quot;,&quot;没&quot;)*tri_prob(&quot;脑&quot;,&quot;没&quot;,&quot;电&quot;)*tri_prob(&quot;包&quot;,&quot;电&quot;,&quot;脑&quot;))</span><br><span class="line">print(uni_prob(&quot;脑&quot;)*bi_prob(&quot;包&quot;,&quot;脑&quot;)*tri_prob(&quot;没&quot;,&quot;脑&quot;,&quot;包&quot;)*tri_prob(&quot;电&quot;,&quot;包&quot;,&quot;没&quot;))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>6.673612562621843e-06<br>3.4793314330830896e-06</p>
+</blockquote>
+<p>從結果可以看出，用trigram來計算句子的機率，一樣是<code>没电脑包</code>比<code>脑包没电</code>有更大的機率出現在句子中。但不知為何，判斷成<code>脑包没电</code>的機率卻意外的高XD</p>
+<h3 id="4-應用ngram於輸入法預測下文"><a href="#4-應用ngram於輸入法預測下文" class="headerlink" title="4. 應用ngram於輸入法預測下文"></a>4. 應用ngram於輸入法預測下文</h3><p>因為ngram可以計算句子出現的機率，所以也可以作為<strong>輸入下文的預測，也就是說當使用者輸入一個字，透過n元語言模型的計算，自動算出接下來n-1個字詞中機率最大(最有可能填)的字詞。</strong></p>
+<p>舉例來說，我們用同樣的資料(某電商評論網)，模型選用trigram，此時我們輸入第一個字 <code>送</code>，並用trigram計算接下來最有可能的兩個字詞。</p>
+<p>$P(w_2,w_3 |w_1= 送 ) =\frac{P(w_1,w_2,w_3) }{ P(w_1= 送 )}$</p>
+<p>$=P(w_1=送)\times P(w_2|w_1= 送 )\times P(w_3 |w_2,w_1= 送 ) \times \frac{1}{ P(w_1= 送 ) }$</p>
+<p>$= P(w_2|w_1= 送 ) \times P(w_3 |w_2,w_1= 送 )$</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">def find_NextWords(w1, N):</span><br><span class="line">    g3s &#x3D; list(filter(lambda x: x[0] &#x3D;&#x3D; w1, tri_freq.keys()))</span><br><span class="line">    results &#x3D; []</span><br><span class="line">    if len(g3s)&#x3D;&#x3D;0:</span><br><span class="line">        print(&#39;資料中沒有這個字!&#39;)</span><br><span class="line">    for g3 in g3s:</span><br><span class="line">        w1, w2, w3 &#x3D; g3</span><br><span class="line">        p &#x3D; bi_prob(w2, w1)*tri_prob(w3, w1, w2)</span><br><span class="line">        if p&gt;0:</span><br><span class="line">            results.append((p, w2+w3))</span><br><span class="line">    results &#x3D; sorted(results, key&#x3D;lambda x: x[0], reverse&#x3D;True)[:N]</span><br><span class="line">    for i, w in enumerate(results):</span><br><span class="line">        print(f&quot;第&#123;i+1&#125;名. &quot;, round(w[0],4), w[1])</span><br></pre></td></tr></table></figure>
+<p>並找出<code>送</code>之後最有可能填的前五名候選字</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find_NextWords(&#39;送&#39;, 5)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>第1名.  0.1382 鼠标<br>第2名.  0.0323 电脑<br>第3名.  0.0184 电话<br>第4名.  0.0138 服务<br>第5名.  0.0138 货速</p>
+</blockquote>
+<h3 id="5-jieba斷詞"><a href="#5-jieba斷詞" class="headerlink" title="5. jieba斷詞"></a>5. jieba斷詞</h3><p>除了ngram可以分詞以外，我們也可以用jieba來斷詞。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">segments &#x3D; jieba.cut(corpus, cut_all&#x3D;False)</span><br><span class="line"></span><br><span class="line"># 移除停用詞及跳行符號</span><br><span class="line">remainderWords &#x3D; list(filter(lambda a: a not in stopWords and a !&#x3D; &#39;\n&#39; and a!&#x3D; &#39;\r&#39; and a!&#x3D; &#39; &#39;, segments))</span><br><span class="line"></span><br><span class="line"># 印出過濾後的分詞</span><br><span class="line">for k in remainderWords[:5]:</span><br><span class="line">    print(k)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>差评<br>买<br>电源<br>充不上<br>…</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jieba_freq &#x3D; Counter(remainderWords)</span><br><span class="line">jieba_freq.most_common(100)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[(‘电脑’, 1060),<br> (‘买’, 778),<br> (‘问题’, 621),<br> (‘客服’, 558),<br> (‘说’, 508),<br> …</p>
+</blockquote>
+<h3 id="6-文字雲"><a href="#6-文字雲" class="headerlink" title="6. 文字雲"></a>6. 文字雲</h3><p>最後，一旦我們把文本都斷好詞之後，可以統計出各字詞的出現次數，這時候就可以用文字雲這個視覺化的圖形來呈現。</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"> from matplotlib import pyplot as plt</span><br><span class="line">from wordcloud import WordCloud</span><br><span class="line">%matplotlib inline</span><br><span class="line"></span><br><span class="line"> # 畫文字雲</span><br><span class="line"> def plt_WordCloud(word_freq):</span><br><span class="line">    height, width  &#x3D; 600, 800</span><br><span class="line">    wc &#x3D; WordCloud(font_path&#x3D;&quot;simsun.ttc&quot;, height&#x3D;height, width&#x3D;width).generate_from_frequencies(dict(word_freq))</span><br><span class="line">    plt.figure(figsize&#x3D;(width&#x2F;96.,height&#x2F;96.)) #pixel to inch</span><br><span class="line">    plt.imshow(wc)</span><br><span class="line">    plt.axis(&quot;off&quot;)</span><br><span class="line">    plt.show()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># unigram</span><br><span class="line">generate_wc(uni_freq.most_common(200))</span><br><span class="line"></span><br><span class="line"># bigram</span><br><span class="line">generate_wc(bi_freq.most_common(200))</span><br><span class="line"></span><br><span class="line"># jieba</span><br><span class="line">generate_wc(jieba_freq)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/OmmiDkV.png"></p>
+<p><img src="https://i.imgur.com/NCQk6bY.png"></p>
+<p><img src="https://i.imgur.com/a2p3C5U.png"></p>
+<h2 id="總結"><a href="#總結" class="headerlink" title="總結"></a>總結</h2><p>本文利用某電商評論網爬下來的評論做斷詞統計分析，資料方面先剔除停用字，接著透過ngram、jieba兩個方法來斷詞，並實作ngram機率的概念，計算出每種句子的出現機率，除此之外也實作簡單的輸入法預測下文的模型，最後統計斷詞後各個字詞的出現次數，並以視覺化的文字雲呈現。</p>
+<p>因為本文爬取的某電商評論網的資料是中文，所以就以中文為主的jieba來斷詞，除此之外，其實有另一套NLTK這個強大的套件可以協助斷詞，但主要是英文語系，之後再用別的英文資料來練習看看NLTK的斷詞分析。</p>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://medium.com/%E6%89%8B%E5%AF%AB%E7%AD%86%E8%A8%98/%E8%87%AA%E7%84%B6%E8%AA%9E%E8%A8%80%E8%99%95%E7%90%86-%E4%BD%BF%E7%94%A8-n-gram-%E5%AF%A6%E7%8F%BE%E8%BC%B8%E5%85%A5%E6%96%87%E5%AD%97%E9%A0%90%E6%B8%AC-10ac622aab7a">自然語言處理 — 使用 N-gram 實現輸入文字預測</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/28080127">深入浅出讲解语言模型</a></li>
+<li><a target="_blank" rel="noopener" href="https://yanwei-liu.medium.com/python%E8%87%AA%E7%84%B6%E8%AA%9E%E8%A8%80%E8%99%95%E7%90%86-%E4%BA%8C-%E4%BD%BF%E7%94%A8jieba%E9%80%B2%E8%A1%8C%E4%B8%AD%E6%96%87%E6%96%B7%E8%A9%9E-faf7828141a4">Python自然語言處理(二)：使用jieba進行中文斷詞</a></li>
+<li><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10192043">中文自然語言處理基礎</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/pyladies-taiwan/%E4%BB%A5-jieba-%E8%88%87-gensim-%E6%8E%A2%E7%B4%A2%E6%96%87%E6%9C%AC%E4%B8%BB%E9%A1%8C-%E4%BA%94%E6%9C%88%E5%A4%A9%E4%BA%BA%E7%94%9F%E7%84%A1%E9%99%90%E5%85%AC%E5%8F%B8%E6%AD%8C%E8%A9%9E%E5%88%86%E6%9E%90-i-cd2147b89083">以 jieba 與 gensim 探索文本主題：五月天人生無限公司歌詞分析 ( I )</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/05/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E5%B8%B8%E8%A6%8B%E7%9A%84%E8%A9%95%E4%BC%B0%E6%8C%87%E6%A8%99/" rel="prev" title="機器學習-常見的評估指標">
+      <i class="fa fa-chevron-left"></i> 機器學習-常見的評估指標
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/12/NLP%E6%96%B7%E8%A9%9E%E7%B5%B1%E8%A8%88%E5%88%86%E6%9E%90-II-NLTK%E3%80%81wordnet/" rel="next" title="NLP斷詞統計分析(II)-NLTK、wordnet">
+      NLP斷詞統計分析(II)-NLTK、wordnet <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#jieba%E6%96%B7%E8%A9%9E"><span class="nav-number">1.</span> <span class="nav-text">jieba斷詞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#tf-idf-term-frequency%E2%80%93inverse-document-frequency"><span class="nav-number">1.1.</span> <span class="nav-text">tf-idf (term frequency–inverse document frequency)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%9C%E7%94%A8%E5%AD%97-stopWords"><span class="nav-number">2.</span> <span class="nav-text">停用字(stopWords)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ngram-%E5%9F%BA%E6%9C%ACNLP%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">ngram: 基本NLP模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC%E5%AF%A6%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">程式碼實作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E8%B3%87%E6%96%99%E9%A0%90%E8%99%95%E7%90%86%EF%BC%8C%E5%89%94%E9%99%A4%E5%81%9C%E7%94%A8%E5%AD%97"><span class="nav-number">4.1.</span> <span class="nav-text">1. 資料預處理，剔除停用字:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%BB%BA%E7%AB%8Bngram%E7%B5%B1%E8%A8%88%E5%AD%97%E6%95%B8%E7%9A%84%E5%87%BD%E5%BC%8F"><span class="nav-number">4.2.</span> <span class="nav-text">2. 建立ngram統計字數的函式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%87%89%E7%94%A8%E9%A6%AC%E5%8F%AF%E5%A4%AB%E9%8D%8A%E5%81%87%E8%A8%AD%E7%9A%84ngram%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.3.</span> <span class="nav-text">3. 應用馬可夫鍊假設的ngram模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%87%89%E7%94%A8ngram%E6%96%BC%E8%BC%B8%E5%85%A5%E6%B3%95%E9%A0%90%E6%B8%AC%E4%B8%8B%E6%96%87"><span class="nav-number">4.4.</span> <span class="nav-text">4. 應用ngram於輸入法預測下文</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-jieba%E6%96%B7%E8%A9%9E"><span class="nav-number">4.5.</span> <span class="nav-text">5. jieba斷詞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E6%96%87%E5%AD%97%E9%9B%B2"><span class="nav-number">4.6.</span> <span class="nav-text">6. 文字雲</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B8%BD%E7%B5%90"><span class="nav-number">5.</span> <span class="nav-text">總結</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">參考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MaDi"
+      src="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DysonMa" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DysonMa" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:madihsiang@gmail.com" title="E-Mail → mailto:madihsiang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/marc_de_shawn" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;marc_de_shawn" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">若要轉載文章，煩請註明作者名稱MaDi與原始連結</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="訪客總數">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="總瀏覽次數">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="NLP斷詞可以處理不同語言，中文常用jieba套件來處理，英文語系則採用NLTK套件居多，本篇文章採用NLTK來做英文語句的斷詞，並結合wordnet這個字詞-語義的網路來協助我們分析同義字，甚至能夠計算不同字詞分類後的結構相似度。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NLP斷詞統計分析(II)-NLTK、wordnet">
+<meta property="og:url" content="https://dysonma.github.io/2020/12/12/NLP%E6%96%B7%E8%A9%9E%E7%B5%B1%E8%A8%88%E5%88%86%E6%9E%90-II-NLTK%E3%80%81wordnet/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="NLP斷詞可以處理不同語言，中文常用jieba套件來處理，英文語系則採用NLTK套件居多，本篇文章採用NLTK來做英文語句的斷詞，並結合wordnet這個字詞-語義的網路來協助我們分析同義字，甚至能夠計算不同字詞分類後的結構相似度。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/1KLj6eG.png">
+<meta property="article:published_time" content="2020-12-12T03:45:53.000Z">
+<meta property="article:modified_time" content="2020-12-12T03:50:07.942Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/1KLj6eG.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/12/12/NLP%E6%96%B7%E8%A9%9E%E7%B5%B1%E8%A8%88%E5%88%86%E6%9E%90-II-NLTK%E3%80%81wordnet/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>NLP斷詞統計分析(II)-NLTK、wordnet | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/12/12/NLP%E6%96%B7%E8%A9%9E%E7%B5%B1%E8%A8%88%E5%88%86%E6%9E%90-II-NLTK%E3%80%81wordnet/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NLP斷詞統計分析(II)-NLTK、wordnet
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-12-12 11:45:53 / 修改時間：11:50:07" itemprop="dateCreated datePublished" datetime="2020-12-12T11:45:53+08:00">2020-12-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92/" itemprop="url" rel="index"><span itemprop="name">機器學習/深度學習</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">閱讀次數：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>NLP斷詞可以處理不同語言，中文常用jieba套件來處理，英文語系則採用NLTK套件居多，本篇文章採用NLTK來做英文語句的斷詞，並結合wordnet這個字詞-語義的網路來協助我們分析同義字，甚至能夠計算不同字詞分類後的結構相似度。</p>
+</blockquote>
+<a id="more"></a>
+
+<p>前情提要，NLP自然語言處理的流程:</p>
+<blockquote>
+<p>語料庫(corpus) =&gt; 文本(file) =&gt; 段落/句子(sentences) =&gt; texts(字詞)</p>
+</blockquote>
+<h2 id="NLTK-Natural-Language-Tool-Kit"><a href="#NLTK-Natural-Language-Tool-Kit" class="headerlink" title="NLTK(Natural Language Tool Kit)"></a>NLTK(Natural Language Tool Kit)</h2><p>首先，先下載套件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">import nltk</span><br><span class="line"></span><br><span class="line">nltk.download() # GUI介面協助下載</span><br></pre></td></tr></table></figure>
+<p>引用網路上的某個英文名言佳句做測試</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text &#x3D; &quot;It&#39;s true that we don&#39;t know what we&#39;ve got until we lose it, but it&#39;s also true that we don&#39;t know what we&#39;ve been losing until it arrives. It is better to stay silent and be thought a fool, than to open one’s mouth and remove all doubt.&quot;</span><br></pre></td></tr></table></figure>
+<p>用<code>sent_tokenize</code>的函式斷句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">from nltk import sent_tokenize</span><br><span class="line"></span><br><span class="line">sentences &#x3D; sent_tokenize(text) # 斷句</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[“It’s true that we don’t know what we’ve got until we lose it, but it’s also true that we don’t know what we’ve been losing until it arrives.”,<br> ‘It is better to stay silent and be thought a fool, than to open one’s mouth and remove all doubt.’]</p>
+</blockquote>
+<p>用<code>word_tokenize</code>的函式斷詞</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">from nltk import word_tokenize</span><br><span class="line"></span><br><span class="line">tokens &#x3D; word_tokenize(text) # 斷詞</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[‘It’,<br> “‘s”,<br> ‘true’,<br> ‘that’,<br> ‘we’,<br> ‘do’,<br> “n’t”…</p>
+</blockquote>
+<p>用<code>FreqDist</code>找出高頻率的字詞</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">from nltk.probability import FreqDist</span><br><span class="line"></span><br><span class="line">fdist &#x3D; FreqDist(tokens)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>FreqDist({‘we’: 5, ‘it’: 3, ‘It’: 2, “‘s”: 2, ‘true’: 2, ‘that’: 2, ‘do’: 2, “n’t”: 2, ‘know’: 2, ‘what’: 2, …})</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 出現頻率最高的10個單字</span><br><span class="line">freq_top10 &#x3D; fdist.most_common(10)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[(‘we’, 5),<br> (‘it’, 3),<br> (‘It’, 2),<br> (“‘s”, 2),<br> (‘true’, 2),<br> (‘that’, 2),<br> (‘do’, 2),<br> (“n’t”, 2),<br> (‘know’, 2),<br> (‘what’, 2)]</p>
+</blockquote>
+<p>載入英文版的停用字</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">from nltk.corpus import stopwords</span><br><span class="line"></span><br><span class="line">print(stopwords.words(&#39;english&#39;))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[‘i’, ‘me’, ‘my’, ‘myself’, ‘we’, ‘our’, ‘ours’, ‘ourselves’, ‘you’, “you’re”, “you’ve”, “you’ll”, “you’d”, ‘your’, ‘yours’, ‘yourself’, ‘yourselves’…</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print([token for token in tokens if token not in stopwords.words(&#39;english&#39;)])</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[‘It’, “‘s”, ‘true’, “n’t”, ‘know’, “‘ve”, ‘got’, ‘lose’, ‘,’, “‘s”, ‘also’, ‘true’, “n’t”, ‘know’, “‘ve”, ‘losing’, ‘arrives’, ‘.’, ‘It’, ‘better’, ‘stay’, ‘silent’, ‘thought’, ‘fool’, ‘,’, ‘open’, ‘one’, ‘’’, ‘mouth’, ‘remove’, ‘doubt’, ‘.’]</p>
+</blockquote>
+<p>用<code>pos_tag</code>來標註詞性 (Parts of speech, POS)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">from nltk import pos_tag</span><br><span class="line"></span><br><span class="line">pos &#x3D; [pos_tag(token) for token in tokens] # 詞性</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[[(‘I’, ‘PRP’), (‘t’, ‘VBP’)],<br> [(“‘“, ‘POS’), (‘s’, ‘NN’)],<br> [(‘t’, ‘NN’), (‘r’, ‘NN’), (‘u’, ‘JJ’), (‘e’, ‘NN’)],<br> [(‘t’, ‘NN’), (‘h’, ‘VBZ’), (‘a’, ‘DT’), (‘t’, ‘NN’)],<br> [(‘w’, ‘NN’), (‘e’, ‘NN’)]…</p>
+</blockquote>
+<p>去除字尾(Stemming)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">from nltk.stem import PorterStemmer</span><br><span class="line"> </span><br><span class="line">stemmer &#x3D; PorterStemmer()</span><br><span class="line">print(stemmer.stem(&quot;writing&quot;)) # 去除字尾</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>write</p>
+</blockquote>
+<p>透過詞性去還原(Lemmatization)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from nltk.stem import WordNetLemmatizer</span><br><span class="line"> </span><br><span class="line">lemmatizer &#x3D; WordNetLemmatizer()</span><br><span class="line">print(lemmatizer.lemmatize(&quot;went&quot;, pos&#x3D;&quot;v&quot;))   #動詞</span><br><span class="line">print(lemmatizer.lemmatize(&quot;women&quot;, pos&#x3D;&quot;n&quot;))  #名詞</span><br><span class="line">print(lemmatizer.lemmatize(&quot;better&quot;, pos&#x3D;&quot;a&quot;)) #形容詞</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>go<br>woman<br>good</p>
+</blockquote>
+<h2 id="wordnet"><a href="#wordnet" class="headerlink" title="wordnet"></a>wordnet</h2><blockquote>
+<p>wordnet是一個語義網絡，以英語語系為主，透過”字詞-語意”的關係去找尋文本中的上下位關係、同義詞、文法的處理(ex:動詞時態、名詞複數…)</p>
+</blockquote>
+<p><img src="https://i.imgur.com/1KLj6eG.png"></p>
+<p>首先，載入套件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">from nltk.corpus import wordnet as wn</span><br></pre></td></tr></table></figure>
+
+<p>用<code>synsets</code>找同義詞</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 找synsets集合</span><br><span class="line">wn.synsets(&#39;engineer&#39;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[Synset(‘engineer.n.01’), Synset(‘engineer.n.02’), Synset(‘engineer.v.01’), Synset(‘mastermind.v.01’)]</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 找出選定synsets裡面的字詞</span><br><span class="line">wn.synset(&#39;engineer.n.01&#39;).lemma_names()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[‘engineer’, ‘applied_scientist’, ‘technologist’]</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 找出所有synsets裡面的字詞</span><br><span class="line">for synset in wn.synsets(&#39;engineer&#39;):</span><br><span class="line">    print(synset.lemma_names())</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[‘engineer’, ‘applied_scientist’, ‘technologist’]<br>[‘engineer’, ‘locomotive_engineer’, ‘railroad_engineer’, ‘engine_driver’]<br>[‘engineer’]<br>[‘mastermind’, ‘engineer’, ‘direct’, ‘organize’, ‘organise’, ‘orchestrate’]</p>
+</blockquote>
+<p>用<code>definition</code>來查看synset的定義</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wn.synset(&#39;engineer.n.01&#39;).definition()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>‘a person who uses scientific knowledge to solve practical problems’</p>
+</blockquote>
+<p>用<code>hypernym</code>,<code>hyponym</code>來找上位詞與下位詞，wordnet是對字詞作分類，所以會有結構層級關係，類似於界門綱目科屬種。而上位詞與下位詞就是代表不同階層的字詞。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># engineer的上位詞</span><br><span class="line">wn.synset(&#39;engineer.n.01&#39;).hypernyms()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[Synset(‘person.n.01’)]</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># engineer的下位詞</span><br><span class="line">wn.synset(&#39;engineer.n.01&#39;).hyponyms()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[Synset(‘aeronautical_engineer.n.01’),<br> Synset(‘aerospace_engineer.n.01’),<br> Synset(‘army_engineer.n.01’),<br> Synset(‘automotive_engineer.n.01’),<br> Synset(‘civil_engineer.n.01’)…</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># engineer最根源的上位詞</span><br><span class="line">wn.synset(&#39;engineer.n.01&#39;).root_hypernyms()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[Synset(‘entity.n.01’)]</p>
+</blockquote>
+<p>用<code>lowest_common_hypernyms</code>找尋兩個synset的最低位共同詞組，並用<code>path_similarity</code>計算兩者的結構相似度</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 以工程師為例</span><br><span class="line">engineer &#x3D; wn.synset(&quot;engineer.n.01&quot;) </span><br><span class="line">hacker &#x3D; wn.synset(&quot;hacker.n.01&quot;)</span><br><span class="line">elephant &#x3D; wn.synset(&quot;elephant.n.01&quot;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">print(&#39;engineer vs enginner: &#39;,engineer.lowest_common_hypernyms(engineer))</span><br><span class="line">print(&#39;engineer vs hacker: &#39;,engineer.lowest_common_hypernyms(hacker))</span><br><span class="line">print(&#39;engineer vs elephant: &#39;,engineer.lowest_common_hypernyms(elephant))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>engineer vs enginner:  [Synset(‘engineer.n.01’)]<br>engineer vs hacker:  [Synset(‘person.n.01’)]<br>engineer vs elephant:  [Synset(‘organism.n.01’)]</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">print(&#39;engineer vs enginner: &#39;,engineer.path_similarity(engineer))</span><br><span class="line">print(&#39;engineer vs hacker: &#39;,engineer.path_similarity(hacker))</span><br><span class="line">print(&#39;engineer vs elephant: &#39;,engineer.path_similarity(elephant))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>engineer vs enginner:  1.0<br>engineer vs hacker:  0.16666666666666666<br>engineer vs elephant:  0.1</p>
+</blockquote>
+<p>最後，我們也可以透過<code>wordnet</code>與<code>WordNetLemmatizer</code>將指定的一句話自動還原詞性</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">from nltk import word_tokenize, pos_tag</span><br><span class="line">from nltk.corpus import wordnet</span><br><span class="line">from nltk.stem import WordNetLemmatizer</span><br><span class="line"></span><br><span class="line">#獲取詞性</span><br><span class="line">def get_pos(tag):</span><br><span class="line">    if tag.startswith(&#39;J&#39;):   #形容詞</span><br><span class="line">        return wordnet.ADJ</span><br><span class="line">    elif tag.startswith(&#39;V&#39;): #動詞</span><br><span class="line">        return wordnet.VERB</span><br><span class="line">    elif tag.startswith(&#39;N&#39;): #名詞</span><br><span class="line">        return wordnet.NOUN</span><br><span class="line">    elif tag.startswith(&#39;R&#39;): #副詞</span><br><span class="line">        return wordnet.ADV</span><br><span class="line">    else:</span><br><span class="line">        return wordnet.NOUN   #如果都不符合，預設傳回名詞</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 測試語句</span><br><span class="line">text &#x3D; &quot;Hello, my name is Madi. I love playing basketball.&quot;</span><br><span class="line"></span><br><span class="line"># 斷詞&#x2F;詞性</span><br><span class="line">tokens &#x3D; word_tokenize(text)</span><br><span class="line">postag_tokens &#x3D; pos_tag(tokens)</span><br><span class="line"></span><br><span class="line"># 定義wordnet的詞態還原</span><br><span class="line">wnl &#x3D; WordNetLemmatizer()</span><br><span class="line"></span><br><span class="line"># 還原詞性的句子</span><br><span class="line">print(&quot; &quot;.join([wnl.lemmatize(tag[0], pos&#x3D;get_wordnet_pos(tag[1])) for tag in postag_tokens]))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Hello , my name <strong>be</strong> Madi . I love <strong>play</strong> basketball .</p>
+</blockquote>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://medium.com/pyladies-taiwan/nltk-%E5%88%9D%E5%AD%B8%E6%8C%87%E5%8D%97-%E4%B8%80-%E7%B0%A1%E5%96%AE%E6%98%93%E4%B8%8A%E6%89%8B%E7%9A%84%E8%87%AA%E7%84%B6%E8%AA%9E%E8%A8%80%E5%B7%A5%E5%85%B7%E7%AE%B1-%E6%8E%A2%E7%B4%A2%E7%AF%87-2010fd7c7540">NLTK 初學指南(一)：簡單易上手的自然語言工具箱－探索篇</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/pyladies-taiwan/nltk-%E5%88%9D%E5%AD%B8%E6%8C%87%E5%8D%97-%E4%B8%89-%E5%9F%BA%E6%96%BC-wordnet-%E7%9A%84%E8%AA%9E%E7%BE%A9%E9%97%9C%E4%BF%82%E8%A1%A8%E7%A4%BA%E6%B3%95-%E4%B8%8A%E4%B8%8B%E4%BD%8D%E8%A9%9E%E7%B5%90%E6%A7%8B%E7%AF%87-4874fb9b167a">NLTK 初學指南(三)：基於 WordNet 的語義關係表示法 — 上下位詞結構篇</a></li>
+<li><a target="_blank" rel="noopener" href="https://clay-atlas.com/blog/2019/07/30/%e3%80%90nlp%e3%80%91nltk-%e5%9f%ba%e6%9c%ac%e6%95%99%e5%ad%b8/">英文自然語言處理的經典工具: NLTK</a></li>
+<li><a target="_blank" rel="noopener" href="https://yanwei-liu.medium.com/python%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92%E7%AD%86%E8%A8%98-%E4%BA%94-%E4%BD%BF%E7%94%A8nltk%E9%80%B2%E8%A1%8C%E8%87%AA%E7%84%B6%E8%AA%9E%E8%A8%80%E8%99%95%E7%90%86-24fba36f3896">Python深度學習筆記(五)：使用NLTK進行自然語言處理</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.nltk.org/book/ch02.html">2. Accessing Text Corpora and Lexical Resources</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/12/NLP%E6%96%B7%E8%A9%9E%E7%B5%B1%E8%A8%88%E5%88%86%E6%9E%90-I-ngram%E3%80%81jieba%E3%80%81%E6%96%87%E5%AD%97%E9%9B%B2/" rel="prev" title="NLP斷詞統計分析(I)-ngram、jieba、文字雲">
+      <i class="fa fa-chevron-left"></i> NLP斷詞統計分析(I)-ngram、jieba、文字雲
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/12/%E8%AB%87%E8%AB%87%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1/" rel="next" title="談談推薦系統">
+      談談推薦系統 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#NLTK-Natural-Language-Tool-Kit"><span class="nav-number">1.</span> <span class="nav-text">NLTK(Natural Language Tool Kit)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wordnet"><span class="nav-number">2.</span> <span class="nav-text">wordnet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">參考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MaDi"
+      src="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DysonMa" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DysonMa" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:madihsiang@gmail.com" title="E-Mail → mailto:madihsiang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/marc_de_shawn" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;marc_de_shawn" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">若要轉載文章，煩請註明作者名稱MaDi與原始連結</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="訪客總數">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="總瀏覽次數">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
