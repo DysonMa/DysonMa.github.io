@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本文利用之前專案寫好的PTT爬蟲程式來抓取板上的資料，並將資料存進SQLite資料庫，再從中撈取資料作為分析，主要目的是想用機器學習的演算法來透過文章標題來預測這篇文章是出自於哪一板。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[專案實作] PTT爬蟲+應用機器學習預測板名">
+<meta property="og:url" content="https://dysonma.github.io/2020/12/20/project-PTT-ML/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="本文利用之前專案寫好的PTT爬蟲程式來抓取板上的資料，並將資料存進SQLite資料庫，再從中撈取資料作為分析，主要目的是想用機器學習的演算法來透過文章標題來預測這篇文章是出自於哪一板。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/kK0Ly2g.png">
+<meta property="og:image" content="https://i.imgur.com/xOHUrxn.png">
+<meta property="og:image" content="https://i.imgur.com/Y5Do6Nx.png">
+<meta property="og:image" content="https://i.imgur.com/reKS8j8.png">
+<meta property="og:image" content="https://i.imgur.com/Ef5JlIa.png">
+<meta property="og:image" content="https://i.imgur.com/fXJKqGO.png">
+<meta property="og:image" content="https://i.imgur.com/znGVIhR.png">
+<meta property="og:image" content="https://i.imgur.com/tKbN6i3.png">
+<meta property="og:image" content="https://i.imgur.com/UrMiWGc.png">
+<meta property="og:image" content="https://i.imgur.com/JgUCZBH.png">
+<meta property="article:published_time" content="2020-12-20T05:49:53.000Z">
+<meta property="article:modified_time" content="2020-12-20T05:53:48.924Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/kK0Ly2g.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/12/20/project-PTT-ML/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>[專案實作] PTT爬蟲+應用機器學習預測板名 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/12/20/project-PTT-ML/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [專案實作] PTT爬蟲+應用機器學習預測板名
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-12-20 13:49:53 / 修改時間：13:53:48" itemprop="dateCreated datePublished" datetime="2020-12-20T13:49:53+08:00">2020-12-20</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92/" itemprop="url" rel="index"><span itemprop="name">機器學習/深度學習</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">閱讀次數：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>本文利用之前專案寫好的PTT爬蟲程式來抓取板上的資料，並將資料存進SQLite資料庫，再從中撈取資料作為分析，主要目的是想用機器學習的演算法來透過文章標題來預測這篇文章是出自於哪一板。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="PTT爬蟲"><a href="#PTT爬蟲" class="headerlink" title="PTT爬蟲"></a>PTT爬蟲</h2><p>先前因為某專案需求，有寫了一個可以自訂板名、截止日期的PTT爬蟲程式，並將它模組化。這裡就直接呼叫程式來做爬蟲，這篇文章爬取的板名有 <code>HatePolitics(政黑板)</code>、<code>Beauty(表特板)</code>、<code>Soft_Job(軟體板)</code>、<code>NBA</code>、<code>Stock(股票板)</code>、<code>Tech_Job(科技板)</code>等六個板。</p>
+<p>因為不想花太多時間在等爬蟲，所以截止日期設定成2020/12/1，大約一星期的資料應該就足夠。廢話不多說，直接執行爬蟲:</p>
+<p><img src="https://i.imgur.com/kK0Ly2g.png"></p>
+<p>程式會把爬下來的資料依照 文章ID、推噓數量、作者、文章標題、發文日期、內文、留言推噓、留言內容、留言者ID、爬取時間存入sqlite資料庫。</p>
+<p><img src="https://i.imgur.com/xOHUrxn.png"></p>
+<p>此外，為了不想一直待在電腦旁邊無法抽身，我在程式裡面額外串接line-notify的通知服務，當每個板爬蟲完畢後就透過line的訊息通知我，並記錄每個板的總爬取時間。爬完六個板之後，大約花了20分鐘。</p>
+<p><img src="https://i.imgur.com/Y5Do6Nx.png"></p>
+<p>到這裡，PTT爬蟲的資料就完成了。</p>
+<p>接著，就是希望能夠簡單的應用機器學習來透過<strong>文章標題去預測該文章是出自於哪一板。</strong></p>
+<h2 id="機器學習預測文章出處"><a href="#機器學習預測文章出處" class="headerlink" title="機器學習預測文章出處"></a>機器學習預測文章出處</h2><p>首先，引入需要的套件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"># sqlite</span><br><span class="line">import sqlite3 as DB</span><br><span class="line">from sqlalchemy import create_engine</span><br><span class="line"></span><br><span class="line"># Words Process</span><br><span class="line">import jieba</span><br><span class="line">import jieba.posseg as pseg</span><br><span class="line"></span><br><span class="line"># ML&#x2F;DL</span><br><span class="line">import tensorflow</span><br><span class="line">import keras</span><br><span class="line"></span><br><span class="line"># Sklearn</span><br><span class="line">from sklearn.model_selection import train_test_split</span><br><span class="line">from sklearn.utils import shuffle</span><br><span class="line">from sklearn.neighbors import KNeighborsClassifier  ## KNN</span><br><span class="line">from sklearn.svm import SVC  ## SVM</span><br><span class="line">from sklearn.ensemble import RandomForestClassifier ## RFC</span><br><span class="line"></span><br><span class="line"># Xgboost</span><br><span class="line">import xgboost</span><br><span class="line">from  xgboost import XGBClassifier  ## xgboost</span><br><span class="line">from xgboost import plot_importance</span><br><span class="line"></span><br><span class="line"># imblearn</span><br><span class="line">from imblearn.over_sampling import SMOTE</span><br><span class="line"></span><br><span class="line"># analyze</span><br><span class="line">from sklearn.metrics import classification_report  </span><br><span class="line">from sklearn.metrics import confusion_matrix</span><br><span class="line"></span><br><span class="line"># plot</span><br><span class="line">import seaborn as sns</span><br><span class="line">import matplotlib.pyplot as plt</span><br></pre></td></tr></table></figure>
+<p>接著，建立讀取資料庫相關的函式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># 定義資料庫位置</span><br><span class="line">def get_DB(DB_path):</span><br><span class="line">    conndb &#x3D; DB.connect(DB_path) # 若有則讀取，沒有則建立</span><br><span class="line">    curr &#x3D; conndb.cursor()  </span><br><span class="line">    return [conndb,curr]</span><br><span class="line"></span><br><span class="line"># 查詢資料</span><br><span class="line">def queryData(sqlite_path,webName):</span><br><span class="line">    [conndb,curr] &#x3D; get_DB(sqlite_path)</span><br><span class="line">    try:</span><br><span class="line">        results &#x3D; curr.execute(&quot;SELECT * FROM &#123;&#125; ORDER BY Date DESC;&quot;.format(webName))</span><br><span class="line">    except DB.OperationalError:</span><br><span class="line">        return &#39;No Such Table&#39;</span><br><span class="line">    return results</span><br><span class="line"></span><br><span class="line"># 查詢各版名</span><br><span class="line">def queryBoardName(sqlite_path):</span><br><span class="line">    [conndb,curr] &#x3D; get_DB(sqlite_path)</span><br><span class="line">    boardList &#x3D; []</span><br><span class="line">    try:</span><br><span class="line">        results &#x3D; curr.execute(&quot;SELECT name FROM sqlite_master&quot;)</span><br><span class="line">        for row in results:</span><br><span class="line">            boardList.append(row[0])</span><br><span class="line">    except DB.OperationalError:</span><br><span class="line">        return &#39;No Tables&#39;</span><br><span class="line">    return boardList</span><br></pre></td></tr></table></figure>
+<p>正式從sqlite資料庫撈取資料</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 建立sqlite的engine</span><br><span class="line">sqlite_path &#x3D; &#39;D:\ptt_flask.db&#39;</span><br><span class="line">engine &#x3D; create_engine(&#39;sqlite:&#x2F;&#x2F;&#x2F;&#39;+sqlite_path)</span><br><span class="line"></span><br><span class="line"># 查詢資料庫內有哪些板</span><br><span class="line">boardName &#x3D; queryBoardName(sqlite_path)</span><br><span class="line"></span><br><span class="line"># 把所有板的資料彙整成一個dataframe</span><br><span class="line">df &#x3D; pd.DataFrame()</span><br><span class="line">for each in boardName:</span><br><span class="line">    sql &#x3D; f&quot;SELECT ArticleID,Author,Title,Content,Comment_Content FROM &#123;each&#125; ORDER BY Date DESC;&quot;</span><br><span class="line">    df_each &#x3D; pd.read_sql(sql, con&#x3D;engine)</span><br><span class="line">    df_each[&#39;boardName&#39;] &#x3D; each</span><br><span class="line">    df &#x3D; df.append(df_each)</span><br><span class="line">    </span><br><span class="line"># 只需要板名、標題就好</span><br><span class="line">df &#x3D; df[[&#39;boardName&#39;,&#39;Title&#39;]]</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/reKS8j8.png"></p>
+<p>要進行分類之前，需要先初步觀察一下資料的分布</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 觀察資料分布</span><br><span class="line">groups &#x3D; df.groupby(&#39;boardName&#39;)</span><br><span class="line">groups.size().plot(kind&#x3D;&#39;bar&#39;)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/Ef5JlIa.png"></p>
+<p>從圖裡面可以看出 <code>Soft_Job</code>的數量相比其他板來的少，依照機器學習的邏輯來說，可以透過SMOTE的方式去過採樣資料的數量，但因為<code>Soft_Job</code>的文章數量實在太少，若是硬要合成資料，會造成機器學習錯誤的機率更大，所以這邊就直接把<code>Soft_Job</code>剔除，以剩下的五個板作為分類。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 去掉 Soft_Job</span><br><span class="line">df &#x3D; df[df[&#39;boardName&#39;]!&#x3D;&#39;Soft_Job&#39;].reset_index()</span><br><span class="line">df.drop(columns&#x3D;&#39;index&#39;,inplace&#x3D;True)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/fXJKqGO.png"></p>
+<p>用0.8的比例去拆分訓練跟測試的資料集</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">TRAIN_TEST_RATIO &#x3D; 0.8 </span><br><span class="line">df_train &#x3D; df.sample(frac&#x3D;TRAIN_TEST_RATIO, random_state&#x3D;914)</span><br><span class="line">df_test_origin &#x3D; df.drop(df_train.index)</span><br></pre></td></tr></table></figure>
+<p>因為是採用文章標題去預測板名，所以先透過<code>jieba</code>套件來將文章標題做斷詞。</p>
+<p>雖然在這裡文章標題都只有一句話，斷詞後可能幫助不大，但如果今天換成是用內文去預測板名，斷詞這步驟就顯得相當重要了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">def jieba_tokenizer(text):</span><br><span class="line">  words &#x3D; pseg.cut(text)</span><br><span class="line">  return &#39; &#39;.join([</span><br><span class="line">      word for word, flag in words if flag !&#x3D; &#39;x&#39;])</span><br><span class="line"></span><br><span class="line">df_train[&#39;Title Tokenized&#39;] &#x3D; df_train[&#39;Title&#39;].apply(jieba_tokenizer)</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/znGVIhR.png"></p>
+<p>用字典把板名轉換成index去代表，ex: <code>Beauty:1, HatePolitics:3, NBA:2, Stock:0, Tech_Job:4</code>，當預測完之後，會得到一串各類別的機率，就可以透過另外一組字典反向查index回來看看板名是什麼。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 類別轉化為數字類別(1-N類)</span><br><span class="line">kind_mapping &#x3D; &#123;&#125;</span><br><span class="line">for num, kind in enumerate(set(df_train[&#39;boardName&#39;])):</span><br><span class="line">    kind_mapping[kind] &#x3D; num</span><br><span class="line"></span><br><span class="line"># 預測時，要將預測出的結果翻譯為原先的類別所使用</span><br><span class="line">inversed_kind_mapping &#x3D; &#123;&#125;</span><br><span class="line">for kind, idx in kind_mapping.items():</span><br><span class="line">    inversed_kind_mapping[idx] &#x3D; kind</span><br><span class="line"></span><br><span class="line">print(&#39;kind_mapping: &#39;,kind_mapping)</span><br><span class="line">print(&#39;inversed_kind_mapping: &#39;,inversed_kind_mapping)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>kind_mapping:  {‘Tech_Job’: 0, ‘Stock’: 1, ‘HatePolitics’: 2, ‘Beauty’: 3, ‘NBA’: 4}</p>
+<p>inversed_kind_mapping:  {0: ‘Tech_Job’, 1: ‘Stock’, 2: ‘HatePolitics’, 3: ‘Beauty’, 4: ‘NBA’}</p>
+</blockquote>
+<p>將文章標題的所有出現過的詞作成一個大字典，並透過這個字典把所有詞彙都轉成向量。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># 準備排序的文字list(keywordindex)</span><br><span class="line">total_words &#x3D; &#39; &#39;.join(df_train[&#39;Title Tokenized&#39;])</span><br><span class="line">vectorterms &#x3D; list(set(total_words))</span><br><span class="line"></span><br><span class="line">## 轉化每個文章標題的詞變成向量</span><br><span class="line">def vectorize(words):</span><br><span class="line">    self_main_list &#x3D; [0] * len(vectorterms)</span><br><span class="line">    for term in words:</span><br><span class="line">        if term in vectorterms:  # 因為測試資料集當中的詞不一定有出現在訓練資料集中</span><br><span class="line">            idx &#x3D; vectorterms.index(term)</span><br><span class="line">            self_main_list[idx] +&#x3D; 1</span><br><span class="line">    return np.array(self_main_list)</span><br><span class="line"></span><br><span class="line"># Tokenized後的文章標題做向量化</span><br><span class="line">X_train &#x3D; np.concatenate(df_train[&#39;Title Tokenized&#39;].apply(vectorize).values).reshape(-1, len(vectorterms))</span><br><span class="line"></span><br><span class="line"># 板名用數字(index)代表</span><br><span class="line">Y_train &#x3D; df_train[&#39;boardName&#39;].apply(kind_mapping.get)</span><br><span class="line"></span><br><span class="line">print(&#39;Shape of X_train: &#39;, X_train.shape)</span><br><span class="line">print(&#39;Shape of Y_train: &#39;, Y_train.shape)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Shape of X_train:  (570, 1370)<br>Shape of Y_train:  (570,)</p>
+</blockquote>
+<p>訓練、驗證資料的切分</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">TRAIN_VALID_RATIO &#x3D; 0.2</span><br><span class="line">x_train, x_valid, y_train, y_valid &#x3D; train_test_split(X_train, Y_train, test_size&#x3D;TRAIN_VALID_RATIO, random_state&#x3D;914)</span><br><span class="line"></span><br><span class="line">print(&#39;Shape of X_train: &#39;, x_train.shape)</span><br><span class="line">print(&#39;Shape of X_Valid: &#39;, x_valid.shape)</span><br><span class="line">print(&#39;Shape of Y_train: &#39;, y_train.shape)</span><br><span class="line">print(&#39;Shape of Y_Valid: &#39;, y_valid.shape)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Shape of X_train:  (456, 1370)<br>Shape of X_Valid:  (114, 1370)<br>Shape of Y_train:  (456,)<br>Shape of Y_Valid:  (114,)</p>
+</blockquote>
+<p>建立計算預測後的準確率的函式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 定義函式，input分類器，output準確率</span><br><span class="line">def get_accuracy(clf, *args):</span><br><span class="line">    if args:</span><br><span class="line">        clf &#x3D; clf(kernel&#x3D;args[0])</span><br><span class="line">    else:</span><br><span class="line">        clf &#x3D; clf()</span><br><span class="line">    clf &#x3D; clf.fit(x_train, y_train)</span><br><span class="line">    y_pred &#x3D; clf.predict(x_valid)</span><br><span class="line">    return (str(sum(y_valid &#x3D;&#x3D; y_pred)&#x2F;y_valid.shape[0]))</span><br></pre></td></tr></table></figure>
+
+<p>有了函式之後，就可以分別得到四個分類器(RandomForest、SVC、KNN、XGboost)的準確度了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">print(&#39;RandomForest: &#39;, get_accuracy(RandomForestClassifier))</span><br><span class="line">print(&#39;SVC(linear):&#39;, get_accuracy(SVC,&#39;linear&#39;))</span><br><span class="line">print(&#39;KNN:&#39;, get_accuracy(KNeighborsClassifier))</span><br><span class="line">print(&#39;XGboost&#39;, get_accuracy(XGBClassifier))</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>RandomForest:  0.8596491228070176<br><strong>SVC(linear): 0.868421052631579</strong><br>KNN: 0.7192982456140351<br>XGboost 0.8157894736842105</p>
+</blockquote>
+<p>可以看到結果是 <code>SVC(linear)</code>準確度愈高，次之是<code>RandomForest</code>，第三名則是<code>XGboost</code>。最後選擇用第三名的<code>XGboost</code>來做最終預測的分類器。(因為XGboost一直是Kaggle上的霸主)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">clf &#x3D; XGBClassifier()</span><br><span class="line">clf &#x3D; clf.fit(X_train, Y_train)</span><br></pre></td></tr></table></figure>
+<p>定義好分類器之後，接著要有預測的函式才能將測試資料做預測</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 定義預測函式</span><br><span class="line">def predict(review,clf): </span><br><span class="line">    words &#x3D; jieba_tokenizer(review)</span><br><span class="line">    vector &#x3D; vectorize(words)</span><br><span class="line">    prob &#x3D; (clf.predict_proba(vector.reshape(1, -1)))*100</span><br><span class="line">    return prob</span><br><span class="line"></span><br><span class="line"># 找predict_proba出來的機率array中最大的，反映射為kind</span><br><span class="line">def find_maxProb(prob):</span><br><span class="line">  max_kind &#x3D; np.argmax(prob)</span><br><span class="line">  return inversed_kind_mapping.get(max_kind)</span><br></pre></td></tr></table></figure>
+
+<p>正式將測試資料拿來做預測</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">df_test &#x3D; df_test_origin</span><br><span class="line">df_test[&#39;ML_Classify_prob&#39;] &#x3D; df_test[&#39;Title&#39;].apply(predict,args&#x3D;(clf,))</span><br><span class="line">df_test[&#39;ML_Classify&#39;] &#x3D; df_test[&#39;ML_Classify_prob&#39;].apply(find_maxProb)</span><br><span class="line">df_test &#x3D; df_test[[&#39;Title&#39;,&#39;boardName&#39;,&#39;ML_Classify&#39;,&#39;ML_Classify_prob&#39;]]</span><br><span class="line"></span><br><span class="line">correct_cnt &#x3D; df_test[df_test_origin[&#39;boardName&#39;]&#x3D;&#x3D;df_test[&#39;ML_Classify&#39;]].count()[0]</span><br><span class="line">acc &#x3D; correct_cnt&#x2F;len(df_test)</span><br><span class="line">print(&#39;Accuracy: &#39;,acc)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Accuracy:  0.823943661971831</p>
+</blockquote>
+<p>預測完之後，準確率大概82%左右，跟驗證資料集的分數差不多。</p>
+<p>接著，快速地用<code>classification_report</code>來看一下<code>precision</code>、<code>recall</code>、<code>f1-score</code>、<code>accuracy</code>等指標</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(classification_report(df_test[&#39;boardName&#39;], df_test[&#39;ML_Classify&#39;]))</span><br></pre></td></tr></table></figure>
+<p>指標結果如下，<code>Beauty(表特板)</code> 的f1-score最高，可見<code>precision</code>跟<code>recall</code>都有不錯的表現，代表這個板分類不錯。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">              precision    recall  f1-score   support</span><br><span class="line"></span><br><span class="line">      Beauty       1.00      0.89      0.94        18</span><br><span class="line">HatePolitics       0.83      0.75      0.79        20</span><br><span class="line">         NBA       0.96      0.80      0.87        30</span><br><span class="line">       Stock       0.77      0.89      0.83        57</span><br><span class="line">    Tech_Job       0.71      0.71      0.71        17</span><br><span class="line"></span><br><span class="line">    accuracy                           0.83       142</span><br><span class="line">   macro avg       0.85      0.81      0.83       142</span><br><span class="line">weighted avg       0.84      0.83      0.83       142</span><br></pre></td></tr></table></figure>
+<p>接著，透過<code>confusion matrix(混淆矩陣)</code> 來判斷一下分類結果的好壞。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 計算混淆矩陣</span><br><span class="line">lbl &#x3D; list(kind_mapping.keys())</span><br><span class="line">arr &#x3D; confusion_matrix(df_test[&#39;boardName&#39;], df_test[&#39;ML_Classify&#39;], labels&#x3D;lbl)</span><br><span class="line"></span><br><span class="line"># 繪熱圖</span><br><span class="line">df_cm &#x3D; pd.DataFrame(arr, index &#x3D; [i for i in lbl], columns &#x3D; [i for i in lbl])</span><br><span class="line"># plt.rcParams[&#39;font.sans-serif&#39;] &#x3D; [&#39;Microsoft JhengHei&#39;]  # 顯示中文</span><br><span class="line">plt.figure(figsize &#x3D; (8,5))  </span><br><span class="line"></span><br><span class="line">sns.heatmap(df_cm, annot&#x3D;True, cmap&#x3D;&quot;YlGnBu&quot;);</span><br><span class="line"></span><br><span class="line">plt.ylabel(&#39;y_true&#39;)</span><br><span class="line">plt.xlabel(&#39;y_pred&#39;);</span><br><span class="line">plt.tight_layout()</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.imgur.com/tKbN6i3.png"></p>
+<p>透過熱圖跟classification_report，可以看到<code>Beauty(表特板)</code>的f1-score是最高，因為他的排他性強烈，比較不會有分錯的問題。</p>
+<p>此外，<code>Stock(股票板)</code>跟<code>Tech_Job(科技板)</code>彼此之間會互相誤判，可能原因是這兩種分類的特徵是互相耦合的。</p>
+<p>再者，因為<code>Stock(股票板)</code>的資料量較多，模型會學到特別多關於<code>Stock(股票板)</code>的資訊，導致容易把其他類別誤判成是<code>Stock(股票板)</code>。</p>
+<p>…</p>
+<p>最後的最後，就是回頭看一下資料裏頭到底是那些文章被分錯</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df_test[df_test[&#39;boardName&#39;]!&#x3D;df_test[&#39;ML_Classify&#39;]]</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/UrMiWGc.png"></p>
+<p>其中有一筆資料長這樣:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Title</th>
+<th align="center">boardName</th>
+<th align="center">ML_Classify</th>
+<th align="center">ML_Classify_prob</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">[新聞] 生涯總薪資達4.35億美元 詹皇躍居史上第一</td>
+<td align="center">NBA</td>
+<td align="center">Stock</td>
+<td align="center">[[ 0.74948156 83.570015    0.8006586   0.31720236 14.562643  ]]</td>
+</tr>
+</tbody></table>
+<p>可能是因為談到薪資和美元的關係才把<code>NBA</code>誤分成<code>Stock</code>。仔細看一下分類後的各類別機率，雖然第一名分錯但<code>NBA</code>是排名在分類的第二名，所以整體來說分類表現還算差強人意。</p>
+<h2 id="後記"><a href="#後記" class="headerlink" title="後記"></a>後記</h2><ol>
+<li><p>資料前處理的時候，有試過把<code>[新聞]</code>、<code>[請益]</code>…等等字樣透過正則表達式去剔除，想說這樣應該比較不會讓模型學壞，結果…</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">regex &#x3D; r&#39;[[\w]*]&#39;</span><br><span class="line">df[&#39;Title&#39;].replace(to_replace&#x3D;regex, value&#x3D;&#39;&#39;, regex&#x3D;True, inplace&#x3D;True)</span><br></pre></td></tr></table></figure>
+<p> <img src="https://i.imgur.com/JgUCZBH.png"></p>
+<p> 事實證明，準確率掉到79.5%… </p>
+<p> 可見這些資料對於模型訓練其實是有幫助的。</p>
+</li>
+<li><p>XGboost有結合cross-validation的套件可以使用，理論上表現會更好，但因為這裡資料量太少，所以做cross-validation的效益看不出來，對於準確率來說無法有效提升。</p>
+<p> <strong>XGboost + CV(Cross-Validation)</strong></p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">params &#x3D; &#123;&#125;</span><br><span class="line">params[&#39;objective&#39;] &#x3D; &#39;multi:softprob&#39; # 多分類</span><br><span class="line">params[&#39;num_class&#39;] &#x3D; len(df_test_origin[&#39;boardName&#39;].unique())</span><br><span class="line"></span><br><span class="line">d_train &#x3D; xgboost.DMatrix(x_train, label&#x3D;y_train)</span><br><span class="line">d_valid &#x3D; xgboost.DMatrix(x_valid, label&#x3D;y_valid)</span><br><span class="line"></span><br><span class="line">watchlist &#x3D; [(d_train, &#39;train&#39;), (d_valid, &#39;valid&#39;)]</span><br><span class="line"></span><br><span class="line">bst &#x3D; xgboost.train(params, d_train, 100, watchlist, early_stopping_rounds&#x3D;100, verbose_eval&#x3D;10)</span><br><span class="line">y_pred &#x3D; bst.predict(xgboost.DMatrix(x_valid))</span><br><span class="line"></span><br><span class="line"># 手動計算準確率</span><br><span class="line">cnt &#x3D; 0</span><br><span class="line">for i in range(len(y_valid)):</span><br><span class="line">    if y_valid.iloc[i] &#x3D;&#x3D; kind_mapping[find_maxProb(y_pred[i])]:</span><br><span class="line">       cnt+&#x3D;1                                                   </span><br><span class="line"></span><br><span class="line">acc &#x3D; cnt&#x2F;len(y_valid)</span><br><span class="line">print(&#39;Accuracy: &#39;,acc)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>[0]    train-merror:0.26316    valid-merror:0.29825<br> Multiple eval metrics have been passed: ‘valid-merror’ will be used for early stopping.</p>
+<p>Will train until valid-merror hasn’t improved in 100 rounds.<br> [10]    train-merror:0.11842    valid-merror:0.24561<br> [20]    train-merror:0.05482    valid-merror:0.21930<br> [30]    train-merror:0.03070    valid-merror:0.21930<br> [40]    train-merror:0.01974    valid-merror:0.21053<br> [50]    train-merror:0.01097    valid-merror:0.19298<br> [60]    train-merror:0.01097    valid-merror:0.20175<br> [70]    train-merror:0.00877    valid-merror:0.20175<br> [80]    train-merror:0.00877    valid-merror:0.20175<br> [90]    train-merror:0.00877    valid-merror:0.21053<br> [99]    train-merror:0.00658    valid-merror:0.21053</p>
+<p>Accuracy:  0.7894736842105263</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="總結"><a href="#總結" class="headerlink" title="總結"></a>總結</h2><p>這篇文章主要透過爬蟲去爬取PTT板上的資訊，最後存入sqlite資料庫，再從sqlite資料庫裏頭撈取資料來做機器學習的分類，並比較常見幾種演算法如:KNN、RandomForest、XGboost、SVM的結果，最終整體分類結果尚可接受。</p>
+<p>當然除了機器學習以外，也可以用深度學習的模型來做分類，ex: LSTM、BERT…等等模型，但就需要調參，而且要自己設計Network Structure，相對麻煩一點，但能夠客製化分類的模型，也算是一種可以嘗試的方向。</p>
+<blockquote>
+<p>TODO:<br>後續會再寫個小網站把sqlite資料庫爬取下來的文章資訊透過網頁的方式去查詢，並嘗試做成文字雲或是將分類的模型上傳到網站以便隨時透過UI去測試分類，並寫成部落格文章以供未來的自己查閱。</p>
+</blockquote>
+<p>TO BE CONTINUE…</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/12/Python%E5%AF%A6%E4%BD%9C%E9%9B%BB%E5%BD%B1%E6%8E%A8%E8%96%A6%E7%B3%BB%E7%B5%B1/" rel="prev" title="Python實作電影推薦系統">
+      <i class="fa fa-chevron-left"></i> Python實作電影推薦系統
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#PTT%E7%88%AC%E8%9F%B2"><span class="nav-number">1.</span> <span class="nav-text">PTT爬蟲</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92%E9%A0%90%E6%B8%AC%E6%96%87%E7%AB%A0%E5%87%BA%E8%99%95"><span class="nav-number">2.</span> <span class="nav-text">機器學習預測文章出處</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%8C%E8%A8%98"><span class="nav-number">3.</span> <span class="nav-text">後記</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B8%BD%E7%B5%90"><span class="nav-number">4.</span> <span class="nav-text">總結</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MaDi"
+      src="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DysonMa" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DysonMa" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:madihsiang@gmail.com" title="E-Mail → mailto:madihsiang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/marc_de_shawn" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;marc_de_shawn" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">若要轉載文章，煩請註明作者名稱MaDi與原始連結</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="訪客總數">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="總瀏覽次數">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
