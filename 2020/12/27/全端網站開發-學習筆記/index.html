@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前陣子有參加一堂教Node.js+Firebase全端的課程，為了怕學完之後全部忘光，特別紀錄了一下自己學習的心得，以利未來需要用Node.js來開發的自己參考參考。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Node.js + Firebase] 全端網站開發-學習筆記">
+<meta property="og:url" content="https://dysonma.github.io/2020/12/27/%E5%85%A8%E7%AB%AF%E7%B6%B2%E7%AB%99%E9%96%8B%E7%99%BC-%E5%AD%B8%E7%BF%92%E7%AD%86%E8%A8%98/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="前陣子有參加一堂教Node.js+Firebase全端的課程，為了怕學完之後全部忘光，特別紀錄了一下自己學習的心得，以利未來需要用Node.js來開發的自己參考參考。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/GLv5baD.png">
+<meta property="og:image" content="https://i.imgur.com/7AeuWhm.png">
+<meta property="og:image" content="https://i.imgur.com/M2GUD0s.png">
+<meta property="og:image" content="https://i.imgur.com/APAzD4G.png">
+<meta property="article:published_time" content="2020-12-27T08:09:37.000Z">
+<meta property="article:modified_time" content="2020-12-27T08:11:39.995Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/GLv5baD.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2020/12/27/%E5%85%A8%E7%AB%AF%E7%B6%B2%E7%AB%99%E9%96%8B%E7%99%BC-%E5%AD%B8%E7%BF%92%E7%AD%86%E8%A8%98/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>[Node.js + Firebase] 全端網站開發-學習筆記 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2020/12/27/%E5%85%A8%E7%AB%AF%E7%B6%B2%E7%AB%99%E9%96%8B%E7%99%BC-%E5%AD%B8%E7%BF%92%E7%AD%86%E8%A8%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [Node.js + Firebase] 全端網站開發-學習筆記
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2020-12-27 16:09:37 / 修改時間：16:11:39" itemprop="dateCreated datePublished" datetime="2020-12-27T16:09:37+08:00">2020-12-27</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">閱讀次數：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>前陣子有參加一堂教Node.js+Firebase全端的課程，為了怕學完之後全部忘光，特別紀錄了一下自己學習的心得，以利未來需要用Node.js來開發的自己參考參考。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="Node-js"><a href="#Node-js" class="headerlink" title="Node.js"></a>Node.js</h2><p>Q. 何謂Node.js?</p>
+<blockquote>
+<p>是別人用javascript寫成的套件，讓使用者可以在伺服端也可以使用javascript</p>
+</blockquote>
+<p>Q. 為何選擇Node.js?</p>
+<blockquote>
+<ol>
+<li><p>對於前端工程師轉往後端發展是相當友善，因為只需要會javascript一種語言就能夠寫前後端</p>
+</li>
+<li><p>因為傳統的後端伺服器在每個使用者連結時都會送他一個新的執行緒，會於IO密集型的需求會有麻煩，而Node.js可以透過異步IO來解決。</p>
+</li>
+<li><p>因為javascript是”事件驅動”的程式語言，可以request為基底，跑事件迴圈來讓執行緒幾乎不會卡住。</p>
+</li>
+</ol>
+</blockquote>
+<p>Q. 何謂NPM?</p>
+<blockquote>
+<p>NPM(Node Package Manager)，是一個線上套件庫，專門下載各式各樣的javascript套件來使用</p>
+</blockquote>
+<h2 id="環境搭建"><a href="#環境搭建" class="headerlink" title="環境搭建"></a>環境搭建</h2><ul>
+<li>Node.js</li>
+<li>Express框架</li>
+<li>VSCode(略)</li>
+</ul>
+<h3 id="Node-js-1"><a href="#Node-js-1" class="headerlink" title="Node.js"></a>Node.js</h3><p>Q. 如何安裝?</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://nodejs.org/zh-tw/download/">官網安裝載點</a>，<code>Automatically install the necessary tools...</code>不要打勾，其他按next<br>安裝好之後，在終端機上輸入<code>node -v</code>，<code>npm -v</code>，如果可以看到version就是安裝成功。</p>
+</blockquote>
+<p>Q. 如何下載套件?</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd 資料夾</span><br><span class="line">npm init              # 用npm來初始化資料夾，裡面會有json.package檔，只要把此json檔給別人就不用下載xxx套件  </span><br><span class="line">npm install xxx--save # 下載xxx套件並存入package.json</span><br></pre></td></tr></table></figure>
+<p>Q. 如何運行程式?</p>
+<blockquote>
+<p><code>node 檔名.js</code></p>
+</blockquote>
+<h3 id="Express框架"><a href="#Express框架" class="headerlink" title="Express框架"></a>Express框架</h3><blockquote>
+<p>別人寫好的module，直接require就能用，專門拿來寫輕型的網站，操作較簡單易懂</p>
+</blockquote>
+<p>Q. 如何下載Express套件?</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">cd Desktop                 </span><br><span class="line">mkdir demo                 #建立demo資料夾</span><br><span class="line">cd demo   </span><br><span class="line"></span><br><span class="line">npm init                   # 用npm來初始化demo資料夾，裡面會有json.package檔，只要把此json檔給別人就不用下載express                </span><br><span class="line">npm install express --save # 下載express套件到demo資料夾並存入package.json</span><br></pre></td></tr></table></figure>
+
+<h2 id="網頁與瀏覽器與伺服器"><a href="#網頁與瀏覽器與伺服器" class="headerlink" title="網頁與瀏覽器與伺服器"></a>網頁與瀏覽器與伺服器</h2><p>網頁前後端分別擔任的角色可以用下圖來呈現:<br><img src="https://i.imgur.com/GLv5baD.png"></p>
+<ol>
+<li>首先，使用者選定某個想去的網站，並告訴瀏覽器，請瀏覽器幫你去問伺服器</li>
+<li>瀏覽器去詢問伺服器，伺服器再去詢問資料庫</li>
+<li>資料庫回傳資料給伺服器，伺服器再回傳給瀏覽器</li>
+<li>瀏覽器顯示靜態網頁給使用者(response)</li>
+</ol>
+<p>其中，伺服器又細分成</p>
+<ol>
+<li>網頁伺服器(Web Server)</li>
+<li>應用程式(應程)伺服器(Application Server)<br><img src="https://i.imgur.com/7AeuWhm.png"></li>
+</ol>
+<p>而Node.js則是負責以下工作:</p>
+<ol>
+<li>建立伺服器</li>
+<li>接收request</li>
+<li>回傳response</li>
+<li>與資料庫溝通</li>
+</ol>
+<h2 id="網址、網頁、伺服器"><a href="#網址、網頁、伺服器" class="headerlink" title="網址、網頁、伺服器"></a>網址、網頁、伺服器</h2><p><img src="https://i.imgur.com/M2GUD0s.png"></p>
+<h3 id="URL網址"><a href="#URL網址" class="headerlink" title="URL網址"></a>URL網址</h3><blockquote>
+<p>全名為 <strong>“統一資源定位符(Uniform Resource Locator)”</strong></p>
+<p><strong>URL指的是網頁的地址</strong></p>
+</blockquote>
+<p>URL裏頭每個位置分別記錄不同的資訊：</p>
+<blockquote>
+<p>1.通訊協定(protocol)，ex: http、https…<br>2.主機位址、網域名稱(domain name)<br>3.連接埠(port)<br>4.路徑<br>5.查詢字串</p>
+</blockquote>
+<h3 id="域名"><a href="#域名" class="headerlink" title="域名"></a>域名</h3><blockquote>
+<p><strong>IP位址的代稱</strong></p>
+<p><strong>IP位置，全名為”網際網路協定位址(Internet Protocol Address)”</strong></p>
+<p>IP位置<strong>由四個0~255的數字所組成</strong>，ex: <a target="_blank" rel="noopener" href="https://172.217.160.68/">172.217.160.68</a></p>
+</blockquote>
+<p>網站、URL、IP三個角色可以比喻如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">網站: 家</span><br><span class="line">URL: 家的門牌 (有很多個)</span><br><span class="line">IP Address: 家的經緯度 (唯一一個)</span><br><span class="line"></span><br><span class="line">舉Google為例子 </span><br><span class="line">IP Address: 172.217.161.174</span><br><span class="line">URL: www.google.com、https:&#x2F;&#x2F;www.google.com...</span><br></pre></td></tr></table></figure>
+<p>特殊IP:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IP: 127.0.0.1</span><br><span class="line">URL: localhost</span><br></pre></td></tr></table></figure>
+<p>這組特殊的IP指的是<strong>本地主機，任何人的127.0.0.1都是自己的主機</strong>。這個地址讓所有的網站開發者可以藉由自己的電腦來測試網站。</p>
+<h3 id="埠口-port"><a href="#埠口-port" class="headerlink" title="埠口(port)"></a>埠口(port)</h3><blockquote>
+<p>在網路世界中，你的電腦的port就好像一個港口。<strong>就是一個接口，讓別人連接，或是讓你接收別人的資訊。</strong></p>
+<p><strong>0到1023號埠不要使用！因為是電腦系統本身在使用的。請盡量使用 5000~9999 的 port</strong></p>
+</blockquote>
+<h3 id="request-v-s-response"><a href="#request-v-s-response" class="headerlink" title="request v.s response"></a>request v.s response</h3><ul>
+<li><p><strong>請求標頭（request Header）</strong></p>
+<ul>
+<li><strong>傳送一些你的資訊給你要 request 的伺服器。</strong><br>例如：你的時區、你習慣用什麼語言、你用的瀏覽器是什麼…等等。</li>
+</ul>
+</li>
+<li><p><strong>回應標頭（response Header）</strong></p>
+<ul>
+<li><strong>伺服器回傳資訊給瀏覽器時，也需要告訴瀏覽器一些資訊。</strong><br>例如：當前回傳的 response 是一個 html檔案、js 檔案、圖片、json物件…等等。</li>
+</ul>
+</li>
+</ul>
+<h3 id="route-路由or路徑"><a href="#route-路由or路徑" class="headerlink" title="route(路由or路徑)"></a>route(路由or路徑)</h3><p>舉例來說，一個網址長這樣</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/">https://zh.wikipedia.org</a> <strong>/wiki/Node.js</strong></p>
+</blockquote>
+<p>斜線後面的就是route，用來分配不同的request到不同的網站，如同資料夾一樣。當使用者用<code>get</code>或<code>post</code>的方式傳request給這個路徑的時候，server就會執行後面的function。</p>
+<h2 id="DOM結構教學"><a href="#DOM結構教學" class="headerlink" title="DOM結構教學"></a>DOM結構教學</h2><ul>
+<li>DOM全名是 <strong>“Document Object Model”</strong></li>
+<li>HTML的DOM架構</li>
+<li><ul>
+<li>當瀏覽器要載入這個網頁的時候，就會生成這個 html 架構。</li>
+</ul>
+</li>
+<li><ul>
+<li>也就是說，其實 html 本身就是一個物件(object)</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://i.imgur.com/APAzD4G.png"></p>
+<p>HTML DOM 是為了方便讓你使用 js 對 HTML 元素進行以下操作:</p>
+<ol>
+<li>選擇(select)</li>
+<li>改變(change)</li>
+<li>增加(add)</li>
+<li>刪除(delete)</li>
+</ol>
+<ul>
+<li><strong>選擇 DOM 物件 (Select)</strong></li>
+</ul>
+<ol>
+<li><code>document.querySelector(selectors)</code></li>
+<li><code>document.querySelectorAll(selectors)</code></li>
+</ol>
+<ul>
+<li><strong>改變 DOM 的內容 (change)</strong></li>
+</ul>
+<ol>
+<li>改變 HTML: <code>innerHTML</code></li>
+<li>改變 屬性(attribute): <code>setAttribute(old,new)</code></li>
+</ol>
+<ul>
+<li><strong>增加 DOM 的元素(add)</strong></li>
+</ul>
+<ol>
+<li><code>document.createElement(element)</code></li>
+<li><code>document.appendChild(element)</code></li>
+</ol>
+<ul>
+<li><strong>刪除 DOM 的元素 (delete)</strong></li>
+</ul>
+<ol>
+<li><code>element.removeChild(element)</code></li>
+<li><code>element.replaceChild(new, old)</code></li>
+</ol>
+<h2 id="事件-event"><a href="#事件-event" class="headerlink" title="事件(event)"></a>事件(event)</h2><ul>
+<li>javascript 可以監聽 html 是否有 <strong>事件</strong> 發生，並且對其作出反應，例如有:</li>
+<li><ul>
+<li>HTML input 輸入框發生改變。<code>(onchange)</code></li>
+</ul>
+</li>
+<li><ul>
+<li>HTML button 被按了一下。<code>(onclick)</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="表單-form-結構、GET、POST"><a href="#表單-form-結構、GET、POST" class="headerlink" title="表單(form)結構、GET、POST"></a>表單(form)結構、GET、POST</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action&#x3D;&quot;送出目的地&quot; method&#x3D;&quot;資料傳送方式&quot;&gt;</span><br><span class="line">    表單內容...</span><br><span class="line">    ...</span><br><span class="line">    &lt;input type&#x3D;&quot;text&quot; name&#x3D;&quot;id&quot; &#x2F;&gt;</span><br><span class="line">    &lt;input type&#x3D;&quot;password&quot; name&#x3D;&quot;password&quot; &#x2F;&gt;</span><br><span class="line">    &lt;input type&#x3D;&quot;submit&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;form&gt;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>送出目的地，ex: “<a href="http://127.0.0.1:8888&quot;">http://127.0.0.1:8888&quot;</a></p>
+</li>
+<li><p><code>name</code>名稱是表單把資料傳往伺服器的變數名稱</p>
+</li>
+<li><p>資料傳送方式分為以下兩種:</p>
+<ul>
+<li><p><strong>GET</strong></p>
+<ul>
+<li><strong>用網址來傳送值</strong>，伺服器從 request 中的網址收到這個值</li>
+<li><strong>較不重要</strong>，可以公開(明信片)，會出現在網址上面，<strong>直接採用url模組來分析網址就可以收信</strong></li>
+</ul>
+</li>
+<li><p><strong>POST</strong> </p>
+<ul>
+<li>別人無法看到內容，伺服器會用特別的方式收下這封信。</li>
+<li><strong>較隱私</strong>(信封內有裝信件)，收信較麻煩所以<strong>採用express框架</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>也就是說，當你用 GET 或 POST 傳 request 給這個PATH時，server 會執行後面的 function。</p>
+<h2 id="伺服器搭建"><a href="#伺服器搭建" class="headerlink" title="伺服器搭建"></a>伺服器搭建</h2><p>Q. 何謂模組(module)?</p>
+<blockquote>
+<p><strong>別人寫好的很多函式，可以提供給使用者引入來應用</strong>，俗稱API(Application progamming interface)，當code愈來愈龐大就可以寫在不同檔案裏頭，即稱為模組。</p>
+</blockquote>
+<p>Q. 如何用javascript客製化自己的模組?</p>
+<blockquote>
+<p>在模組檔案裏頭，<code>module.exports = xxx</code>，提供接口，當別人使用該模組時，就會拿到xxx這個值</p>
+</blockquote>
+<p>伺服器搭建有兩種方式，<code>http</code>和<code>Express</code>框架，其中<code>Express</code>是適合輕型框架網站的開發。</p>
+<ol>
+<li><p>用<code>http</code>來搭建伺服器的程式碼:</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">let http &#x3D; require(&#39;http&#39;);   &#x2F;&#x2F;引入http模組</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;使用http模組裏頭的createServer函式，會回傳一個物件，有listen這個函式</span><br><span class="line">http.createServer(function (req, res) &#123;</span><br><span class="line">  res.writeHead(200, &#123;&#39;Content-Type&#39;: &#39;text&#x2F;plain&#39;&#125;); </span><br><span class="line">  res.write(&#39;&lt;html&gt;&lt;body&gt;Demo&lt;&#x2F;body&gt;&lt;&#x2F;html&gt;&#39;);</span><br><span class="line">  res.end(&#39;Hello World!&#39;);</span><br><span class="line">&#125;).listen(8080);   &#x2F;&#x2F;將伺服器監聽在8080這個port</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>response.writeHead()</code>: 設定response header</p>
+</li>
+<li><p><code>content-type</code>: 用來表示你當前傳的資料類別。<a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types">[content-type 的官方文檔]</a></p>
+</li>
+<li><p><code>res.write()</code>: 寫回應的網頁body內容</p>
+</li>
+<li><p><code>res.end()</code>: 送出response</p>
+</li>
+<li><p><code>createServer().listen(8080)</code>: 開一個server在port 8080，而你連結的方式就是<code>localhost:8080</code>、<code>127.0.0.1:8080</code></p>
+<p>使用 <strong>parse</strong> 來分析url</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">let query &#x3D; url.parse(request.url, true).query;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>用<code>Express</code>框架搭建伺服器的程式碼:</p>
+<blockquote>
+<p><code>app.METHOD(PATH, function)</code></p>
+<p><code>METHOD</code>分為<code>get</code>、<code>post</code></p>
+</blockquote>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">const express &#x3D; require(&#39;express&#39;); &#x2F;&#x2F;引入Express</span><br><span class="line">const app &#x3D; express();              &#x2F;&#x2F; 建立server</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 以下三行很重要！</span><br><span class="line">const bodyParser &#x3D; require(&#39;body-parser&#39;); </span><br><span class="line">app.use(bodyParser.json());</span><br><span class="line">app.use(bodyParser.urlencoded(&#123; extended: false &#125;));</span><br><span class="line"></span><br><span class="line">app.get(&quot;&#x2F;&quot;, function(req, res) &#123;</span><br><span class="line">    res.send(&quot;This is &#x2F;&quot;);</span><br><span class="line">&#125;);</span><br><span class="line">app.get(&#39;&#x2F;about&#39;, function(req, res) &#123;</span><br><span class="line">    console.log(request.query.id);       &#x2F;&#x2F;GET取得資料</span><br><span class="line">    console.log(request.query.password); &#x2F;&#x2F;GET取得資料</span><br><span class="line">    res.send(&quot;This is about&quot;);</span><br><span class="line">&#125;);</span><br><span class="line">app.post(&#39;&#x2F;post&#39;, function(req, res) &#123;</span><br><span class="line">    console.log(request.body);      &#x2F;&#x2F;POST取得資料</span><br><span class="line">    res.send(&quot;This is post&quot;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p> Express框架存取資料的地方:</p>
+<ol>
+<li>GET:<ul>
+<li><code>request.query</code></li>
+<li>資料都存在 request 物件的 <strong>query</strong> 物件裡面</li>
+</ul>
+</li>
+<li>POST<ul>
+<li><code>request.body</code></li>
+<li>資料都存在 request 物件的 <strong>body</strong> 物件裡面</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<p>通常簡易的網站都用Express框架就可以處理，操作起來<code>get</code>、<code>post</code>都比較簡單一點，不需要每個route都要用parse來分析url。不然這樣會需要太多switch的case來決定流程的控制。</p>
+<p><code>Express</code>框架裏頭的其他操作:</p>
+<ol>
+<li><p>讀取檔案 (ex:html、css、javascript…):</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">let fs &#x3D; require(&#39;fs&#39;) &#x2F;&#x2F;需要引入fs這個模組</span><br><span class="line">fs.readFile(&#39;test.html&#39;, function(err, data)&#123;</span><br><span class="line">         if (err) throw err; &#x2F;&#x2F;callback是讀取資料後會執行的函式</span><br><span class="line">         res.write(data);    &#x2F;&#x2F;data是檔案內容</span><br><span class="line">         res.end();</span><br><span class="line">     &#125;)</span><br></pre></td></tr></table></figure></li>
+<li><p><code>res.send()</code>: 傳送各種類型的回應，例如: 字串</p>
+</li>
+<li><p><code>res.sendFile()</code>: 傳送檔案類型的回應</p>
+</li>
+<li><p><code>res.direct()</code>:重新導向到其他網站或位址</p>
+</li>
+<li><p><code>res.download()</code>: 提示要下載的檔案</p>
+</li>
+<li><p><code>res.end()</code>: 什麼都不做，直接結束回應程序</p>
+</li>
+<li><p><code>app.use(func)</code>: 希望每個網頁進入時，server都先做同一件事</p>
+</li>
+<li><p><code>next()</code>: 當 server 收到 request，會找最上面的 “中介軟體” 運作，然後就會卡在裡面，next 是為了把使用權給下一個 “中介軟體” 。</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">let express &#x3D; require(&#39;express&#39;);</span><br><span class="line">let app &#x3D; express();</span><br><span class="line"></span><br><span class="line">let func1 &#x3D; function (req, res, next) &#123;</span><br><span class="line">  console.log(&#39;func1&#39;);</span><br><span class="line">  next();</span><br><span class="line">&#125;</span><br><span class="line">let func2 &#x3D; function (req, res, next) &#123;</span><br><span class="line">  console.log(&#39;func2&#39;);</span><br><span class="line">  next();</span><br><span class="line">&#125;</span><br><span class="line">let func3 &#x3D; function (req, res) &#123;</span><br><span class="line">  res.send(&#39;This is Func3, End!&#39;);</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line">app.get(&#39;&#x2F;test&#39;, [func1, func2, func3]);</span><br><span class="line">app.listen(8888);</span><br></pre></td></tr></table></figure></li>
+<li><p><code>router</code>: 把不同網頁寫在不同檔案裏頭，以作為分類用途</p>
+<p> Madi.js</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">var express &#x3D; require(&#39;express&#39;);</span><br><span class="line">var router &#x3D; express.Router();</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; middleware that is specific to this router</span><br><span class="line">router.use(function timeLog(req, res, next) &#123;</span><br><span class="line">  console.log(&#39;Time: &#39;, Date.now());</span><br><span class="line">  next();</span><br><span class="line">&#125;);</span><br><span class="line">&#x2F;&#x2F; define the home page route</span><br><span class="line">router.get(&#39;&#x2F;&#39;, function(req, res) &#123;</span><br><span class="line">  res.send(&#39;Madi\&#39;s home page&#39;);</span><br><span class="line">&#125;);</span><br><span class="line">&#x2F;&#x2F; define the about route</span><br><span class="line">router.get(&#39;&#x2F;about&#39;, function(req, res) &#123;</span><br><span class="line">  res.send(&#39;About Madi&#39;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">module.exports &#x3D; router;</span><br></pre></td></tr></table></figure>
+<p> index.js</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">let express &#x3D; require(&#39;express&#39;);</span><br><span class="line">let app &#x3D; express();</span><br><span class="line">let Madi &#x3D; require(&#39;.&#x2F;Madi.js&#39;);  &#x2F;&#x2F;引入Madi.js</span><br><span class="line">app.use(&#39;&#x2F;Madi&#39;, Madi);</span><br><span class="line"></span><br><span class="line">let get_time &#x3D; function (req, res, next) &#123;</span><br><span class="line">  console.log(&#39;Time:&#39;, Date.now());</span><br><span class="line">  next();</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">app.use(get_time);</span><br><span class="line"></span><br><span class="line">app.get(&quot;&#x2F;&quot;, (req, res) &#x3D;&gt; &#123;</span><br><span class="line">    res.send(&quot;&#x2F;&quot;);</span><br><span class="line">&#125;);</span><br><span class="line">app.get(&quot;&#x2F;about&quot;, (req, res) &#x3D;&gt; &#123;</span><br><span class="line">    res.send(&quot;&#x2F;about&quot;);</span><br><span class="line">&#125;);</span><br><span class="line">app.listen(8888);</span><br></pre></td></tr></table></figure></li>
+<li><p><code>app.use(express.static(&#39;public&#39;))</code>: 把public中的檔案全部丟上去，缺點是使用者只能看到畫面，不能處理get或post，而且public資料夾中的所有資料都會被公開。</p>
+</li>
+</ol>
+<h2 id="Firebase"><a href="#Firebase" class="headerlink" title="Firebase"></a>Firebase</h2><p>Q. 何謂Firebase?</p>
+<blockquote>
+<p>是一種”即時”的線上資料庫，不像傳統的資料庫是靠Table欄位來建立資料，資料儲存的方式是更直觀的 JSON Tree。</p>
+</blockquote>
+<p>資料庫由以下三個元素組成:</p>
+<ol>
+<li><code>Collection</code>: 收納用的資料夾</li>
+<li><code>Document</code>: 資料夾中放的紙</li>
+<li><code>Data</code>: 紙上面記載需要的內容</li>
+</ol>
+<p>以下為網路參考資料</p>
+<blockquote>
+<p>創建流程: <a target="_blank" rel="noopener" href="https://hackmd.io/3Bl_xSSYQneX6BQ_Wu9hrQ?both">創建 Firebase Project</a></p>
+<p>如何在網頁中引入Firebase當中的資料: <a target="_blank" rel="noopener" href="https://hackmd.io/KdWwKigFQWKnfaAqnM1meA">引入資料</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">let firebase &#x3D; require(&#39;firebase&#39;); &#x2F;&#x2F;引入firebase</span><br><span class="line"></span><br><span class="line">var firebaseConfig &#x3D; &#123;</span><br><span class="line">    apiKey:... ,</span><br><span class="line">    authDomain:...,</span><br><span class="line">    databaseURL:...,</span><br><span class="line">    projectId:...,</span><br><span class="line">    storageBucket:...,</span><br><span class="line">    messagingSenderId:...,</span><br><span class="line">    appId:...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">firebase.initializeApp(firebaseConfig); &#x2F;&#x2F;Initialize Firebase</span><br></pre></td></tr></table></figure>
+
+<p>接下來操作Firebase的過程會需要用到promise的概念，甚至是async/await非同步的概念。</p>
+<h3 id="取出資料-get"><a href="#取出資料-get" class="headerlink" title="取出資料(get)"></a>取出資料(get)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">const db &#x3D; firebase.firestore(); &#x2F;&#x2F;取得與database的連結</span><br><span class="line">db.collection(&#39;ClassA&#39;).get().then(data &#x3D;&gt; &#123;</span><br><span class="line">    data.docs.forEach(doc &#x3D;&gt; &#123;</span><br><span class="line">        console.log(doc);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>使用 get() 來取出collection中的document，<strong>get()取出的會是Promise型態</strong>(因為讀取網路中的資料需要時間)。</p>
+<h3 id="新增資料-add-set"><a href="#新增資料-add-set" class="headerlink" title="新增資料(add,set)"></a>新增資料(add,set)</h3><p>用add方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">db.collection(&#39;ClassA&#39;).add(&#123;</span><br><span class="line">    name: Madi,</span><br><span class="line">    age: 25,</span><br><span class="line">    gender: male</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>連 document ID 都做修改的新增方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">db.collection(&#39;ClassA&#39;).doc(&#39;student1&#39;).set(&#123;</span><br><span class="line">    name: Madi,</span><br><span class="line">    age: 25,</span><br><span class="line">    gender: male</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="刪除資料-delete"><a href="#刪除資料-delete" class="headerlink" title="刪除資料(delete)"></a>刪除資料(delete)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.collection(&#39;ClassA&#39;).doc(&quot;你要刪除的id&quot;).delete();</span><br></pre></td></tr></table></figure>
+
+<h3 id="後端操作firebase利用async-await"><a href="#後端操作firebase利用async-await" class="headerlink" title="後端操作firebase利用async/await"></a>後端操作firebase利用async/await</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">app.get(&quot;&#x2F;&quot;, async (req, res) &#x3D;&gt; &#123;</span><br><span class="line">    let html &#x3D; &#39;&#39;;</span><br><span class="line">    await db.collection(&#39;classA&#39;).get().then(data &#x3D;&gt; &#123;</span><br><span class="line">        data.forEach(doc &#x3D;&gt; &#123;</span><br><span class="line">            console.log(doc.data())</span><br><span class="line">            html +&#x3D; &#96;$&#123;html&#125;&lt;div&gt;$&#123;doc.id&#125;: name &#x3D; $&#123;doc.data().name&#125; age &#x3D; $&#123;doc.data().age&#125;&lt;&#x2F;div&gt;&#96;;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">    console.log(html)</span><br><span class="line">    res.send(html)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><p><a target="_blank" rel="noopener" href="https://train.csie.ntu.edu.tw/train/">[Node.js + Firebase]全端實戰網站開發-台大資工(講師邱榆洋)</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/20/project-PTT-ML/" rel="prev" title="[專案實作] PTT爬蟲+應用機器學習預測板名">
+      <i class="fa fa-chevron-left"></i> [專案實作] PTT爬蟲+應用機器學習預測板名
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/27/%E5%A0%B1%E5%90%8D%E7%B6%B2%E7%AB%99%E5%B0%88%E6%A1%88%E5%BF%83%E5%BE%97/" rel="next" title="[Node.js+Firebase] 報名網站專案心得">
+      [Node.js+Firebase] 報名網站專案心得 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Node-js"><span class="nav-number">1.</span> <span class="nav-text">Node.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%92%B0%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">2.</span> <span class="nav-text">環境搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Node-js-1"><span class="nav-number">2.1.</span> <span class="nav-text">Node.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Express%E6%A1%86%E6%9E%B6"><span class="nav-number">2.2.</span> <span class="nav-text">Express框架</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B6%B2%E9%A0%81%E8%88%87%E7%80%8F%E8%A6%BD%E5%99%A8%E8%88%87%E4%BC%BA%E6%9C%8D%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">網頁與瀏覽器與伺服器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B6%B2%E5%9D%80%E3%80%81%E7%B6%B2%E9%A0%81%E3%80%81%E4%BC%BA%E6%9C%8D%E5%99%A8"><span class="nav-number">4.</span> <span class="nav-text">網址、網頁、伺服器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#URL%E7%B6%B2%E5%9D%80"><span class="nav-number">4.1.</span> <span class="nav-text">URL網址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%9F%E5%90%8D"><span class="nav-number">4.2.</span> <span class="nav-text">域名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%A0%E5%8F%A3-port"><span class="nav-number">4.3.</span> <span class="nav-text">埠口(port)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#request-v-s-response"><span class="nav-number">4.4.</span> <span class="nav-text">request v.s response</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#route-%E8%B7%AF%E7%94%B1or%E8%B7%AF%E5%BE%91"><span class="nav-number">4.5.</span> <span class="nav-text">route(路由or路徑)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DOM%E7%B5%90%E6%A7%8B%E6%95%99%E5%AD%B8"><span class="nav-number">5.</span> <span class="nav-text">DOM結構教學</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6-event"><span class="nav-number">6.</span> <span class="nav-text">事件(event)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A8%E5%96%AE-form-%E7%B5%90%E6%A7%8B%E3%80%81GET%E3%80%81POST"><span class="nav-number">7.</span> <span class="nav-text">表單(form)結構、GET、POST</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%BA%E6%9C%8D%E5%99%A8%E6%90%AD%E5%BB%BA"><span class="nav-number">8.</span> <span class="nav-text">伺服器搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Firebase"><span class="nav-number">9.</span> <span class="nav-text">Firebase</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%96%E5%87%BA%E8%B3%87%E6%96%99-get"><span class="nav-number">9.1.</span> <span class="nav-text">取出資料(get)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E8%B3%87%E6%96%99-add-set"><span class="nav-number">9.2.</span> <span class="nav-text">新增資料(add,set)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%AA%E9%99%A4%E8%B3%87%E6%96%99-delete"><span class="nav-number">9.3.</span> <span class="nav-text">刪除資料(delete)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%8C%E7%AB%AF%E6%93%8D%E4%BD%9Cfirebase%E5%88%A9%E7%94%A8async-await"><span class="nav-number">9.4.</span> <span class="nav-text">後端操作firebase利用async&#x2F;await</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">10.</span> <span class="nav-text">參考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MaDi"
+      src="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">31</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DysonMa" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DysonMa" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:madihsiang@gmail.com" title="E-Mail → mailto:madihsiang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/marc_de_shawn" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;marc_de_shawn" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">若要轉載文章，煩請註明作者名稱MaDi與原始連結</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="訪客總數">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="總瀏覽次數">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
