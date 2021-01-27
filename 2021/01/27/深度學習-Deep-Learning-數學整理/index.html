@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="AI主要分為機器學習(Machine Learning)與深度學習(Deep Learning)，機器學習的數學整理於前一篇，而深度學習的基本數學整理於此篇，取自於台大大神李弘毅之線上課程，並記錄一些筆記提供給未來的自己做參考。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深度學習(Deep Learning)-數學整理">
+<meta property="og:url" content="https://dysonma.github.io/2021/01/27/%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92-Deep-Learning-%E6%95%B8%E5%AD%B8%E6%95%B4%E7%90%86/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="AI主要分為機器學習(Machine Learning)與深度學習(Deep Learning)，機器學習的數學整理於前一篇，而深度學習的基本數學整理於此篇，取自於台大大神李弘毅之線上課程，並記錄一些筆記提供給未來的自己做參考。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/6nfnbsh.png">
+<meta property="og:image" content="https://i.imgur.com/7LI6EXd.png">
+<meta property="og:image" content="https://i.imgur.com/aLq0kOa.png">
+<meta property="og:image" content="https://i.imgur.com/1tS4ay6.png">
+<meta property="og:image" content="https://i.imgur.com/2dRpHy7.png">
+<meta property="og:image" content="https://i.imgur.com/ztijX4y.png">
+<meta property="og:image" content="https://i.imgur.com/juQSm7t.png">
+<meta property="og:image" content="https://i.imgur.com/GqQLYtF.png">
+<meta property="og:image" content="https://i.imgur.com/dTrO31F.png">
+<meta property="og:image" content="https://i.imgur.com/LUbVdxp.png">
+<meta property="og:image" content="https://i.imgur.com/NW6I3sW.png">
+<meta property="article:published_time" content="2021-01-27T13:43:18.000Z">
+<meta property="article:modified_time" content="2021-01-27T14:05:15.811Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/6nfnbsh.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2021/01/27/%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92-Deep-Learning-%E6%95%B8%E5%AD%B8%E6%95%B4%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>深度學習(Deep Learning)-數學整理 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2021/01/27/%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92-Deep-Learning-%E6%95%B8%E5%AD%B8%E6%95%B4%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          深度學習(Deep Learning)-數學整理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2021-01-27 21:43:18 / 修改時間：22:05:15" itemprop="dateCreated datePublished" datetime="2021-01-27T21:43:18+08:00">2021-01-27</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92/" itemprop="url" rel="index"><span itemprop="name">機器學習/深度學習</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">閱讀次數：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>AI主要分為機器學習(Machine Learning)與深度學習(Deep Learning)，機器學習的數學整理於前一篇，而深度學習的基本數學整理於此篇，取自於台大大神李弘毅之線上課程，並記錄一些筆記提供給未來的自己做參考。</p>
+</blockquote>
+<a id="more"></a>
+
+
+<h2 id="Deep-Learning"><a href="#Deep-Learning" class="headerlink" title="[Deep Learning]"></a>[Deep Learning]</h2><p><img src="https://i.imgur.com/6nfnbsh.png"><br>把多個Logistic Regression前後連接在一起，每個Logistic Regression就稱做neuron，所有neuron形成一個network。</p>
+<blockquote>
+<p>neuron的連接方式決定了這個模型的structure，<strong>模型裏頭所有的參數如weight、bias全部集合起來，就是整個network的參數，用θ表示。</strong></p>
+</blockquote>
+<p>整個模型主要分成三個部分:</p>
+<ol>
+<li><p>輸入層(input layer)</p>
+</li>
+<li><p>隱藏層(hidden layer)</p>
+</li>
+<li><p>輸出層(output layer)</p>
+<p><img src="https://i.imgur.com/7LI6EXd.png"></p>
+</li>
+</ol>
+<p>其中，hidden layer又可以視為是一個<strong>feature extractor(特徵提取器)。</strong> 而output layer則可以視為是一個<strong>Multi-class classifier(多分類器)</strong> ，通常用 <strong>softmax</strong>。</p>
+<blockquote>
+<p>決定一個模型的形狀(function set)是由三個元素組成: <strong>input dimension、output dimension、network structure</strong></p>
+<p>其中，<strong>決定network structure是整個deep learning的關鍵點。</strong></p>
+</blockquote>
+<p>所以，在做deep learning的時候，流程分為三步驟:</p>
+<blockquote>
+<p><strong>Step1. Build Neural Network</strong><br><strong>Step2. Goodness of function</strong><br><strong>Step3. Pick the best function</strong></p>
+</blockquote>
+<h3 id="Step1-Build-Neural-Network"><a href="#Step1-Build-Neural-Network" class="headerlink" title="Step1. Build Neural Network"></a>Step1. Build Neural Network</h3><blockquote>
+<p><strong>決定模型的structure，就決定了function set(model)</strong> ，接下來要做的就是從這個function set裏頭找出最好的function，當然也有可能找不到，因為structure設計得太爛</p>
+</blockquote>
+<h3 id="Step2-Goodness-of-function"><a href="#Step2-Goodness-of-function" class="headerlink" title="Step2. Goodness of function"></a>Step2. Goodness of function</h3><p><img src="https://i.imgur.com/aLq0kOa.png"></p>
+<blockquote>
+<p>定義一個function的好壞，分類問題裏頭，<strong>預測值跟真值之間的差值就用cross-entropy(交叉熵)去計算</strong></p>
+</blockquote>
+<p><img src="https://i.imgur.com/1tS4ay6.png"></p>
+<h3 id="Step3-Pick-the-best-function"><a href="#Step3-Pick-the-best-function" class="headerlink" title="Step3. Pick the best function"></a>Step3. Pick the best function</h3><blockquote>
+<p><strong>調整參數，使cross-entropy愈低愈好</strong></p>
+<p>做法是 <strong>把所有data的cross-entropy都做加總，得到一個total loss，接著透過Gradient Descent(梯度下降法)來找一組可以minimize這個total loss的最佳network parameters，用θ’表示</strong> 。</p>
+<p>找到之後，這組network parameters對應到的function就是最終訓練好的模型。</p>
+</blockquote>
+<h3 id="deep-learning與machine-learning的差異"><a href="#deep-learning與machine-learning的差異" class="headerlink" title="[deep learning與machine learning的差異]"></a>[deep learning與machine learning的差異]</h3><blockquote>
+<p>簡單來說就是，問題從如何extract features轉換成如何design network structure。</p>
+<p>至於要用哪一個，取決於要解決的問題。</p>
+</blockquote>
+<p>舉例來說，在做影像辨識或是語音辨識，因為人類難以表達我們怎麼分辨的，也就是不知道自己如何extract features，更遑論讓機器也學會，因此這個時候design network structure就比extract features來的容易許多。</p>
+<h3 id="Backpropagation-反向傳播"><a href="#Backpropagation-反向傳播" class="headerlink" title="[Backpropagation 反向傳播]"></a>[Backpropagation 反向傳播]</h3><p>傳統的network是feedforward前饋式的架構，這個名詞是相對於Backpropagation。</p>
+<blockquote>
+<p>在deep learning裏頭，<strong>計算Gradient Descent的微分方法其實就是Backpropagation。</strong></p>
+</blockquote>
+<p>在neuron network裏頭，參數相當龐大，要計算微分是比較費力的，所以如何有效地解微分就是Backpropagation在做的事情。簡單來說，<strong>Backpropagation就是一個求微分比較有效率的Gradient Descent。</strong></p>
+<p>過程就是chain-rule，詳細推導 <a target="_blank" rel="noopener" href="https://sakura-gh.github.io/ML-notes/ML-notes-html/9_Backpropagation.html">參考此篇</a></p>
+<p><img src="https://i.imgur.com/2dRpHy7.png"><br><img src="https://i.imgur.com/ztijX4y.png"></p>
+<h3 id="Tips-for-deep-learning"><a href="#Tips-for-deep-learning" class="headerlink" title="[Tips for deep learning]"></a>[Tips for deep learning]</h3><blockquote>
+<p>overfitting是指在訓練過程中表現很好，但測試的時候表現很差</p>
+</blockquote>
+<p>所以在做deep learning的時候，要先檢查模型在訓練過程中是否表現優良，如果好，但是測試卻差才叫overfitting，而不是任何時候看到模型表現差都怪罪於overfitting。</p>
+<p><strong>檢查的SOP:</strong></p>
+<ol>
+<li>training data上是否表現優良?<ul>
+<li>YES: 下一步就test資料</li>
+<li>NO:  <ul>
+<li><strong>換新的activation function</strong><ul>
+<li>ReLU、Maxout</li>
+</ul>
+</li>
+<li><strong>調整learning rate</strong><ul>
+<li>Adagrad、RMSProp、Momentum、Adam…</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>testing data上是否表現優良?<ul>
+<li>YES: 可以apply to實際應用</li>
+<li>NO: <ul>
+<li><strong>Early Stopping</strong></li>
+<li><strong>Regularization</strong></li>
+<li><strong>Dropout</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>接著，細講每一個步驟:</p>
+<h4 id="1-換新的activation-function"><a href="#1-換新的activation-function" class="headerlink" title="1. 換新的activation function"></a>1. 換新的activation function</h4><p>主要是為了解決<strong>梯度消失(Vanishing gradient)</strong> 的問題。</p>
+<p><strong>梯度消失(Vanishing gradient)</strong>:</p>
+<blockquote>
+<p>梯度消失發生的原因是因為sigmoid函式會把大的input，壓縮成小的output。所以愈多層layer，梯度消失的問題愈嚴重。</p>
+</blockquote>
+<p><img src="https://i.imgur.com/juQSm7t.png"></p>
+<p>第一種activation function: ReLU<br><img src="https://i.imgur.com/GqQLYtF.png"></p>
+<p>ReLU在input&lt;0的時候output會等於0，在input&gt;0的時候output=input。</p>
+<p>所以當拿掉所有output=0的neuron之後，整個network會變瘦長的<strong>linear</strong> network，linear的好處是output=input，不會像sigmoid一樣有梯度消失的問題。</p>
+<p>第二種activation function: Maxout</p>
+<blockquote>
+<p>行為類似於在每個layer上做<strong>max pooling</strong>，將原先幾個neuron的input按一定規則分組，再選取最大值作為這組neuron的output。</p>
+</blockquote>
+<p>透過maxout可以產生ReLU，甚至更自由彈性的ReLU。<br><img src="https://i.imgur.com/dTrO31F.png"></p>
+<ol start="2">
+<li>調整learning rate</li>
+</ol>
+<ul>
+<li><p>Adagrad:<br>  <strong>精神:</strong> 考慮不同參數wi在不同方向上的gradient大小，如果gradient比較小，代表比較平坦，則給他較大的learning rate，反之亦然。<br>  <strong>缺點:</strong> 現實情況沒有那麼理想，可能平坦陡峭來回出現，必須快速的應對</p>
+</li>
+<li><p>RMSProp:<br>  <strong>精神:</strong> learning rate底下除的分母一樣是對所有的gradient進行平方和開根號，但<strong>多了一個α來調整對新舊gradient的相信程度。</strong><br>  <strong>缺點:</strong> 仍然無法解決卡在local minimum、saddle point、plateau的問題</p>
+</li>
+<li><p>Momentum:<br>  <strong>精神:</strong> 把<strong>慣性</strong>的概念引入，第二個時間點要走的方向是由第一個時間點移動的方向和gradient的反方向共同決定的。</p>
+</li>
+<li><p>Adam:<br>  <strong>精神:</strong> <strong>RMSProp+Momentum=Adam</strong></p>
+</li>
+</ul>
+<ol start="3">
+<li><p>Early Stopping</p>
+<p> 訓練過程中total loss會愈來愈小，但training data跟testing data的表現未必相同，所以<strong>應該以testing data為準，當testing data的loss最小的時候就停止。</strong><br> 這裡的testing data指的是validate用途的data，因為testing data是未知的。</p>
+</li>
+</ol>
+<p><img src="https://i.imgur.com/LUbVdxp.png"></p>
+<ol start="4">
+<li><p>Regularization<br> 詳另一篇</p>
+</li>
+<li><p>Dropout</p>
+<p> 在training的時候，每次update參數之前，都先對每個neuron做取樣(input layer也要)，每個neuron都有P%機率被丟棄掉，當某個neuron被丟棄掉，則相連的weight也要丟棄掉。也就是說每次update參數都只保留network的某一部份來做訓練。</p>
+<blockquote>
+<p>Dropout就是要讓training set上表現差，讓testing set上表現好</p>
+</blockquote>
+<p> <strong>&lt;注意&gt; testing的時候不做dropout</strong></p>
+<p> <strong>dropout可以視為是一種終極的ensemble方法</strong>，每次training的時候都是拿一個minibatch來做一次update，而每個neuron都是drop或不drop，所以會有很多種組合來訓練。</p>
+</li>
+</ol>
+<p>當network很接近linaer的時候，dropout得到的表現會比較好，而這就是為什麼我們常常會把ReLU、Maxout的network拿來與Dropout配合使用，因為ReLU、Maxout也是接近於linear的。</p>
+<p><img src="https://i.imgur.com/NW6I3sW.png"></p>
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h2><p><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=Dr-WRlEFefw&list=PLJV_el3uVTsPy9oCRY30oBPNLCo89yu49&index=11&t=4s">ML Lecture 6: Brief Introduction of Deep Learning</a><br><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=ibJpTrp5mcE&list=PLJV_el3uVTsPy9oCRY30oBPNLCo89yu49&index=12">ML Lecture 7: Backpropagation</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/27/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E6%AD%A3%E8%A6%8F%E5%8C%96-Regularization/" rel="prev" title="機器學習-正規化(Regularization)">
+      <i class="fa fa-chevron-left"></i> 機器學習-正規化(Regularization)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/27/D3-js-%E8%B3%87%E6%96%99%E8%A6%96%E8%A6%BA%E5%8C%96%E4%B9%8B%E5%89%8D%E7%AB%AF%E7%A5%9E%E5%99%A8/" rel="next" title="[D3.js] 資料視覺化之前端神器">
+      [D3.js] 資料視覺化之前端神器 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Deep-Learning"><span class="nav-number">1.</span> <span class="nav-text">[Deep Learning]</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Step1-Build-Neural-Network"><span class="nav-number">1.1.</span> <span class="nav-text">Step1. Build Neural Network</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step2-Goodness-of-function"><span class="nav-number">1.2.</span> <span class="nav-text">Step2. Goodness of function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step3-Pick-the-best-function"><span class="nav-number">1.3.</span> <span class="nav-text">Step3. Pick the best function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#deep-learning%E8%88%87machine-learning%E7%9A%84%E5%B7%AE%E7%95%B0"><span class="nav-number">1.4.</span> <span class="nav-text">[deep learning與machine learning的差異]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Backpropagation-%E5%8F%8D%E5%90%91%E5%82%B3%E6%92%AD"><span class="nav-number">1.5.</span> <span class="nav-text">[Backpropagation 反向傳播]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tips-for-deep-learning"><span class="nav-number">1.6.</span> <span class="nav-text">[Tips for deep learning]</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%8F%9B%E6%96%B0%E7%9A%84activation-function"><span class="nav-number">1.6.1.</span> <span class="nav-text">1. 換新的activation function</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">2.</span> <span class="nav-text">參考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MaDi"
+      src="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DysonMa" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DysonMa" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:madihsiang@gmail.com" title="E-Mail → mailto:madihsiang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/marc_de_shawn" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;marc_de_shawn" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">若要轉載文章，煩請註明作者名稱MaDi與原始連結</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="訪客總數">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="總瀏覽次數">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

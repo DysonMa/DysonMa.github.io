@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dysonma.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="談到AI，不外乎是機器學習(Machine Learning)和深度學習(Deep Learning)，機器學習主要是以演算法來達到人工智慧的目的，過程牽涉到許多數學，為了讓自己不要只是會呼叫套件，還得懂一點背後的數學，特別紀錄這篇網路上的教學，提供給未來的自己參考。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="機器學習(Machine learning)-數學整理">
+<meta property="og:url" content="https://dysonma.github.io/2021/01/27/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-Machine-learning-%E6%95%B8%E5%AD%B8%E6%95%B4%E7%90%86/index.html">
+<meta property="og:site_name" content="MaDi&#39;s Blog">
+<meta property="og:description" content="談到AI，不外乎是機器學習(Machine Learning)和深度學習(Deep Learning)，機器學習主要是以演算法來達到人工智慧的目的，過程牽涉到許多數學，為了讓自己不要只是會呼叫套件，還得懂一點背後的數學，特別紀錄這篇網路上的教學，提供給未來的自己參考。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/6UdUuSS.png">
+<meta property="og:image" content="https://i.imgur.com/KOsdnew.png">
+<meta property="og:image" content="https://i.imgur.com/iqM8dD2.png">
+<meta property="og:image" content="https://i.imgur.com/gyyYK8t.png">
+<meta property="og:image" content="https://i.imgur.com/8mrI0Cb.png">
+<meta property="og:image" content="https://i.imgur.com/P7GpAeM.png">
+<meta property="og:image" content="https://i.imgur.com/VsEC3Pp.png">
+<meta property="og:image" content="https://i.imgur.com/fkvaHFY.png">
+<meta property="og:image" content="https://i.imgur.com/ZhZ0jX6.png">
+<meta property="og:image" content="https://i.imgur.com/NI4E5Ll.png">
+<meta property="og:image" content="https://i.imgur.com/yVivpyG.png">
+<meta property="og:image" content="https://i.imgur.com/abS7zW3.png">
+<meta property="og:image" content="https://i.imgur.com/ykTJTRH.png">
+<meta property="article:published_time" content="2021-01-27T13:19:15.000Z">
+<meta property="article:modified_time" content="2021-01-27T14:05:31.700Z">
+<meta property="article:author" content="MaDi">
+<meta property="article:tag" content="python,AI,學習紀錄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/6UdUuSS.png">
+
+<link rel="canonical" href="https://dysonma.github.io/2021/01/27/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-Machine-learning-%E6%95%B8%E5%AD%B8%E6%95%B4%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>機器學習(Machine learning)-數學整理 | MaDi's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MaDi's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一個紀錄自己在轉職軟體工程師路上的學習小空間</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://dysonma.github.io/2021/01/27/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-Machine-learning-%E6%95%B8%E5%AD%B8%E6%95%B4%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+      <meta itemprop="name" content="MaDi">
+      <meta itemprop="description" content="持續學習新技術，反走過必留下痕跡">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MaDi's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          機器學習(Machine learning)-數學整理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2021-01-27 21:19:15 / 修改時間：22:05:31" itemprop="dateCreated datePublished" datetime="2021-01-27T21:19:15+08:00">2021-01-27</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92/" itemprop="url" rel="index"><span itemprop="name">機器學習/深度學習</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="閱讀次數" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">閱讀次數：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>談到AI，不外乎是機器學習(Machine Learning)和深度學習(Deep Learning)，機器學習主要是以演算法來達到人工智慧的目的，過程牽涉到許多數學，為了讓自己不要只是會呼叫套件，還得懂一點背後的數學，特別紀錄這篇網路上的教學，提供給未來的自己參考。</p>
+</blockquote>
+<a id="more"></a>
+
+
+<h2 id="感知器-Perceptron"><a href="#感知器-Perceptron" class="headerlink" title="感知器(Perceptron)"></a>感知器(Perceptron)</h2><h3 id="介紹"><a href="#介紹" class="headerlink" title="介紹:"></a>介紹:</h3><ol>
+<li>感知器又被稱為 <code>PLA(Perceptron Learning Algorithm)</code></li>
+<li>是機器學習中最早的演算法</li>
+<li>限制: 唯有在資料是<strong>線性可分</strong>的情況下能夠被正確地分類。也就是說在二維平面上可以被一條線切開，三維空間內可以被一個面所切開…</li>
+<li>是以生物的”神經元模型”為基礎所開發出來的演算法</li>
+</ol>
+<h3 id="數學"><a href="#數學" class="headerlink" title="數學:"></a>數學:</h3><p><img src="https://i.imgur.com/6UdUuSS.png"></p>
+<p>把不等式右邊的threshold移到左邊，並以”某個值”來表示他，為了配合整個式子的符號，這邊就用w0*x0來表示，但是 x0永遠等於1。</p>
+<p>因此，整個不等式最後長這樣:</p>
+<p><img src="https://i.imgur.com/KOsdnew.png"></p>
+<p>也就是說改成用&gt;0或是&lt;0來區分分類的結果。而式子裡面的 <strong>權重wi正是模型要不斷訓練才能得到的資訊，也就是為什麼我們要訓練模型的原因。</strong></p>
+<p>而這個不等式判斷大於零還是小於零來做為分類結果的規則，就是激勵函式(activation function)</p>
+<p>激勵函式在做的事情就是</p>
+<p><img src="https://i.imgur.com/iqM8dD2.png"></p>
+<p>回頭看這個不等式，其實就是一個平面，<strong>wi是權重，也是這個平面的法向量</strong>，所以<strong>我們在訓練模型的過程中就是去決定一個最佳的法向量，也就是決定一個最佳的平面，達到分類的成果。</strong></p>
+<p>接著，我們要定義預測錯誤的時候，該怎麼更新權重，Perceptron更新權重的規則是這樣:</p>
+<p><img src="https://i.imgur.com/gyyYK8t.png"></p>
+<p>當第一次分類的結果中有分錯的，在迭代第二次之前先更新權重，而這裡的<strong>y指的是理論上要分對的output是什麼，也就是所謂的正解。</strong></p>
+<h3 id="實例"><a href="#實例" class="headerlink" title="實例:"></a>實例:</h3><p>舉例來說，今天有個二分類問題，在二維平面上各自有一群data，我們希望找到一條線可以將它完美的切分開來:</p>
+<p>首先，第一步初始化權重，假設 w=[0, 0] (也可以隨意假設)，而 x = [1,2]，透過 wi*xi 計算完會得到0，因為&lt;=0，所以會把所有分類都分成-1，導致理論上要分成1的全部分錯。</p>
+<p>現在假設分錯的某一筆資料是 x = [3,10]，在迭代第二次之前要更新權重，所以</p>
+<p><img src="https://i.imgur.com/8mrI0Cb.png"></p>
+<p>更新完權重之後，就開始進行第二次迭代，重複數次之後…</p>
+<p>最終就會找到最佳的平面，將數據完美的切分開來。</p>
+<h3 id="限制"><a href="#限制" class="headerlink" title="限制:"></a>限制:</h3><ol>
+<li>perceptron停止的criteria是當所有error=0，也就是要全部分對才會停止迭代。如果資料無法線性可分割，就會無法停止，這也就是為何資料要線性才能使用perceptron的原因。</li>
+<li>只能完成分類，但無法知道分完之後各類別的機率是多少。(Logistic regression可解決)</li>
+</ol>
+<h2 id="羅吉斯回歸-Logistic-Regression"><a href="#羅吉斯回歸-Logistic-Regression" class="headerlink" title="羅吉斯回歸(Logistic Regression)"></a>羅吉斯回歸(Logistic Regression)</h2><h3 id="介紹-1"><a href="#介紹-1" class="headerlink" title="介紹:"></a>介紹:</h3><ol>
+<li>名稱雖然有回歸，但其實是分類</li>
+<li>概念與perceptron類同，僅差在有機率的概念引進</li>
+<li>解決perceptron只能知道分類結果卻不知道機率是多少的問題</li>
+</ol>
+<h3 id="數學-1"><a href="#數學-1" class="headerlink" title="數學:"></a>數學:</h3><p><img src="https://i.imgur.com/P7GpAeM.png"></p>
+<p>logistic regression採用的激勵函式跟perceptron不同，採用比較平滑的函數，如sigmoid就是一個例子。</p>
+<p><img src="https://i.imgur.com/VsEC3Pp.png"><br><img src="https://i.imgur.com/fkvaHFY.png"></p>
+<blockquote>
+<p>y值介於0~1<br>當z&gt;0，判斷成A的機率&gt;0.5<br>當z&lt;0，判斷成A的機率&lt;0.5</p>
+</blockquote>
+<h3 id="程式碼"><a href="#程式碼" class="headerlink" title="程式碼:"></a>程式碼:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from sklearn.linear_model import LogisticRegression</span><br><span class="line">lr &#x3D; LogisticRegression()</span><br><span class="line">lr.fit(X_train, Y_train)</span><br><span class="line"></span><br><span class="line">lr.predict(X_test)       #分類結果</span><br><span class="line">lr.predict_proba(X_test) #分類後的機率</span><br></pre></td></tr></table></figure>
+
+<h3 id="優點"><a href="#優點" class="headerlink" title="優點:"></a>優點:</h3><ol>
+<li>資料不需要線性可分</li>
+<li>可以獲得A類跟B類的機率</li>
+<li>實務上Logistic Regression執行速度非常快</li>
+</ol>
+<h3 id="缺點"><a href="#缺點" class="headerlink" title="缺點:"></a>缺點:</h3><p>線的切法不夠漂亮(SVM可以解決)</p>
+<h2 id="SVM"><a href="#SVM" class="headerlink" title="SVM"></a>SVM</h2><h3 id="介紹-2"><a href="#介紹-2" class="headerlink" title="介紹:"></a>介紹:</h3><ol>
+<li><code>SVM(Support Vector Machine)</code>，支援向量機</li>
+<li>不再受限於線性可分，可以做<strong>非線性的分類</strong></li>
+</ol>
+<h3 id="數學-2"><a href="#數學-2" class="headerlink" title="數學:"></a>數學:</h3><p>黑色虛線分別距離紅線左右距離k，虛線上的藍紅兩顆球X1,X2就是支援向量(Support vector)，目標是最大化中間的margin，margin的計算方式是計算X1-X2向量在W上的投影。</p>
+<p><img src="https://i.imgur.com/ZhZ0jX6.png"></p>
+<p>透過條件 <code>Y * (W * X) &lt;= k</code> 來計算來最大化margin。</p>
+<p><img src="https://i.imgur.com/NI4E5Ll.png"></p>
+<h3 id="程式碼-1"><a href="#程式碼-1" class="headerlink" title="程式碼:"></a>程式碼:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from sklearn.svm import SVC</span><br><span class="line">svm &#x3D; SVC(kernel&#x3D;&#39;linear&#39;, probability&#x3D;True)</span><br><span class="line">svm.fit(X_train, Y_train)</span><br><span class="line"></span><br><span class="line">svm.predict(X_test)        #分類結果</span><br><span class="line">svm.predict_proba(X_test)  #分類後的機率</span><br></pre></td></tr></table></figure>
+
+<h3 id="優點-1"><a href="#優點-1" class="headerlink" title="優點:"></a>優點:</h3><ol>
+<li>kernel可以選擇線性或非線性</li>
+<li>可以得到分類後的機率大小</li>
+</ol>
+<h3 id="缺點-1"><a href="#缺點-1" class="headerlink" title="缺點:"></a>缺點:</h3><p>效能不好，因為時間複雜度為 O(n^2)，當資料量過多的時候會執行較慢。</p>
+<h2 id="決策樹-Decision-Tree-、隨機森林-Random-Forest"><a href="#決策樹-Decision-Tree-、隨機森林-Random-Forest" class="headerlink" title="決策樹(Decision Tree)、隨機森林(Random Forest)"></a>決策樹(Decision Tree)、隨機森林(Random Forest)</h2><h3 id="介紹-3"><a href="#介紹-3" class="headerlink" title="介紹:"></a>介紹:</h3><ol>
+<li>決策樹是透過一層一層的問題來分類答案，具有更強的解釋性</li>
+<li>執行效率高的監督式機器學習模型</li>
+<li>可以做分類與回歸</li>
+<li>隨機森林是多個決策樹組合而成的，應用ensemble的概念將許多弱的機器學習模型結合起來建構成一個較強的模型，比較不會有overfitting的問題</li>
+</ol>
+<p><img src="https://i.imgur.com/yVivpyG.png"><br><a target="_blank" rel="noopener" href="https://chtseng.wordpress.com/2017/02/10/%E6%B1%BA%E7%AD%96%E6%A8%B9-decision-trees/">圖片來源</a></p>
+<h3 id="數學-3"><a href="#數學-3" class="headerlink" title="數學:"></a>數學:</h3><p>計算資訊量的公式有兩種:</p>
+<ol>
+<li>熵(Entropy)</li>
+<li>Gini(Gini Impurity)</li>
+</ol>
+<p>它們的原理都是計算所謂的Information Gain，將較高同質性的資料放置於相同的類別，以產生各個節點。Entropy代表某個資料集的乾淨程度，當資料愈乾淨，則Entropy=0，反之，當資料很混亂，則Entropy=1。</p>
+<p><strong>1. Entropy:</strong></p>
+<p><img src="https://i.imgur.com/abS7zW3.png"></p>
+<p>p：成功的機率（或true的機率）<br>q：失敗的機率（或false的機率）</p>
+<p><strong>2. Gini</strong>:</p>
+<p><img src="https://i.imgur.com/ykTJTRH.png"></p>
+<p>p：成功的機率（或true的機率）<br>q：失敗的機率（或false的機率）</p>
+<h3 id="程式碼-2"><a href="#程式碼-2" class="headerlink" title="程式碼:"></a>程式碼:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 決策樹</span><br><span class="line">from sklearn.tree import DecisionTreeClassifier</span><br><span class="line">tree &#x3D; DecisionTreeClassifier(criterion &#x3D; &#39;entropy&#39;, random_state&#x3D;0) #entropy or gini</span><br><span class="line">tree.fit(X_train, Y_train)</span><br><span class="line">tree.predict(X_test)</span><br><span class="line">tree.score(X_test, Y_test)</span><br><span class="line"></span><br><span class="line"># 隨機森林</span><br><span class="line">from sklearn.ensemble import RandomForestClassifier</span><br><span class="line">forest &#x3D; RandomForestClassifier(criterion&#x3D;&#39;entropy&#39;, n_estimators&#x3D;10,random_state&#x3D;3,n_jobs&#x3D;2) </span><br><span class="line">forest.fit(X_train, Y_train)</span><br><span class="line"></span><br><span class="line"># 將樹的實際長相視覺化</span><br><span class="line">from sklearn.tree import export_graphviz</span><br><span class="line">export_graphviz(tree, out_file&#x3D;&#39;檔名.dot&#39;, feature_names&#x3D;[&#39;name1&#39;,&#39;name2&#39;...])</span><br></pre></td></tr></table></figure>
+<p><code>max_depth</code>: 主要是可以防止樹長得過高造成overfit</p>
+<p><code>n_estimators</code>: 樹木的多寡(你要創造幾個決策樹來投票)，通常越多越好，但運算時間也會拉長。</p>
+<p><code>n_jobs</code>: 主要是隨機森林支援平行運算，你可以決定要用你電腦的幾個核心去算，來加速運算速度</p>
+<h2 id="XGBoost"><a href="#XGBoost" class="headerlink" title="XGBoost"></a>XGBoost</h2><h3 id="介紹-4"><a href="#介紹-4" class="headerlink" title="介紹:"></a>介紹:</h3><ol>
+<li><code>XGBoost, eXtreme Gradient Boosting</code> (極限梯度提升)</li>
+<li>基於Gradient Boosted Decision Tree (GBDT)的改良與延伸</li>
+</ol>
+<h3 id="程式碼-3"><a href="#程式碼-3" class="headerlink" title="程式碼:"></a>程式碼:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">from xgboost import XGBClassifier</span><br><span class="line">xgb &#x3D; XGBClassifier()</span><br><span class="line">xgb.fit(X_train, Y_train)</span><br><span class="line">xgb.score(X_test, Y_test)</span><br></pre></td></tr></table></figure>
+
+<h2 id="參考"><a href="#參考" class="headerlink" title="參考:"></a>參考:</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://medium.com/jameslearningnote/%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90-%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E7%AC%AC3-2%E8%AC%9B-%E7%B7%9A%E6%80%A7%E5%88%86%E9%A1%9E-%E6%84%9F%E7%9F%A5%E5%99%A8-perceptron-%E4%BB%8B%E7%B4%B9-84d8b809f866">[資料分析&amp;機器學習] 第3.2講：線性分類-感知器(Perceptron) 介紹</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/jameslearningnote/%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90-%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E7%AC%AC3-3%E8%AC%9B-%E7%B7%9A%E6%80%A7%E5%88%86%E9%A1%9E-%E9%82%8F%E8%BC%AF%E6%96%AF%E5%9B%9E%E6%AD%B8-logistic-regression-%E4%BB%8B%E7%B4%B9-a1a5f47017e5">[資料分析&amp;機器學習] 第3.3講：線性分類-邏輯斯回歸(Logistic Regression) 介紹</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/jameslearningnote/%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90-%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E7%AC%AC3-4%E8%AC%9B-%E6%94%AF%E6%8F%B4%E5%90%91%E9%87%8F%E6%A9%9F-support-vector-machine-%E4%BB%8B%E7%B4%B9-9c6c6925856b">[資料分析&amp;機器學習] 第3.4講：支援向量機(Support Vector Machine)介紹</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/jameslearningnote/%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90-%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E7%AC%AC3-5%E8%AC%9B-%E6%B1%BA%E7%AD%96%E6%A8%B9-decision-tree-%E4%BB%A5%E5%8F%8A%E9%9A%A8%E6%A9%9F%E6%A3%AE%E6%9E%97-random-forest-%E4%BB%8B%E7%B4%B9-7079b0ddfbda">[資料分析&amp;機器學習] 第3.5講 : 決策樹(Decision Tree)以及隨機森林(Random Forest)介紹</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/jameslearningnote/%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90-%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E7%AC%AC5-2%E8%AC%9B-kaggle%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92%E7%AB%B6%E8%B3%BD%E7%A5%9E%E5%99%A8xgboost%E4%BB%8B%E7%B4%B9-1c8f55cffcc">[資料分析&amp;機器學習] 第5.2講: Kaggle機器學習競賽神器XGBoost介紹</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/27/%E5%A0%B1%E5%90%8D%E7%B6%B2%E7%AB%99%E5%B0%88%E6%A1%88%E5%BF%83%E5%BE%97/" rel="prev" title="[Node.js+Firebase] 報名網站專案心得">
+      <i class="fa fa-chevron-left"></i> [Node.js+Firebase] 報名網站專案心得
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/27/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E6%AD%A3%E8%A6%8F%E5%8C%96-Regularization/" rel="next" title="機器學習-正規化(Regularization)">
+      機器學習-正規化(Regularization) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%84%9F%E7%9F%A5%E5%99%A8-Perceptron"><span class="nav-number">1.</span> <span class="nav-text">感知器(Perceptron)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%B4%B9"><span class="nav-number">1.1.</span> <span class="nav-text">介紹:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B8%E5%AD%B8"><span class="nav-number">1.2.</span> <span class="nav-text">數學:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%A6%E4%BE%8B"><span class="nav-number">1.3.</span> <span class="nav-text">實例:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%90%E5%88%B6"><span class="nav-number">1.4.</span> <span class="nav-text">限制:</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BE%85%E5%90%89%E6%96%AF%E5%9B%9E%E6%AD%B8-Logistic-Regression"><span class="nav-number">2.</span> <span class="nav-text">羅吉斯回歸(Logistic Regression)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%B4%B9-1"><span class="nav-number">2.1.</span> <span class="nav-text">介紹:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B8%E5%AD%B8-1"><span class="nav-number">2.2.</span> <span class="nav-text">數學:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">2.3.</span> <span class="nav-text">程式碼:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%84%AA%E9%BB%9E"><span class="nav-number">2.4.</span> <span class="nav-text">優點:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E9%BB%9E"><span class="nav-number">2.5.</span> <span class="nav-text">缺點:</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SVM"><span class="nav-number">3.</span> <span class="nav-text">SVM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%B4%B9-2"><span class="nav-number">3.1.</span> <span class="nav-text">介紹:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B8%E5%AD%B8-2"><span class="nav-number">3.2.</span> <span class="nav-text">數學:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC-1"><span class="nav-number">3.3.</span> <span class="nav-text">程式碼:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%84%AA%E9%BB%9E-1"><span class="nav-number">3.4.</span> <span class="nav-text">優點:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E9%BB%9E-1"><span class="nav-number">3.5.</span> <span class="nav-text">缺點:</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%BA%E7%AD%96%E6%A8%B9-Decision-Tree-%E3%80%81%E9%9A%A8%E6%A9%9F%E6%A3%AE%E6%9E%97-Random-Forest"><span class="nav-number">4.</span> <span class="nav-text">決策樹(Decision Tree)、隨機森林(Random Forest)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%B4%B9-3"><span class="nav-number">4.1.</span> <span class="nav-text">介紹:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B8%E5%AD%B8-3"><span class="nav-number">4.2.</span> <span class="nav-text">數學:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC-2"><span class="nav-number">4.3.</span> <span class="nav-text">程式碼:</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XGBoost"><span class="nav-number">5.</span> <span class="nav-text">XGBoost</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%B4%B9-4"><span class="nav-number">5.1.</span> <span class="nav-text">介紹:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC-3"><span class="nav-number">5.2.</span> <span class="nav-text">程式碼:</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">參考:</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MaDi"
+      src="/images/%E5%A4%A7%E9%A0%AD%E8%B2%BC.jpg">
+  <p class="site-author-name" itemprop="name">MaDi</p>
+  <div class="site-description" itemprop="description">持續學習新技術，反走過必留下痕跡</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DysonMa" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DysonMa" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:madihsiang@gmail.com" title="E-Mail → mailto:madihsiang@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/marc_de_shawn" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;marc_de_shawn" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">若要轉載文章，煩請註明作者名稱MaDi與原始連結</span>
+</div>
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="訪客總數">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="總瀏覽次數">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
